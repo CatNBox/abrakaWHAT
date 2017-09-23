@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>frames</key>
+        <dict>
+            <key>ms1_yongyong.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{69,1},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>135 91 69 91 69 1 135 1</string>
+            </dict>
+            <key>ms2_bangrang.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{1,1},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>67 91 1 91 1 1 67 1</string>
+            </dict>
+            <key>ms3_wind.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{1,93},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>67 183 1 183 1 93 67 93</string>
+            </dict>
+            <key>ms4_booung.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{1,185},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>67 275 1 275 1 185 67 185</string>
+            </dict>
+            <key>ms5_bunpok.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{1,277},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>67 367 1 367 1 277 67 277</string>
+            </dict>
+            <key>ms6_nungang.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{69,277},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>135 367 69 367 69 277 135 277</string>
+            </dict>
+            <key>ms7_buljack.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{69,93},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>135 183 69 183 69 93 135 93</string>
+            </dict>
+            <key>ms8_postion.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{69,185},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>135 275 69 275 69 185 135 185</string>
+            </dict>
+            <key>ms_bg.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{66,90}</string>
+                <key>spriteSourceSize</key>
+                <string>{66,90}</string>
+                <key>textureRect</key>
+                <string>{{1,369},{66,90}}</string>
+                <key>textureRotated</key>
+                <false/>
+                <key>triangles</key>
+                <string>1 2 3 0 1 3</string>
+                <key>vertices</key>
+                <string>66 90 0 90 0 0 66 0</string>
+                <key>verticesUV</key>
+                <string>67 459 1 459 1 369 67 369</string>
+            </dict>
+        </dict>
+        <key>metadata</key>
+        <dict>
+            <key>format</key>
+            <integer>3</integer>
+            <key>pixelFormat</key>
+            <string>RGBA8888</string>
+            <key>premultiplyAlpha</key>
+            <false/>
+            <key>realTextureFileName</key>
+            <string>magicStones.png</string>
+            <key>size</key>
+            <string>{136,460}</string>
+            <key>smartupdate</key>
+            <string>$TexturePacker:SmartUpdate:511441af1e0fc91a0461e74e1451b44b:da1fa170da6171519b6d4693ed0266a7:599871f6c681e85fca1d86e820ee36fd$</string>
+            <key>textureFileName</key>
+            <string>magicStones.png</string>
+        </dict>
+    </dict>
+</plist>
