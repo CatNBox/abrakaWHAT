@@ -16,6 +16,10 @@ bool gameRoomObjLayer::init()
 	uiListener = EventListenerCustom::create("initRound", 
 		CC_CALLBACK_0(gameRoomObjLayer::initRound,this));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(uiListener, this);
+	
+	uiListener = EventListenerCustom::create("checkOwnedMagic",
+		CC_CALLBACK_1(gameRoomObjLayer::checkOwnedMagic, this));
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(uiListener, this);
 
 	//count option value load
 	playerCnt = gameFlowManager::getInstance()->getPlayerCount();
@@ -93,17 +97,79 @@ bool gameRoomObjLayer::init()
 	initRound();
 	
 	//draw update set
-	this->schedule(SEL_SCHEDULE(&gameRoomObjLayer::screenUpdate));
+	this->schedule(SEL_SCHEDULE(&gameRoomObjLayer::layerUpdate));
 
 	return true;
 }
 
-void gameRoomObjLayer::screenUpdate(float d)
+void gameRoomObjLayer::layerUpdate(float d)
 {
-	//remove All
-	this->removeAllChildren();
-	//std::cout << "removeAllChildren before screenUpdate" << std::endl;
+	//update object state
+	dataUpdate();
 
+	//remove All object
+	this->removeAllChildren();
+
+	//update screen
+	seenCheckUpdate();
+	stoneObjUpdate();
+}
+
+void gameRoomObjLayer::dataUpdate()
+{
+}
+
+void gameRoomObjLayer::seenCheckUpdate()
+{
+	//205,400 / 16*32 / y+40 x+23 / +35
+	std::string arrNotSeen[] = { 
+		"ms1_notSeen.png",
+		"ms2_notSeen.png",
+		"ms3_notSeen.png",
+		"ms4_notSeen.png",
+		"ms5_notSeen.png",
+		"ms6_notSeen.png",
+		"ms7_notSeen.png",
+		"ms8_notSeen.png"
+	};
+	std::string arrSeen[] = {
+		"ms1_seen.png",
+		"ms2_seen.png",
+		"ms3_seen.png",
+		"ms4_seen.png",
+		"ms5_seen.png",
+		"ms6_seen.png",
+		"ms7_seen.png",
+		"ms8_seen.png"
+	};
+	
+	Sprite* seenMs;
+	int seenObjNum = 0;
+	for (auto &i : arrStones)
+	{
+		int msNum = i->getMagic() - 1;
+
+		int defaultX = 205, defaultY = 400, recalibX = 23, recalibY = 40;
+		if (msNum > 3)
+			defaultX = 205 + recalibX * 3 + 35;
+
+		if (seenObjNum > msNum)
+			seenObjNum = 0;
+
+		if (i->getState() == gameMetaData::stoneState::discard)
+			seenMs = Sprite::createWithSpriteFrameName(arrSeen[msNum]);
+		else
+			seenMs = Sprite::createWithSpriteFrameName(arrNotSeen[msNum]);
+
+		seenMs->setPosition(Vec2(defaultX + seenObjNum * recalibX, defaultY + (msNum % 4) * recalibY));
+		this->addChild(seenMs);
+
+		seenObjNum++;
+	}
+}
+
+void gameRoomObjLayer::stoneObjUpdate()
+{
 	//플레이어 덱 검사후 출력설정
 	for (int i = 0; i < arrPlayers.size(); i++)
 	{
@@ -147,7 +213,7 @@ void gameRoomObjLayer::screenUpdate(float d)
 			//setPosition and rotation
 			if (i == 1) {
 				tempSpr->setRotation(90.0f);
-				tempSpr->setPosition(Vec2(defaultX , defaultY + recalibration));
+				tempSpr->setPosition(Vec2(defaultX, defaultY + recalibration));
 			}
 			else if (i == 3) {
 				tempSpr->setRotation(-90.0f);
@@ -156,43 +222,20 @@ void gameRoomObjLayer::screenUpdate(float d)
 			else {
 				tempSpr->setPosition(Vec2(defaultX + recalibration, defaultY));
 			}
-			
+
 			this->addChild(tempSpr);
 		}
 	}
-	//205,400 / 16*32 / y+40 x+20
+}
 
-	auto seenMS5 = Sprite::createWithSpriteFrameName("ms5_seen.png");
-	seenMS5->setPosition(Vec2(205, 400));
-	this->addChild(seenMS5);
+void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
+{
+	int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
+	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
+}
 
-	auto seenMS5_1 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_1->setPosition(Vec2(205, 440));
-	this->addChild(seenMS5_1);
-
-	auto seenMS5_2 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_2->setPosition(Vec2(205, 480));
-	this->addChild(seenMS5_2);
-
-	auto seenMS5_3 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_3->setPosition(Vec2(205, 520));
-	this->addChild(seenMS5_3);
-
-	auto seenMS5_4 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_4->setPosition(Vec2(225, 440));
-	this->addChild(seenMS5_4);
-
-	auto seenMS5_5 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_5->setPosition(Vec2(245, 440));
-	this->addChild(seenMS5_5);
-
-	auto seenMS5_6 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_6->setPosition(Vec2(225, 480));
-	this->addChild(seenMS5_6);
-
-	auto seenMS5_7 = Sprite::createWithSpriteFrame(seenMS5->getSpriteFrame());
-	seenMS5_7->setPosition(Vec2(225, 520));
-	this->addChild(seenMS5_7);
+void gameRoomObjLayer::activeMagic(magicStone * activeStone)
+{
 }
 
 void gameRoomObjLayer::initRound()

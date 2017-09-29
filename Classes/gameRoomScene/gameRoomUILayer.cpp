@@ -32,6 +32,7 @@ bool gameRoomUILayer::init()
 
 void gameRoomUILayer::initUI()
 {
+	auto sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprYongyong = Sprite::createWithSpriteFrameName("ms1_yongyong.png");
 	if (sprYongyong == nullptr)
 	{
@@ -39,11 +40,10 @@ void gameRoomUILayer::initUI()
 		std::abort();
 	}
 	auto btnYongyong = MenuItemImage::create();
-	//btnYongyong->setNormalSpriteFrame(sprYongyong);
 
 	btnYongyong->initWithNormalSprite(
 		sprYongyong,
-		sprYongyong,
+		sprStoneBackward,
 		sprYongyong,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -52,6 +52,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprBangrang = Sprite::createWithSpriteFrameName("ms2_bangrang.png");
 	if (sprBangrang == nullptr)
 	{
@@ -61,7 +62,7 @@ void gameRoomUILayer::initUI()
 	auto btnBangrang = MenuItemImage::create();
 	btnBangrang->initWithNormalSprite(
 		sprBangrang,
-		sprBangrang,
+		sprStoneBackward,
 		sprBangrang,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -70,6 +71,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprWind = Sprite::createWithSpriteFrameName("ms3_wind.png");
 	if (sprWind == nullptr)
 	{
@@ -79,7 +81,7 @@ void gameRoomUILayer::initUI()
 	auto btnWind = MenuItemImage::create();
 	btnWind->initWithNormalSprite(
 		sprWind,
-		sprWind,
+		sprStoneBackward,
 		sprWind,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -88,6 +90,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprBooung = Sprite::createWithSpriteFrameName("ms4_booung.png");
 	if (sprBooung == nullptr)
 	{
@@ -97,7 +100,7 @@ void gameRoomUILayer::initUI()
 	auto btnBooung = MenuItemImage::create();
 	btnBooung->initWithNormalSprite(
 		sprBooung,
-		sprBooung,
+		sprStoneBackward,
 		sprBooung,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -106,6 +109,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprBunpok = Sprite::createWithSpriteFrameName("ms5_bunpok.png");
 	if (sprBunpok == nullptr)
 	{
@@ -115,7 +119,7 @@ void gameRoomUILayer::initUI()
 	auto btnBunpok = MenuItemImage::create();
 	btnBunpok->initWithNormalSprite(
 		sprBunpok,
-		sprBunpok,
+		sprStoneBackward,
 		sprBunpok,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -124,6 +128,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprNungang = Sprite::createWithSpriteFrameName("ms6_nungang.png");
 	if (sprNungang == nullptr)
 	{
@@ -133,7 +138,7 @@ void gameRoomUILayer::initUI()
 	auto btnNungang = MenuItemImage::create();
 	btnNungang->initWithNormalSprite(
 		sprNungang,
-		sprNungang,
+		sprStoneBackward,
 		sprNungang,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -142,6 +147,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprBuljak = Sprite::createWithSpriteFrameName("ms7_buljack.png");
 	if (sprBuljak == nullptr)
 	{
@@ -151,7 +157,7 @@ void gameRoomUILayer::initUI()
 	auto btnBuljak = MenuItemImage::create();
 	btnBuljak->initWithNormalSprite(
 		sprBuljak,
-		sprBuljak,
+		sprStoneBackward,
 		sprBuljak,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -160,6 +166,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
 	auto sprPostion = Sprite::createWithSpriteFrameName("ms8_postion.png");
 	if (sprPostion == nullptr)
 	{
@@ -169,7 +176,7 @@ void gameRoomUILayer::initUI()
 	auto btnPostion = MenuItemImage::create();
 	btnPostion->initWithNormalSprite(
 		sprPostion,
-		sprPostion,
+		sprStoneBackward,
 		sprPostion,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
@@ -230,6 +237,9 @@ void gameRoomUILayer::initUI()
 
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
+	EventCustom checkEvent("checkOwnedMagic");
+	checkEvent.setUserData((void*)magicStoneNumber);
+	Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
 }
 
 void gameRoomUILayer::returnMainMenu()

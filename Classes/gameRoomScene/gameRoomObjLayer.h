@@ -11,7 +11,12 @@ public:
 
 	CREATE_FUNC(gameRoomObjLayer);
 private:
-	void screenUpdate(float d);
+	void layerUpdate(float d);
+	void dataUpdate();
+	void seenCheckUpdate();
+	void stoneObjUpdate();
+	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
+	void activeMagic(magicStone* activeStone);
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
 	void setStartOrder();

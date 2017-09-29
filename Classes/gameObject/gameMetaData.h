@@ -26,7 +26,8 @@ namespace gameMetaData
 		owned,
 		secret,
 		ownedSecret,
-		discard
+		discard,
+		active
 	};
 
 	enum curScene
