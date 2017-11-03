@@ -15,8 +15,10 @@ private:
 	void dataUpdate();
 	void seenCheckUpdate();
 	void stoneObjUpdate();
+	void curLPUpdate();
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void activeMagic(magicStone* activeStone);
+	void passTurn();
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
 	void setStartOrder();
@@ -37,11 +39,15 @@ private:
 	int postionCnt;
 	int secretCnt;
 
+	int seenCnt[8];
+
 	int stoneMinCnt = 0;
 	int stoneMaxCnt;
 
-	int starter;
-	//자기자신이 항상 1번 플레이어 arrPlayer[0]
+	int starterNum;
+	int curPlayerNum;
+	int myPlayerNum = 0;
+
 	std::vector<magicStone*> arrStones;
 	std::vector<player*> arrPlayers;
 

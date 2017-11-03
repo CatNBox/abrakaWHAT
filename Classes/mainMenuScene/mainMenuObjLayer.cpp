@@ -48,6 +48,10 @@ bool mainMenuObjLayer::init()
 	mainMenu->alignItemsVerticallyWithPadding(2.0f);
 	mainMenu->setPosition(Vec2(384, 190));
 	btnSingle->setPosition(Vec2(0, 450));
+
+	//포폴용코드
+	btnHost->setEnabled(false);
+	btnJoin->setEnabled(false);
 #endif
 
 	this->addChild(mainMenu);

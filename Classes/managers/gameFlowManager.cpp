@@ -25,7 +25,7 @@ gameFlowManager::gameFlowManager()
 void gameFlowManager::changeScene2MainMenu()
 {
 	log("### gameFlowManager::changeScene2MainMenu in");
-	auto mainMenuScene = TransitionFade::create(2.0f, mainMenuScene::createScene());
+	auto mainMenuScene = TransitionFade::create(1.0f, mainMenuScene::createScene());
 	Director::getInstance()->replaceScene(mainMenuScene);
 	curSceneState = gameMetaData::curScene::mainMenuScene;
 }
@@ -46,7 +46,7 @@ void gameFlowManager::changeScene2SingleMode()
 	setBuljakCount(7);
 	setPostionCount(8);
 
-	auto singleModeScene = TransitionSlideInT::create(1.2f, gameRoomScene::createScene());
+	auto singleModeScene = TransitionSlideInT::create(0.8f, gameRoomScene::createScene());
 	Director::getInstance()->replaceScene(singleModeScene);
 	curSceneState = gameMetaData::curScene::gameRoom;
 }
@@ -65,8 +65,58 @@ void gameFlowManager::preloadSprites()
 	auto spriteCache = SpriteFrameCache::getInstance();
 	spriteCache->addSpriteFramesWithFile("magicStones.plist","magicStones.png");
 	spriteCache->addSpriteFramesWithFile("seenChecker.plist", "seenChecker.png");
-	//TextureCache::addImageAsync
-	//SpriteFrame::
+	
+	auto tempSpr = Sprite::create("UISprite/spr_number.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "spr_number.png");
+}
+
+cocos2d::Sprite * gameFlowManager::getNumSprite(const int num)
+{
+	Sprite* tempSpr;
+	switch (num)
+	{
+	case 1:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 2:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 3:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 4:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 5:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 6:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 7:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 8:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	case 9:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	default:
+		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		return tempSpr;
+	}
+	return nullptr;
 }
 
 void gameFlowManager::setPlayerCount(int cnt)

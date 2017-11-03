@@ -2,7 +2,7 @@
 #include "cocos2d.h"
 #include "gameObject\gameMetaData.h"
 
-#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
+#define CURRENT_BUILD_MODE RELEASE_MODE_BUILD
 
 class networkManager;
 class soundManager;
@@ -11,7 +11,6 @@ class gameFlowManager:public cocos2d::Object
 {
 public:
 	static gameFlowManager* getInstance();
-	
 	gameFlowManager();
 
 	void changeScene2MainMenu();
@@ -20,10 +19,12 @@ public:
 	void changeScene2JoinMode();
 
 	void preloadSprites();
+	cocos2d::Sprite* getNumSprite(const int num); //0-9 only
 
 	void setPlayerCount(int cnt);
 	int getPlayerCount() const;
 
+	//for gameOption
 	void setYongyongCount(int cnt);
 	int getYongyongCount() const;
 	void setBangrangCount(int cnt);
@@ -46,11 +47,6 @@ public:
 	void endGame();
 
 private:
-	//gameFlowManager();
-	//SpriteFrameCache* spriteCache;
-
-	const char* MY_IP;
-
 	int playerCount;
 	int yongyongCnt;
 	int bangrangCnt;

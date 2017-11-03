@@ -36,4 +36,10 @@ namespace gameMetaData
 		mainMenuScene = 1,
 		gameRoom
 	};
+
+	enum npcState
+	{
+		wait,
+		turnOn
+	};
 }

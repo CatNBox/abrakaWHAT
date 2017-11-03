@@ -1,6 +1,7 @@
 #include "gameRoomUILayer.h"
 #include "managers\gameFlowManager.h"
 #include "gameObject\gameMetaData.h"
+#include <iostream>
 
 using namespace cocos2d;
 
@@ -11,6 +12,7 @@ bool gameRoomUILayer::init()
 		return false;
 	}
 
+	//키보드 인벤트 등록
 	keyListener = EventListenerKeyboard::create();
 	if (keyListener != nullptr)
 	{
@@ -24,6 +26,44 @@ bool gameRoomUILayer::init()
 		log("### err ### gameRoomLayer::keyListener is nullptr ");
 		std::abort();
 	}
+
+	//각종 이벤트 디스패치
+	//패스버튼 및 선택ui 활성화
+	callBackListener = EventListenerCustom::create("choicerUIEnabled",
+		[=](EventCustom* event) {
+		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
+		btnPass->setEnabled(true);
+		magicChoicer->setEnabled(true);
+		this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
+
+	//턴이 넘어갈땐 패스버튼 및 선택ui 비활성화
+	callBackListener = EventListenerCustom::create("passTurn2NextUser",
+		[=](EventCustom* event) {
+		std::cout << " 패스 턴 " << std::endl;
+		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
+		btnPass->setEnabled(false);
+		magicChoicer->setEnabled(false);
+		this->setKeyboardEnabled(false);//키보드 이벤트 비활성화로 바꿀것
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
+
+	//내턴이 돌아오면 magicStone선택ui 활성화
+	callBackListener = EventListenerCustom::create("myTurn",
+		[=](EventCustom* event) {
+		magicChoicer->setEnabled(true);
+		this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
+
+	//라운드가 종료되면 라운드 숫자 UP
+	callBackListener = EventListenerCustom::create("roundUp",
+		[=](EventCustom* event) {
+		std::cout << " 라운드 업 " << std::endl;
+		roundNum++;
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
 	this->initUI();
 
@@ -233,10 +273,26 @@ void gameRoomUILayer::initUI()
 	seenCheckerBoard->setRotation(90.0f);
 
 	this->addChild(seenCheckerBoard);
+
+	setRound();
+}
+
+void gameRoomUILayer::setRound()
+{
+	std::cout << "라운드 업" << std::endl;
+	//라운드 50 710
+	auto roundSpr = gameFlowManager::getInstance()->getNumSprite(1);
+	roundSpr->setPosition(Vec2(50, 710));
+	roundSpr->setScale(0.8f);
+	this->addChild(roundSpr);
 }
 
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
+	//처리중 버튼메뉴 비활성화 - 이벤트 람다함수를 통해 활성화됨
+	magicChoicer->setEnabled(false);
+	this->setKeyboardEnabled(false);
+
 	EventCustom checkEvent("checkOwnedMagic");
 	checkEvent.setUserData((void*)magicStoneNumber);
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
@@ -257,35 +313,35 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{
-
+		checkMagic(gameMetaData::magicStones::yongyong);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_2)
 	{
-
+		checkMagic(gameMetaData::magicStones::bangrang);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_3)
 	{
-
+		checkMagic(gameMetaData::magicStones::wind);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_4)
 	{
-
+		checkMagic(gameMetaData::magicStones::booung);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_5)
 	{
-
+		checkMagic(gameMetaData::magicStones::bunpok);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_6)
 	{
-
+		checkMagic(gameMetaData::magicStones::nungang);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_7)
 	{
-
+		checkMagic(gameMetaData::magicStones::buljak);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_8)
 	{
-
+		checkMagic(gameMetaData::magicStones::postion);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_F5)
 	{
