@@ -65,42 +65,42 @@ bool gameRoomObjLayer::init()
 		magicStone *temp;
 		if (i < yongyongCnt)
 		{
-			temp = new ms_yongyong;
+			temp = new msYongyong;
 		}
 		else if (i < yongyongCnt 
 			+ bangrangCnt)
 		{
-			temp = new ms_bangrang;
+			temp = new msBangrang;
 		}
 		else if (i < yongyongCnt + bangrangCnt 
 			+ windCnt)
 		{
-			temp = new ms_wind;
+			temp = new msWind;
 		}
 		else if (i < yongyongCnt + bangrangCnt + windCnt 
 			+ booungCnt)
 		{
-			temp = new ms_booung;
+			temp = new msBooung;
 		}
 		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt 
 			+ bunpokCnt)
 		{
-			temp = new ms_bunpok;
+			temp = new msBunpok;
 		}
 		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt
 			+ nungangCnt)
 		{
-			temp = new ms_nungang;
+			temp = new msNungang;
 		}
 		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt
 			+ buljakCnt)
 		{
-			temp = new ms_buljak;
+			temp = new msBuljak;
 		}
 		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + buljakCnt
 			+ postionCnt)
 		{
-			temp = new ms_postion;
+			temp = new msPostion;
 		}
 
 		arrStones[i] = temp;

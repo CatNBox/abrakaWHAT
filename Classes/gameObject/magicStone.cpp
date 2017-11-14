@@ -24,34 +24,34 @@ magicStone::~magicStone()
 {
 }
 
-ms_yongyong::~ms_yongyong()
+msYongyong::~msYongyong()
 {
 }
 
-ms_bangrang::~ms_bangrang()
+msBangrang::~msBangrang()
 {
 }
 
-ms_wind::~ms_wind()
+msWind::~msWind()
 {
 }
 
-ms_booung::~ms_booung()
+msBooung::~msBooung()
 {
 }
 
-ms_bunpok::~ms_bunpok()
+msBunpok::~msBunpok()
 {
 }
 
-ms_nungang::~ms_nungang()
+msNungang::~msNungang()
 {
 }
 
-ms_buljak::~ms_buljak()
+msBuljak::~msBuljak()
 {
 }
 
-ms_postion::~ms_postion()
+msPostion::~msPostion()
 {
 }
