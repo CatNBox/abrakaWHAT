@@ -1,10 +1,5 @@
 #include "magicStone.h"
 
-void magicStone::init()
-{
-	state = gameMetaData::stoneState::notUse;
-}
-
 int magicStone::getMagic()
 {
 	return this->magic;

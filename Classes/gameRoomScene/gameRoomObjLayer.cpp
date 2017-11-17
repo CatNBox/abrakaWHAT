@@ -60,50 +60,65 @@ bool gameRoomObjLayer::init()
 
 	//create magicStones
 	arrStones.resize(stoneMaxCnt);
-	for (int i = 0; i < arrStones.size(); i++)
+	arrStones[0] = new msYongyong;
+	arrStones[yongyongCnt] = new msBangrang;
+	arrStones[yongyongCnt + bangrangCnt] = new msWind;
+	arrStones[yongyongCnt + bangrangCnt	+ windCnt] = new msBooung;
+	arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt] = new msBunpok;
+	arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt] = new msNungang;
+	arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt] = new msBuljak;
+	arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + buljakCnt] = new msPostion;
+	int prototypeIndex = 0;
+	for (int i = 0; i < (int)arrStones.size(); i++)
 	{
-		magicStone *temp;
+		if (arrStones[i] != nullptr)
+		{
+			prototypeIndex = i;
+			continue;
+		}
+		arrStones[i] = arrStones[prototypeIndex]->clone();
+
+		/*
 		if (i < yongyongCnt)
 		{
-			temp = new msYongyong;
+			arrStones[0 + i] 
+				= arrStones[0]->clone();
 		}
-		else if (i < yongyongCnt 
-			+ bangrangCnt)
+		if (i < bangrangCnt)
 		{
-			temp = new msBangrang;
+			arrStones[yongyongCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt 
-			+ windCnt)
+		if (i < windCnt)
 		{
-			temp = new msWind;
+			arrStones[yongyongCnt + bangrangCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt + windCnt 
-			+ booungCnt)
+		if (i < booungCnt)
 		{
-			temp = new msBooung;
+			arrStones[yongyongCnt + bangrangCnt + windCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt 
-			+ bunpokCnt)
+		if (i < bunpokCnt)
 		{
-			temp = new msBunpok;
+			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt
-			+ nungangCnt)
+		if (i < nungangCnt)
 		{
-			temp = new msNungang;
+			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt
-			+ buljakCnt)
+		if (i < buljakCnt)
 		{
-			temp = new msBuljak;
+			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + i] 
+				= arrStones[yongyongCnt]->clone;
 		}
-		else if (i < yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + buljakCnt
-			+ postionCnt)
+		if (i < postionCnt)
 		{
-			temp = new msPostion;
-		}
-
-		arrStones[i] = temp;
+			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + buljakCnt + i] 
+				= arrStones[yongyongCnt]->clone;
+		}*/
 	}
 
 	std::cout << "arrStones size : " << arrStones.size() << std::endl;
@@ -201,7 +216,7 @@ void gameRoomObjLayer::seenCheckUpdate()
 void gameRoomObjLayer::stoneObjUpdate()
 {
 	//플레이어 덱 검사후 출력설정
-	for (int i = 0; i < arrPlayers.size(); i++)
+	for (int i = 0; i < (int)arrPlayers.size(); i++)
 	{
 		//basic screen size 768
 		auto curPlayer = arrPlayers[i];
@@ -290,7 +305,7 @@ void gameRoomObjLayer::curLPUpdate()
 {
 	//p0 370 330, p1 140 390, p2 380 620, p3 630 390
 
-	for (int i = 0; i < arrPlayers.size(); i++)
+	for (int i = 0; i < (int)arrPlayers.size(); i++)
 	{
 		std::string tempStrLP = std::to_string(arrPlayers[i]->getCurLP());
 		auto tempLabelLP = Label::createWithTTF(tempStrLP, "fonts/Marker Felt.ttf", 36);

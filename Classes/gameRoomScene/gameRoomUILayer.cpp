@@ -34,7 +34,7 @@ bool gameRoomUILayer::init()
 		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
 		btnPass->setEnabled(true);
 		magicChoicer->setEnabled(true);
-		this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+		//this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
@@ -45,7 +45,7 @@ bool gameRoomUILayer::init()
 		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
 		btnPass->setEnabled(false);
 		magicChoicer->setEnabled(false);
-		this->setKeyboardEnabled(false);//키보드 이벤트 비활성화로 바꿀것
+		//this->setKeyboardEnabled(false);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
@@ -53,7 +53,7 @@ bool gameRoomUILayer::init()
 	callBackListener = EventListenerCustom::create("myTurn",
 		[=](EventCustom* event) {
 		magicChoicer->setEnabled(true);
-		this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+		//this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
@@ -291,7 +291,7 @@ void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
 	//처리중 버튼메뉴 비활성화 - 이벤트 람다함수를 통해 활성화됨
 	magicChoicer->setEnabled(false);
-	this->setKeyboardEnabled(false);
+	//this->setKeyboardEnabled(false); //변경할것
 
 	EventCustom checkEvent("checkOwnedMagic");
 	checkEvent.setUserData((void*)magicStoneNumber);
