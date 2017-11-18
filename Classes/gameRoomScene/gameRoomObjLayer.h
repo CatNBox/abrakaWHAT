@@ -48,6 +48,8 @@ private:
 	int curPlayerNum;
 	int myPlayerNum = 0;
 
+	bool isChanged = true;
+
 	std::vector<magicStone*> arrStones;
 	std::vector<player*> arrPlayers;
 

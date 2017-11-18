@@ -76,49 +76,7 @@ bool gameRoomObjLayer::init()
 			prototypeIndex = i;
 			continue;
 		}
-		arrStones[i] = arrStones[prototypeIndex]->clone();
-
-		/*
-		if (i < yongyongCnt)
-		{
-			arrStones[0 + i] 
-				= arrStones[0]->clone();
-		}
-		if (i < bangrangCnt)
-		{
-			arrStones[yongyongCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < windCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < booungCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + windCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < bunpokCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < nungangCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < buljakCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}
-		if (i < postionCnt)
-		{
-			arrStones[yongyongCnt + bangrangCnt + windCnt + booungCnt + bunpokCnt + nungangCnt + buljakCnt + i] 
-				= arrStones[yongyongCnt]->clone;
-		}*/
+		arrStones[i] = arrStones[prototypeIndex]->clone();	//prototype pattern
 	}
 
 	std::cout << "arrStones size : " << arrStones.size() << std::endl;
@@ -137,13 +95,18 @@ void gameRoomObjLayer::layerUpdate(float d)
 	//update object state
 	dataUpdate();
 
-	//remove All object
-	this->removeAllChildren();
+	if (isChanged)
+	{
+		//remove All object
+		this->removeAllChildren();
 
-	//update screen
-	seenCheckUpdate();
-	stoneObjUpdate();
-	curLPUpdate();
+		//update screen
+		seenCheckUpdate();
+		stoneObjUpdate();
+		curLPUpdate();
+
+		isChanged = false;
+	}
 }
 
 void gameRoomObjLayer::dataUpdate()
@@ -331,6 +294,9 @@ void gameRoomObjLayer::curLPUpdate()
 //보유한 magicStone 체크이벤트
 void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 {
+	//임시코드
+	isChanged = true;
+
 	std::cout << "check Event in" << std::endl;
 	int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
 	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
@@ -359,6 +325,9 @@ void gameRoomObjLayer::activeMagic(magicStone * activeStone)
 
 void gameRoomObjLayer::passTurn()
 {
+	//임시코드
+	isChanged = true;
+
 	//current Player
 	auto curPlayer = arrPlayers[curPlayerNum];
 
@@ -418,6 +387,9 @@ void gameRoomObjLayer::passTurn()
 
 void gameRoomObjLayer::initRound()
 {
+	//임시코드
+	isChanged = true;
+
 	//0.각 객체 초기화
 	for (auto &i : arrStones)
 	{
@@ -500,6 +472,7 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 	{
 		checkArrStones();
 		std::cout << "All MagicStone is used" << std::endl;
+		//뽑을 카드가 없을 경우 예외설정
 		return nullptr;
 	}
 

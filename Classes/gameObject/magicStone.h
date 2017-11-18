@@ -2,20 +2,24 @@
 #include "cocos2d.h"
 #include "gameMetaData.h"
 
+#define stdAxis 384.0f
+
+/*----------------------------------------
+
+
+magicStone
+
+
+-----------------------------------------*/
 class magicStone : public cocos2d::Object
 {
 public:
 	int getMagic();
 	int getState();
 	void setState(gameMetaData::stoneState newState);
-	virtual void init()
-	{
-		state = gameMetaData::stoneState::notUse;
-	};
-	magicStone()
-	{
-		init();
-	};
+	void init();
+
+	magicStone() {};
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern
@@ -23,181 +27,172 @@ public:
 protected:
 	int magic = gameMetaData::magicStones::base;
 	int state = gameMetaData::stoneState::notUse;
+
+	float curX = stdAxis;
+	float curY = stdAxis;
+
+	float tX = stdAxis;
+	float tY = stdAxis;
+
+	cocos2d::Sprite* msTexture;
 };
 
+/*----------------------------------------
+
+
+msYongyong
+
+
+-----------------------------------------*/
 class msYongyong : public magicStone
 {
 public:
-	msYongyong()
-	{
-		cocos2d::log("@@@ create YONGYONG CLASS @@@");
-	};
-	msYongyong(const msYongyong& clon)
-	{
-		cocos2d::log("@@@ cloning YONGYONG CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msYongyong(*this);
-	};
+	msYongyong();
+	msYongyong(const msYongyong& clon);
 	~msYongyong();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::yongyong;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msBangrang
+
+
+-----------------------------------------*/
 class msBangrang : public magicStone
 {
 public:
-	msBangrang()
-	{
-		cocos2d::log("@@@ create BANGRANG CLASS @@@");
-	};
-	msBangrang(const msBangrang& clon)
-	{
-		cocos2d::log("@@@ cloning BANGRANG CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msBangrang(*this);
-	};
+	msBangrang();
+	msBangrang(const msBangrang& clon);
 	~msBangrang();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::bangrang;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msWind
+
+
+-----------------------------------------*/
 class msWind : public magicStone
 {
 public:
-	msWind()
-	{
-		cocos2d::log("@@@ create WIND CLASS @@@");
-	};
-	msWind(const msWind& clon)
-	{
-		cocos2d::log("@@@ cloning WIND CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msWind(*this);
-	};
+	msWind();
+	msWind(const msWind& clon);
 	~msWind();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::wind;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msBooung
+
+
+-----------------------------------------*/
 class msBooung : public magicStone
 {
 public:
-	msBooung()
-	{
-		cocos2d::log("@@@ create BOOUNG CLASS @@@");
-	};
-	msBooung(const msBooung& clon)
-	{
-		cocos2d::log("@@@ cloning BOOUNG CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msBooung(*this);
-	};
+	msBooung();
+	msBooung(const msBooung& clon);
 	~msBooung();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::booung;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msBunpok
+
+
+-----------------------------------------*/
 class msBunpok : public magicStone
 {
 public:
-	msBunpok()
-	{
-		cocos2d::log("@@@ create BUNPOK CLASS @@@");
-	};
-	msBunpok(const msBunpok& clon)
-	{
-		cocos2d::log("@@@ cloning BUNPOK CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msBunpok(*this);
-	};
+	msBunpok();
+	msBunpok(const msBunpok& clon);
 	~msBunpok();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::bunpok;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msNungang
+
+
+-----------------------------------------*/
 class msNungang : public magicStone
 {
 public:
-	msNungang()
-	{
-		cocos2d::log("@@@ create NUNGANG CLASS @@@");
-	};
-	msNungang(const msNungang& clon)
-	{
-		cocos2d::log("@@@ cloning NUNGANG CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msNungang(*this);
-	};
+	msNungang();
+	msNungang(const msNungang& clon);
 	~msNungang();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::nungang;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msBuljak
+
+
+-----------------------------------------*/
 class msBuljak : public magicStone
 {
 public:
-	msBuljak()
-	{
-		cocos2d::log("@@@ create BULJAK CLASS @@@");
-	};
-	msBuljak(const msBuljak& clon)
-	{
-		cocos2d::log("@@@ cloning BULJAK CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msBuljak(*this);
-	};
+	msBuljak();
+	msBuljak(const msBuljak& clon);
 	~msBuljak();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::buljak;
-	}
+	void init() ;
 };
+
+/*----------------------------------------
+
+
+msPostion
+
+
+-----------------------------------------*/
 class msPostion : public magicStone
 {
 public:
-	msPostion()
-	{
-		cocos2d::log("@@@ create POSTION CLASS @@@");
-	};
-	msPostion(const msPostion& clon)
-	{
-		cocos2d::log("@@@ cloning POSTION CLASS @@@");
-	};
-	magicStone* clone() override
-	{
-		return  new msPostion(*this);
-	};
+	msPostion();
+	msPostion(const msPostion& clon);
 	~msPostion();
+
+	magicStone* clone() override;
+
 private:
-	void init() override
-	{
-		magic = gameMetaData::magicStones::postion;
-	}
+	void init() ;
 };
