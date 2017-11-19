@@ -6,21 +6,53 @@
 
 namespace gameMetaData
 {
-	enum magicStones
-	{
-		base = 0,
-		yongyong = 1,
-		bangrang,
-		wind,
-		booung,
-		bunpok,
-		nungang,
-		buljak,
-		postion,
-		pass
+	const std::string arrMsSprite[] = {
+		"ms_bg.png",
+		"ms1_yongyong.png",
+		"ms2_bangrang.png",
+		"ms3_wind.png",
+		"ms4_booung.png",
+		"ms5_bunpok.png",
+		"ms6_nungang.png",
+		"ms7_buljack.png",
+		"ms8_postion.png"
+	}; 
+	const std::string arrNotSeenSprite[] = {
+		"ms1_notSeen.png",
+		"ms2_notSeen.png",
+		"ms3_notSeen.png",
+		"ms4_notSeen.png",
+		"ms5_notSeen.png",
+		"ms6_notSeen.png",
+		"ms7_notSeen.png",
+		"ms8_notSeen.png"
+	};
+	const std::string arrSeenSprite[] = {
+		"ms1_seen.png",
+		"ms2_seen.png",
+		"ms3_seen.png",
+		"ms4_seen.png",
+		"ms5_seen.png",
+		"ms6_seen.png",
+		"ms7_seen.png",
+		"ms8_seen.png"
 	};
 
-	enum stoneState
+	enum msType
+	{
+		base = 0,	//0
+		yongyong,	//1
+		bangrang,	//2
+		wind,		//3
+		booung,		//4
+		bunpok,		//5
+		nungang,	//6
+		buljak,		//7
+		postion,	//8
+		pass		//9
+	};
+
+	enum msStatus
 	{
 		notUse,
 		owned,

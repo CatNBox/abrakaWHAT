@@ -2,7 +2,7 @@
 #include "cocos2d.h"
 #include "gameObject\gameMetaData.h"
 
-#define CURRENT_BUILD_MODE RELEASE_MODE_BUILD
+#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
 
 class networkManager;
 class soundManager;

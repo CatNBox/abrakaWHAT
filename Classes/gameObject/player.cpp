@@ -55,7 +55,7 @@ int player::getBooungMS(const int idx)
 		return booungList[idx]->getMagic();
 	}
 
-	return gameMetaData::magicStones::base;
+	return gameMetaData::msType::base;
 }
 
 int player::getMagic(const int idx)
@@ -75,7 +75,7 @@ bool player::checkOutMagic(const int magicEnum)
 	{
 		if (magicEnum == i->getMagic())
 		{
-			i->setState(gameMetaData::stoneState::discard);
+			i->setState(gameMetaData::msStatus::discard);
 			stoneList.remove(i);
 			return true;
 		}
@@ -142,7 +142,7 @@ void npc::npcProcess()
 	if (state == gameMetaData::npcState::turnOn)
 	{
 		EventCustom checkEvent("checkOwnedMagic");
-		checkEvent.setUserData((void*)gameMetaData::magicStones::pass);
+		checkEvent.setUserData((void*)gameMetaData::msType::pass);
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
 	}
 }

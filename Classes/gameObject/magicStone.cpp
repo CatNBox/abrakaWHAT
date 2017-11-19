@@ -1,5 +1,7 @@
 #include "magicStone.h"
 
+using namespace gameMetaData;
+
 /*----------------------------------------
 
 
@@ -17,18 +19,40 @@ int magicStone::getState()
 	return this->state;
 }
 
-void magicStone::setState(gameMetaData::stoneState newState)
+void magicStone::setState(const gameMetaData::msStatus newState)
 {
 	state = newState;
 }
 
 void magicStone::init()
 {
-	state = gameMetaData::stoneState::notUse;
+	visible(false);
+	state = gameMetaData::msStatus::notUse;
+	curX = stdAxis;
+	curY = stdAxis;
+	tX = stdAxis;
+	tY = stdAxis;
+}
+
+void magicStone::initTexture(const gameMetaData::msType msTypeEnum)
+{
+	auto temp = arrMsSprite[msTypeEnum];
+	if (state == msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
 }
 
 magicStone::~magicStone()
 {
+}
+
+void magicStone::visible(const bool textureVisible)
+{
+	msTexture->setVisible(textureVisible);
 }
 
 /*----------------------------------------
@@ -55,15 +79,25 @@ magicStone * msYongyong::clone()
 	return  new msYongyong(*this);
 }
 
+void msYongyong::initTexture()
+{
+	auto temp = arrMsSprite[msType::yongyong];
+	if (state == msStatus::mine) 
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 msYongyong::~msYongyong()
 {
 }
 
 void msYongyong::init()
 {
-	magic = gameMetaData::magicStones::yongyong;
-	//msTexture = cocos2d::Sprite::createWithSpriteFrameName("ms1_yongyong.png");
-	cocos2d::log("calling msYongyonh init()");
+	magic = gameMetaData::msType::yongyong;
 }
 
 /*----------------------------------------
@@ -90,9 +124,21 @@ magicStone * msBangrang::clone()
 	return  new msBangrang(*this);
 }
 
+void msBangrang::initTexture()
+{
+	std::string temp = arrMsSprite[msType::bangrang];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msBangrang::init()
 {
-	magic = gameMetaData::magicStones::bangrang;
+	magic = gameMetaData::msType::bangrang;
 }
 
 msBangrang::~msBangrang()
@@ -123,9 +169,21 @@ magicStone * msWind::clone()
 	return  new msWind(*this);
 }
 
+void msWind::initTexture()
+{
+	std::string temp = arrMsSprite[msType::wind];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msWind::init()
 {
-	magic = gameMetaData::magicStones::wind;
+	magic = gameMetaData::msType::wind;
 }
 
 msWind::~msWind()
@@ -156,9 +214,21 @@ magicStone * msBooung::clone()
 	return  new msBooung(*this);
 }
 
+void msBooung::initTexture()
+{
+	std::string temp = arrMsSprite[msType::booung];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msBooung::init()
 {
-	magic = gameMetaData::magicStones::booung;
+	magic = gameMetaData::msType::booung;
 }
 
 msBooung::~msBooung()
@@ -193,9 +263,21 @@ magicStone * msBunpok::clone()
 	return  new msBunpok(*this);
 }
 
+void msBunpok::initTexture()
+{
+	std::string temp = arrMsSprite[msType::bunpok];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msBunpok::init()
 {
-	magic = gameMetaData::magicStones::bunpok;
+	magic = gameMetaData::msType::bunpok;
 }
 
 /*----------------------------------------
@@ -226,9 +308,21 @@ magicStone * msNungang::clone()
 	return  new msNungang(*this);
 }
 
+void msNungang::initTexture()
+{
+	std::string temp = arrMsSprite[msType::nungang];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msNungang::init()
 {
-	magic = gameMetaData::magicStones::nungang;
+	magic = gameMetaData::msType::nungang;
 }
 
 /*----------------------------------------
@@ -259,9 +353,21 @@ magicStone * msBuljak::clone()
 	return  new msBuljak(*this);
 }
 
+void msBuljak::initTexture()
+{
+	std::string temp = arrMsSprite[msType::buljak];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msBuljak::init()
 {
-	magic = gameMetaData::magicStones::buljak;
+	magic = gameMetaData::msType::buljak;
 }
 
 /*----------------------------------------
@@ -292,7 +398,19 @@ magicStone * msPostion::clone()
 	return  new msPostion(*this);
 }
 
+void msPostion::initTexture()
+{
+	std::string temp = arrMsSprite[msType::postion];
+	if (state == gameMetaData::msStatus::mine)
+	{
+		temp = arrMsSprite[msType::base];
+	}
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(temp);
+	msTexture->setTexture(tempSpr->getTexture());
+}
+
 void msPostion::init()
 {
-	magic = gameMetaData::magicStones::postion;
+	magic = gameMetaData::msType::postion;
 }

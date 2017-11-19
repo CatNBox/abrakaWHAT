@@ -22,4 +22,6 @@ private:
 	cocos2d::Menu* etcUI; //exit
 	
 	int roundNum = 0;
+	cocos2d::Sprite* roundSpr;
+	cocos2d::Object* roundObj;
 };

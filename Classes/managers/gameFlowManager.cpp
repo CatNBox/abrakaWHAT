@@ -77,43 +77,43 @@ cocos2d::Sprite * gameFlowManager::getNumSprite(const int num)
 	{
 	case 1:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(11, 5, 34, 81));
 		return tempSpr;
 	case 2:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(51, 5, 47, 81));
 		return tempSpr;
 	case 3:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(100, 5, 45, 81));
 		return tempSpr;
 	case 4:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(147, 5, 46, 81));
 		return tempSpr;
 	case 5:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(194, 5, 45, 81));
 		return tempSpr;
 	case 6:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(242, 5, 43, 81));
 		return tempSpr;
 	case 7:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(289, 5, 45, 81));
 		return tempSpr;
 	case 8:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(336, 5, 45, 81));
 		return tempSpr;
 	case 9:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(381, 5, 47, 81));
 		return tempSpr;
 	default:
 		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 0, 34, 101));
+		tempSpr->setTextureRect(cocos2d::Rect(430, 5, 46, 81));
 		return tempSpr;
 	}
 	return nullptr;

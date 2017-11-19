@@ -60,8 +60,9 @@ bool gameRoomUILayer::init()
 	//라운드가 종료되면 라운드 숫자 UP
 	callBackListener = EventListenerCustom::create("roundUp",
 		[=](EventCustom* event) {
-		std::cout << " 라운드 업 " << std::endl;
 		roundNum++;
+		std::cout << " 라운드 업 : " << roundNum << std::endl;
+		setRound();
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
@@ -88,7 +89,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::yongyong
+			(const int)gameMetaData::msType::yongyong
 		)
 	);
 
@@ -107,7 +108,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::bangrang
+			(const int)gameMetaData::msType::bangrang
 		)
 	);
 
@@ -126,7 +127,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::wind
+			(const int)gameMetaData::msType::wind
 		)
 	);
 
@@ -145,7 +146,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::booung
+			(const int)gameMetaData::msType::booung
 		)
 	);
 
@@ -164,7 +165,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::bunpok
+			(const int)gameMetaData::msType::bunpok
 		)
 	);
 
@@ -183,7 +184,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::nungang
+			(const int)gameMetaData::msType::nungang
 		)
 	);
 
@@ -202,7 +203,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::buljak
+			(const int)gameMetaData::msType::buljak
 		)
 	);
 
@@ -221,7 +222,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::postion
+			(const int)gameMetaData::msType::postion
 		)
 	);
 	
@@ -233,7 +234,7 @@ void gameRoomUILayer::initUI()
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::magicStones::pass
+			(const int)gameMetaData::msType::pass
 		)
 	);
 
@@ -274,17 +275,21 @@ void gameRoomUILayer::initUI()
 
 	this->addChild(seenCheckerBoard);
 
+	roundSpr = gameFlowManager::getInstance()->getNumSprite(roundNum);
 	setRound();
+
+	this->addChild(roundSpr);
 }
 
 void gameRoomUILayer::setRound()
 {
 	std::cout << "라운드 업" << std::endl;
 	//라운드 50 710
-	auto roundSpr = gameFlowManager::getInstance()->getNumSprite(1);
+	auto temp = gameFlowManager::getInstance()->getNumSprite(roundNum);
+	
+	roundSpr->setTextureRect(temp->getTextureRect());
 	roundSpr->setPosition(Vec2(50, 710));
 	roundSpr->setScale(0.8f);
-	this->addChild(roundSpr);
 }
 
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
@@ -313,35 +318,35 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{
-		checkMagic(gameMetaData::magicStones::yongyong);
+		checkMagic(gameMetaData::msType::yongyong);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_2)
 	{
-		checkMagic(gameMetaData::magicStones::bangrang);
+		checkMagic(gameMetaData::msType::bangrang);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_3)
 	{
-		checkMagic(gameMetaData::magicStones::wind);
+		checkMagic(gameMetaData::msType::wind);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_4)
 	{
-		checkMagic(gameMetaData::magicStones::booung);
+		checkMagic(gameMetaData::msType::booung);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_5)
 	{
-		checkMagic(gameMetaData::magicStones::bunpok);
+		checkMagic(gameMetaData::msType::bunpok);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_6)
 	{
-		checkMagic(gameMetaData::magicStones::nungang);
+		checkMagic(gameMetaData::msType::nungang);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_7)
 	{
-		checkMagic(gameMetaData::magicStones::buljak);
+		checkMagic(gameMetaData::msType::buljak);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_8)
 	{
-		checkMagic(gameMetaData::magicStones::postion);
+		checkMagic(gameMetaData::msType::postion);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_F5)
 	{

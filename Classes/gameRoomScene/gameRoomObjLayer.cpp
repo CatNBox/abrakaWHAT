@@ -119,7 +119,7 @@ void gameRoomObjLayer::dataUpdate()
 	for (auto &i : arrStones)
 	{
 		int magicEnum = i->getMagic() - 1;
-		if (i->getState() == gameMetaData::stoneState::discard)
+		if (i->getState() == gameMetaData::msStatus::discard)
 			seenCnt[magicEnum]++;
 	}
 
@@ -132,28 +132,7 @@ void gameRoomObjLayer::dataUpdate()
 
 void gameRoomObjLayer::seenCheckUpdate()
 {
-	//205,400 / 16*32 / y+40 x+23 / +35
-	std::string arrNotSeen[] = { 
-		"ms1_notSeen.png",
-		"ms2_notSeen.png",
-		"ms3_notSeen.png",
-		"ms4_notSeen.png",
-		"ms5_notSeen.png",
-		"ms6_notSeen.png",
-		"ms7_notSeen.png",
-		"ms8_notSeen.png"
-	};
-	std::string arrSeen[] = {
-		"ms1_seen.png",
-		"ms2_seen.png",
-		"ms3_seen.png",
-		"ms4_seen.png",
-		"ms5_seen.png",
-		"ms6_seen.png",
-		"ms7_seen.png",
-		"ms8_seen.png"
-	};
-	
+	//205,400 / 16*32 / y+40 x+23 / +35	
 	Sprite* seenMs;
 	for (int msNum = 0; msNum < 8; msNum++)
 	{
@@ -166,9 +145,9 @@ void gameRoomObjLayer::seenCheckUpdate()
 		for (int seenObjNum = 0; seenObjNum < msNum + 1; seenObjNum++)
 		{
 			if(seenObjNum < seenCnt[msNum])
-				seenMs = Sprite::createWithSpriteFrameName(arrSeen[msNum]);
+				seenMs = Sprite::createWithSpriteFrameName(gameMetaData::arrSeenSprite[msNum]);
 			else
-				seenMs = Sprite::createWithSpriteFrameName(arrNotSeen[msNum]);
+				seenMs = Sprite::createWithSpriteFrameName(gameMetaData::arrNotSeenSprite[msNum]);
 
 			seenMs->setPosition(Vec2(defaultX + seenObjNum * recalibX, defaultY + (msNum % 4) * recalibY));
 			this->addChild(seenMs);
@@ -209,7 +188,7 @@ void gameRoomObjLayer::stoneObjUpdate()
 		{
 			int tempMagic = 0;
 			if (i == 0) {
-				tempMagic = gameMetaData::magicStones::base;
+				tempMagic = gameMetaData::msType::base;
 			}
 			else {
 				tempMagic = curPlayer->getMagic(j);
@@ -240,14 +219,14 @@ void gameRoomObjLayer::stoneObjUpdate()
 	{
 		//비밀의 돌은 현재 클라이언트에 해당하는 플레이어의 List만 체크하면 되므로
 		//기본적으로 magicStones::base (마법의돌 뒷면)을 출력
-		auto tempSpr = getMSSprite(gameMetaData::magicStones::base);
+		auto tempSpr = getMSSprite(gameMetaData::msType::base);
 
 		auto me = arrPlayers[myPlayerNum];
 		int myBooungSize = me->getBooungListSize();
 		if (i < myBooungSize)
 		{
 			auto tempMagic = me->getBooungMS(i);
-			if (tempMagic != gameMetaData::magicStones::base)
+			if (tempMagic != gameMetaData::msType::base)
 			{
 				tempSpr = getMSSprite(tempMagic);
 			}
@@ -301,7 +280,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
 	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
-	if (magicEnum == gameMetaData::magicStones::pass)
+	if (magicEnum == gameMetaData::msType::pass)
 	{
 		passTurn();
 		std::cout << "passTurn : " << magicEnum << std::endl;
@@ -346,7 +325,7 @@ void gameRoomObjLayer::passTurn()
 		int curPlayerReqCnt = 5 - curPlayer->getStoneListSize();
 		for (int i = 0; i < curPlayerReqCnt; i++)
 		{
-			auto tempSelStone = pickAStone(gameMetaData::stoneState::notUse);
+			auto tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
 			if (tempSelStone == nullptr)
 			{
 				break;
@@ -354,7 +333,7 @@ void gameRoomObjLayer::passTurn()
 			else
 			{
 				curPlayer->pushStone2List(tempSelStone);
-				tempSelStone->setState(gameMetaData::stoneState::owned);
+				tempSelStone->setState(gameMetaData::msStatus::owned);
 			}
 		}
 	}
@@ -408,8 +387,8 @@ void gameRoomObjLayer::initRound()
 	for (int i = 0; i < secretCnt; i++)
 	{
 		magicStone *secretTemp;
-		secretTemp = pickAStone(gameMetaData::stoneState::notUse);
-		secretTemp->setState(gameMetaData::stoneState::secret);
+		secretTemp = pickAStone(gameMetaData::msStatus::notUse);
+		secretTemp->setState(gameMetaData::msStatus::secret);
 	}
 
 	//2. 돌분배
@@ -417,10 +396,10 @@ void gameRoomObjLayer::initRound()
 	for (int i = 0; i < tempDrawCnt; i++)
 	{
 		magicStone *tempSelStone;
-		tempSelStone = pickAStone(gameMetaData::stoneState::notUse);
+		tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
 		int tempCurPlayer = i%playerCnt;
 		arrPlayers[tempCurPlayer]->pushStone2List(tempSelStone);
-		tempSelStone->setState(gameMetaData::stoneState::owned);
+		tempSelStone->setState(gameMetaData::msStatus::owned);
 	}
 
 	//3. 시작플레이어 결정
@@ -434,30 +413,7 @@ void gameRoomObjLayer::initRound()
 
 cocos2d::Sprite* gameRoomObjLayer::getMSSprite(const int magicEnum)
 {
-	switch (magicEnum)
-	{
-	case gameMetaData::magicStones::yongyong :
-		return Sprite::createWithSpriteFrameName("ms1_yongyong.png");
-	case gameMetaData::magicStones::bangrang :
-		return Sprite::createWithSpriteFrameName("ms2_bangrang.png");
-	case gameMetaData::magicStones::wind :
-		return Sprite::createWithSpriteFrameName("ms3_wind.png");
-	case gameMetaData::magicStones::booung :
-		return Sprite::createWithSpriteFrameName("ms4_booung.png");
-	case gameMetaData::magicStones::bunpok :
-		return Sprite::createWithSpriteFrameName("ms5_bunpok.png");
-	case gameMetaData::magicStones::nungang :
-		return Sprite::createWithSpriteFrameName("ms6_nungang.png");
-	case gameMetaData::magicStones::buljak :
-		return Sprite::createWithSpriteFrameName("ms7_buljack.png");
-	case gameMetaData::magicStones::postion :
-		return Sprite::createWithSpriteFrameName("ms8_postion.png");
-	case gameMetaData::magicStones::base :
-	default:
-		return Sprite::createWithSpriteFrameName("ms_bg.png");
-	}
-
-	//return nullptr;
+	return Sprite::createWithSpriteFrameName(gameMetaData::arrMsSprite[magicEnum]);
 }
 
 void gameRoomObjLayer::setStartOrder()
@@ -473,6 +429,8 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 		checkArrStones();
 		std::cout << "All MagicStone is used" << std::endl;
 		//뽑을 카드가 없을 경우 예외설정
+		//1. 모두 사용됬을 경우
+		//2. 초기화가 안되어서 분배에 실패했을 경우
 		return nullptr;
 	}
 
@@ -494,7 +452,7 @@ bool gameRoomObjLayer::isAllUsed() const
 {
 	for (auto const &i : arrStones)
 	{
-		if (i->getState() == gameMetaData::stoneState::notUse)
+		if (i->getState() == gameMetaData::msStatus::notUse)
 		{
 			return false;
 		}

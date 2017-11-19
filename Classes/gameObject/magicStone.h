@@ -16,17 +16,21 @@ class magicStone : public cocos2d::Object
 public:
 	int getMagic();
 	int getState();
-	void setState(gameMetaData::stoneState newState);
+	void setState(const gameMetaData::msStatus newState);
 	void init();
+	void initTexture(const gameMetaData::msType msTypeEnum);
 
 	magicStone() {};
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern
+	virtual void initTexture() = 0;
+
+	void visible(bool textureVisible);
 
 protected:
-	int magic = gameMetaData::magicStones::base;
-	int state = gameMetaData::stoneState::notUse;
+	int magic = gameMetaData::msType::base;
+	int state = gameMetaData::msStatus::notUse;
 
 	float curX = stdAxis;
 	float curY = stdAxis;
@@ -34,7 +38,8 @@ protected:
 	float tX = stdAxis;
 	float tY = stdAxis;
 
-	cocos2d::Sprite* msTexture;
+	cocos2d::Sprite* msTexture = 
+		cocos2d::Sprite::createWithSpriteFrameName(arrMsSprite[msType::base]);
 };
 
 /*----------------------------------------
@@ -53,8 +58,10 @@ public:
 
 	magicStone* clone() override;
 
+	virtual void initTexture();
+
 private:
-	void init() ;
+	void init();
 };
 
 /*----------------------------------------
@@ -72,6 +79,8 @@ public:
 	~msBangrang();
 
 	magicStone* clone() override;
+
+	virtual void initTexture();
 
 private:
 	void init() ;
@@ -93,6 +102,8 @@ public:
 
 	magicStone* clone() override;
 
+	virtual void initTexture();
+
 private:
 	void init() ;
 };
@@ -112,6 +123,8 @@ public:
 	~msBooung();
 
 	magicStone* clone() override;
+
+	virtual void initTexture();
 
 private:
 	void init() ;
@@ -133,6 +146,8 @@ public:
 
 	magicStone* clone() override;
 
+	virtual void initTexture();
+
 private:
 	void init() ;
 };
@@ -152,6 +167,8 @@ public:
 	~msNungang();
 
 	magicStone* clone() override;
+
+	virtual void initTexture();
 
 private:
 	void init() ;
@@ -173,6 +190,8 @@ public:
 
 	magicStone* clone() override;
 
+	virtual void initTexture();
+
 private:
 	void init() ;
 };
@@ -192,6 +211,8 @@ public:
 	~msPostion();
 
 	magicStone* clone() override;
+
+	virtual void initTexture();
 
 private:
 	void init() ;
