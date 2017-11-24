@@ -19,9 +19,10 @@ public:
 
 	int getStoneListSize();
 	int getBooungListSize();
-	int getBooungMS(const int idx);
 
-	int getMagic(const int idx);
+	magicStone* getBooungMS(const int idx);
+	magicStone* getMagicStone(const int idx);
+
 	bool checkOutMagic(const int magicEnum);
 
 	int getCurLP();
@@ -33,6 +34,7 @@ public:
 
 	player* getNextPlayer();
 	void setNextPlayer(player* next);
+
 
 protected:
 	int leftPlayer = 0;

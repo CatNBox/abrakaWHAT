@@ -2,8 +2,6 @@
 #include "cocos2d.h"
 #include "gameMetaData.h"
 
-#define stdAxis 384.0f
-
 /*----------------------------------------
 
 
@@ -11,35 +9,29 @@ magicStone
 
 
 -----------------------------------------*/
-class magicStone : public cocos2d::Object
+class magicStone : public cocos2d::Sprite
 {
 public:
 	int getMagic();
-	int getState();
-	void setState(const gameMetaData::msStatus newState);
-	void init();
-	void initTexture(const gameMetaData::msType msTypeEnum);
-
-	magicStone() {};
+	int getStatus();
+	void setStatus(const gameMetaData::msStatus newStatus);
+	void initObjData();
+	bool initMsTexture();
+	bool setBaseSprite();
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern
-	virtual void initTexture() = 0;
-
-	void visible(bool textureVisible);
 
 protected:
 	int magic = gameMetaData::msType::base;
-	int state = gameMetaData::msStatus::notUse;
+	int status = gameMetaData::msStatus::notUse;
+	int actionState;
 
 	float curX = stdAxis;
 	float curY = stdAxis;
 
 	float tX = stdAxis;
 	float tY = stdAxis;
-
-	cocos2d::Sprite* msTexture = 
-		cocos2d::Sprite::createWithSpriteFrameName(arrMsSprite[msType::base]);
 };
 
 /*----------------------------------------
@@ -58,10 +50,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init();
+	void initMagic();
 };
 
 /*----------------------------------------
@@ -80,10 +70,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -102,10 +90,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -124,10 +110,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -146,10 +130,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -168,10 +150,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -190,10 +170,8 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };
 
 /*----------------------------------------
@@ -212,8 +190,6 @@ public:
 
 	magicStone* clone() override;
 
-	virtual void initTexture();
-
 private:
-	void init() ;
+	void initMagic() ;
 };

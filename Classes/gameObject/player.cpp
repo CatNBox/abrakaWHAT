@@ -48,25 +48,26 @@ int player::getBooungListSize()
 	return booungList.size();
 }
 
-int player::getBooungMS(const int idx)
+magicStone* player::getBooungMS(const int idx)
 {
 	if (idx < getBooungListSize())
 	{
-		return booungList[idx]->getMagic();
+		return booungList[idx];
 	}
-
-	return gameMetaData::msType::base;
 }
 
-int player::getMagic(const int idx)
+magicStone* player::getMagicStone(const int idx)
 {
 	magicStone* magic;
 	std::list<magicStone*>::iterator iter;
 	iter = stoneList.begin();
 	for (int i = 0; i < idx; i++)
+	{
 		iter++;
+	}
+
 	magic = *iter;
-	return magic->getMagic();
+	return magic;
 }
 
 bool player::checkOutMagic(const int magicEnum)
@@ -75,7 +76,8 @@ bool player::checkOutMagic(const int magicEnum)
 	{
 		if (magicEnum == i->getMagic())
 		{
-			i->setState(gameMetaData::msStatus::discard);
+			i->setStatus(gameMetaData::msStatus::discard);
+			i->setVisible(false);
 			stoneList.remove(i);
 			return true;
 		}

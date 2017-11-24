@@ -3,10 +3,11 @@
 #define SINGLE_MODE_BUILD 1
 #define NETWORK_MODE_BUILD 2
 #define RELEASE_MODE_BUILD 0
+#define stdAxis 150.0f
 
 namespace gameMetaData
 {
-	const std::string arrMsSprite[] = {
+	const std::string arrMsSpriteName[] = {
 		"ms_bg.png",
 		"ms1_yongyong.png",
 		"ms2_bangrang.png",
@@ -17,7 +18,7 @@ namespace gameMetaData
 		"ms7_buljack.png",
 		"ms8_postion.png"
 	}; 
-	const std::string arrNotSeenSprite[] = {
+	const std::string arrNotSeenSpriteName[] = {
 		"ms1_notSeen.png",
 		"ms2_notSeen.png",
 		"ms3_notSeen.png",
@@ -27,7 +28,7 @@ namespace gameMetaData
 		"ms7_notSeen.png",
 		"ms8_notSeen.png"
 	};
-	const std::string arrSeenSprite[] = {
+	const std::string arrSeenSpriteName[] = {
 		"ms1_seen.png",
 		"ms2_seen.png",
 		"ms3_seen.png",
@@ -57,10 +58,8 @@ namespace gameMetaData
 		notUse,
 		owned,
 		secret,
-		ownedSecret,
 		discard,
-		active,
-		mine
+		active
 	};
 
 	enum curScene
