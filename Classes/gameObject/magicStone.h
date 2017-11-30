@@ -16,8 +16,13 @@ public:
 	int getStatus();
 	void setStatus(const gameMetaData::msStatus newStatus);
 	void initObjData();
-	bool initMsTexture();
-	bool setBaseSprite();
+
+	bool initMsSprite();	//magic에 맞는 스프라이트로 갱신
+	bool setBaseSprite();	//뒷모습 스프라이트로 갱신
+
+	bool isActionRunning();
+	void toggleLockAction();
+	void actionMove(const float delay, const cocos2d::Vec2 targetPos);
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern
@@ -25,7 +30,9 @@ public:
 protected:
 	int magic = gameMetaData::msType::base;
 	int status = gameMetaData::msStatus::notUse;
-	int actionState;
+	int actionState = gameMetaData::msActionState::msWait;
+
+	bool actionActiveChecker = false;
 
 	float curX = stdAxis;
 	float curY = stdAxis;

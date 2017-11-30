@@ -21,7 +21,7 @@ private:
 	cocos2d::Menu* magicChoicer; //eash stone's front sprite and pass sprite
 	cocos2d::Menu* etcUI; //exit
 	
-	int roundNum = 0;
+	int roundNum = 1;
 	cocos2d::Sprite* roundSpr;
 	cocos2d::Object* roundObj;
 };

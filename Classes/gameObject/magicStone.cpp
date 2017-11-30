@@ -29,12 +29,14 @@ void magicStone::initObjData()
 	curY = stdAxis;
 	tX = stdAxis;
 	tY = stdAxis;
+	actionActiveChecker = false;
+	this->stopAllActions();
 	this->setVisible(false);
 	this->setRotation(0);
-	this->setPosition(curX, curY);
+	this->setPosition(stdAxis, stdAxis);
 }
 
-bool magicStone::initMsTexture()
+bool magicStone::initMsSprite()
 {
 	return this->initWithSpriteFrameName(gameMetaData::arrMsSpriteName[magic]);
 }
@@ -42,6 +44,32 @@ bool magicStone::initMsTexture()
 bool magicStone::setBaseSprite()
 {
 	return this->initWithSpriteFrameName(gameMetaData::arrMsSpriteName[gameMetaData::msType::base]);
+}
+
+bool magicStone::isActionRunning()
+{
+	return actionActiveChecker;
+}
+
+void magicStone::toggleLockAction()
+{
+	actionActiveChecker = !actionActiveChecker;
+}
+
+void magicStone::actionMove(const float delay, const cocos2d::Vec2 targetPos)
+{
+	if (isActionRunning())
+		return;
+
+	toggleLockAction();	//Lock runAction
+	auto preDelay = cocos2d::DelayTime::create(delay);
+	auto showThis = cocos2d::Show::create();
+	auto waitDelay = cocos2d::DelayTime::create(0.5f);
+	auto moving = cocos2d::MoveTo::create(0.8f, targetPos);
+	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
+	auto seq = cocos2d::Sequence::create(preDelay, showThis, waitDelay, moving, callTogLock, NULL);
+
+	this->runAction(seq);
 }
 
 magicStone::~magicStone()

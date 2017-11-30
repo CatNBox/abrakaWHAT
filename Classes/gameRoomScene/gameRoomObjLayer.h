@@ -11,6 +11,14 @@ public:
 
 	CREATE_FUNC(gameRoomObjLayer);
 private:
+	void settingEventListener();
+	void settingCntValues();
+	void createPlayers();
+	void createMagicStones();
+
+	void selSecretStone();
+	void shareStone2Player();
+
 	void layerUpdate(float d);
 	void dataUpdate();
 	void seenCheckUpdate();
@@ -27,6 +35,7 @@ private:
 	bool isAllUsed() const; //check to discard all
 
 	int getRandomIndex();
+	int getMsPosRevision(int msListSize, int msOrder);
 
 	int playerCnt;
 	int yongyongCnt;

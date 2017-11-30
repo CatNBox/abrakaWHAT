@@ -284,10 +284,11 @@ void gameRoomUILayer::initUI()
 void gameRoomUILayer::setRound()
 {
 	std::cout << "라운드 업" << std::endl;
+
 	//라운드 50 710
-	auto temp = gameFlowManager::getInstance()->getNumSprite(roundNum);
+	//auto temp = gameFlowManager::getInstance()->getNumSprite(roundNum);
 	
-	roundSpr->setTextureRect(temp->getTextureRect());
+	//roundSpr->setTextureRect(temp->getTextureRect());
 	roundSpr->setPosition(Vec2(50, 710));
 	roundSpr->setScale(0.8f);
 }

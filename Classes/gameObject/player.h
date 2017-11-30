@@ -4,18 +4,14 @@
 
 class magicStone;
 
-class player : public cocos2d::Object
+class player
 {
 public:
 	player();
 	player(int seq);
 	void init();
 
-	int getLeftPlayer();
-	int getRightPlayer();
-
 	void pushStone2List(magicStone* ms);
-	void popStoneFromList(magicStone* ms);	//Á¦°Å
 
 	int getStoneListSize();
 	int getBooungListSize();
@@ -30,22 +26,32 @@ public:
 	void increaseLP(int varyValue);
 
 	bool doHaveThisMagic(const int magicNumber);
-	bool isNPC();
+	bool isNPC() const;
 
-	player* getNextPlayer();
+	player* getNextPlayer() const;
 	void setNextPlayer(player* next);
+	player* getPrevPlayer() const;
+	void setPrevPlayer(player* next);
 
+	int getDefaultX() const;
+	void setDefaultX(int posX);
+	int getDefaultY() const;
+	void setDefaultY(int posY);
+	float getRotationValue() const;
+	void setRotationValue(float rot);
 
 protected:
-	int leftPlayer = 0;
-	int rightPlayer = 0;
+	int defaultX = 384;
+	int defaultY = 0;
+	float rotationValue = 0;
+
 	int roundLP = 5;
 
 	bool flagNPC = false;
-
 	char* playerIPaddr;
 
 	player* nextPlayer = nullptr;
+	player* prevPlayer = nullptr;
 
 	std::list<magicStone*> stoneList;
 	//std::vector<magicStone*> stoneList;

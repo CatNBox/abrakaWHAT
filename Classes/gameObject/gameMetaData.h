@@ -3,7 +3,7 @@
 #define SINGLE_MODE_BUILD 1
 #define NETWORK_MODE_BUILD 2
 #define RELEASE_MODE_BUILD 0
-#define stdAxis 150.0f
+#define stdAxis 384.0f
 
 namespace gameMetaData
 {
@@ -58,8 +58,15 @@ namespace gameMetaData
 		notUse,
 		owned,
 		secret,
-		discard,
-		active
+		discard
+	};
+
+	enum msActionState
+	{
+		msWait,
+		msMove,
+		msDiscard,
+		msActive
 	};
 
 	enum curScene
@@ -71,7 +78,7 @@ namespace gameMetaData
 
 	enum npcState
 	{
-		wait,
-		turnOn
+		npcWait,
+		npcTurnOn
 	};
 }

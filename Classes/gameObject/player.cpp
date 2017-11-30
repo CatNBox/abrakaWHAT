@@ -5,12 +5,10 @@ using namespace cocos2d;
 
 player::player()
 {
-	//stoneList.reserve(5);
 }
 
 player::player(int seq)
 {
-	//stoneList.reserve(5);
 }
 
 void player::init()
@@ -19,23 +17,9 @@ void player::init()
 	booungList.clear();
 }
 
-int player::getLeftPlayer()
-{
-	return leftPlayer;
-}
-
-int player::getRightPlayer()
-{
-	return rightPlayer;
-}
-
 void player::pushStone2List(magicStone* ms)
 {
 	stoneList.push_back(ms);
-}
-
-void player::popStoneFromList(magicStone* ms)
-{
 }
 
 int player::getStoneListSize()
@@ -118,12 +102,12 @@ bool player::doHaveThisMagic(const int magicNumber)
 	return false;
 }
 
-bool player::isNPC()
+bool player::isNPC() const
 {
 	return flagNPC;
 }
 
-player * player::getNextPlayer()
+player * player::getNextPlayer() const
 {
 	return nextPlayer;
 }
@@ -133,15 +117,55 @@ void player::setNextPlayer(player * next)
 	nextPlayer = next;
 }
 
+player * player::getPrevPlayer() const
+{
+	return prevPlayer;
+}
+
+void player::setPrevPlayer(player * next)
+{
+	prevPlayer = next;
+}
+
+int player::getDefaultX() const
+{
+	return defaultX;
+}
+
+void player::setDefaultX(int posX)
+{
+	defaultX = posX;
+}
+
+int player::getDefaultY() const
+{
+	return defaultY;
+}
+
+void player::setDefaultY(int posY)
+{
+	defaultY = posY;
+}
+
+float player::getRotationValue() const
+{
+	return rotationValue;
+}
+
+void player::setRotationValue(float rot)
+{
+	rotationValue = rot;
+}
+
 npc::npc()
-	:state(gameMetaData::npcState::wait)
+	:state(gameMetaData::npcState::npcWait)
 {
 	flagNPC = true;
 }
 
 void npc::npcProcess()
 {
-	if (state == gameMetaData::npcState::turnOn)
+	if (state == gameMetaData::npcState::npcTurnOn)
 	{
 		EventCustom checkEvent("checkOwnedMagic");
 		checkEvent.setUserData((void*)gameMetaData::msType::pass);
@@ -151,10 +175,10 @@ void npc::npcProcess()
 
 void npc::npcTurnOn()
 {
-	state = gameMetaData::npcState::turnOn;
+	state = gameMetaData::npcState::npcTurnOn;
 }
 
 void npc::waitTurn()
 {
-	state = gameMetaData::npcState::wait;
+	state = gameMetaData::npcState::npcWait;
 }
