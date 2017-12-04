@@ -1,6 +1,8 @@
 #pragma once
 #include "cocos2d.h"
 #include "gameObject\gameMetaData.h"
+#include <random>
+#include <assert.h>
 
 #define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
 
@@ -19,7 +21,7 @@ public:
 	void changeScene2JoinMode();
 
 	void preloadSprites();
-	cocos2d::Sprite* getNumSprite(const int num); //0-9 only
+	cocos2d::Rect getNumSprRect(const int num); //0-9 only
 
 	void setPlayerCount(int cnt);
 	int getPlayerCount() const;
@@ -39,10 +41,14 @@ public:
 	int getNungangCount() const;
 	void setBuljakCount(int cnt);
 	int getBuljakCount() const;
-	void setPostionCount(int cnt);
-	int getPostionCount() const;
+	void setPotionCount(int cnt);
+	int getPotionCount() const;
 	void setSecretCount(int cnt);
 	int getSecretCount() const;
+	void setLifePoint(int cnt);
+	int getMaxLifePoint() const;
+
+	int getRandomInt(int min, int max);
 
 	void endGame();
 
@@ -55,8 +61,9 @@ private:
 	int bunpokCnt;
 	int nungangCnt;
 	int buljakCnt;
-	int postionCnt;
+	int potionCnt;
 	int secretCnt;
+	int maxLifePoint = 0;
 
 	int curSceneState;
 

@@ -55,6 +55,9 @@
     <Filter Include="resource\UISprites">
       <UniqueIdentifier>{760e63ca-b4a2-490f-a965-74e8d48c9080}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\lpToken">
+      <UniqueIdentifier>{d0ff8cba-ae40-4b41-8591-22edce610bba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomUILayer.h">
       <Filter>src\04_gameRoomScene\layers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\deletedCode.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -312,12 +318,39 @@
     <Image Include="..\Resources\UISprite\spr_rank.png">
       <Filter>resource\UISprites</Filter>
     </Image>
+    <Image Include="..\Resources\particle4SeenCheck.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\magicStones.png">
+      <Filter>resource</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken00.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken01.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken02.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken03.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken04.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\lpToken\lpToken05.png">
+      <Filter>resource\lpToken</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\magicStones.plist">
       <Filter>resource</Filter>
     </None>
     <None Include="..\Resources\seenChecker.plist">
+      <Filter>resource</Filter>
+    </None>
+    <None Include="..\Resources\particle4SeenCheck.plist">
       <Filter>resource</Filter>
     </None>
   </ItemGroup>

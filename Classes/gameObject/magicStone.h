@@ -23,6 +23,7 @@ public:
 	bool isActionRunning();
 	void toggleLockAction();
 	void actionMove(const float delay, const cocos2d::Vec2 targetPos);
+	void actionActivated();
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern
@@ -184,16 +185,16 @@ private:
 /*----------------------------------------
 
 
-msPostion
+mspotion
 
 
 -----------------------------------------*/
-class msPostion : public magicStone
+class msPotion : public magicStone
 {
 public:
-	msPostion();
-	msPostion(const msPostion& clon);
-	~msPostion();
+	msPotion();
+	msPotion(const msPotion& clon);
+	~msPotion();
 
 	magicStone* clone() override;
 

@@ -1,5 +1,6 @@
-#include "player.h"
-#include "magicStone.h"
+#include "gameObject/player.h"
+#include "gameObject/magicStone.h"
+#include "managers/gameFlowManager.h"
 
 using namespace cocos2d;
 
@@ -7,7 +8,8 @@ player::player()
 {
 }
 
-player::player(int seq)
+player::player(int idx)
+	:myIndex(idx)
 {
 }
 
@@ -15,6 +17,8 @@ void player::init()
 {
 	stoneList.clear();
 	booungList.clear();
+	if (!lpSprList.empty())
+		initLpObj();
 }
 
 void player::pushStone2List(magicStone* ms)
@@ -60,8 +64,8 @@ bool player::checkOutMagic(const int magicEnum)
 	{
 		if (magicEnum == i->getMagic())
 		{
-			i->setStatus(gameMetaData::msStatus::discard);
-			i->setVisible(false);
+			//Activate magicStone
+			i->actionActivated();
 			stoneList.remove(i);
 			return true;
 		}
@@ -71,7 +75,13 @@ bool player::checkOutMagic(const int magicEnum)
 
 int player::getCurLP()
 {
-	return roundLP;
+	int temp = 0;
+	for (const auto i : lpSprList)
+	{
+		if (i.second == true)
+			temp++;
+	}
+	return temp;
 }
 
 void player::decreaseLP(int varyValue)
@@ -88,6 +98,88 @@ void player::increaseLP(int varyValue)
 
 	if (roundLP > 5)
 		roundLP = 5;
+}
+
+cocos2d::Sprite * player::createLpObj(int playerIdx)
+{
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrLpTokenName[playerIdx]);
+	std::pair<cocos2d::Sprite*, bool> tempPair(tempSpr, true);
+	lpSprList.push_back(tempPair);
+	tempSpr->setPosition(defaultX, defaultY);
+	return tempSpr;
+}
+
+void player::initLpObj()
+{
+	for (auto &i : lpSprList)
+	{
+		i.second = false;
+		i.first->stopAllActions();
+		i.first->setOpacity(255);
+		i.first->setScale(1);
+		i.first->setVisible(false);
+		i.first->setRotation(0);
+		i.first->setPosition(defaultX, defaultY);
+	}
+	actionGainLp(gameFlowManager::getInstance()->getMaxLifePoint());
+}
+
+void player::actionGainLp(int gainNum)
+{
+	for (auto &i : lpSprList)
+	{
+		if (gainNum <= 0)
+			break;
+
+		if (i.second == false)
+		{
+			i.second = true;
+
+			//±âÁØ 384,600 / 168,434 / 600,434 / 384,260
+			int revisionX = gameFlowManager::getInstance()->getRandomInt(0, 60);
+			int revisionY = gameFlowManager::getInstance()->getRandomInt(1, 61);
+
+			int tempX = defaultX;
+			int tempY = defaultY;
+
+			if (tempX == 384)
+			{
+				tempX = tempX - 30 + revisionX;
+			}
+			else if(tempX > 384)
+			{
+				tempX = tempX - 70 - revisionX;
+			}
+			else
+			{
+				tempX = tempX + 70 + revisionX;
+			}
+
+			if (tempY == 434)
+			{
+				tempY = tempY - 30 + revisionY;
+			}
+			else if (tempY > 434)
+			{
+				tempY = tempY - 70 - revisionY;
+			}
+			else
+			{
+				tempY = tempY + 70 + revisionY;
+			}
+
+			Vec2 tempVec(tempX, tempY);
+
+			auto showThis = cocos2d::Show::create();
+			auto moving = cocos2d::MoveTo::create(0.4f, tempVec);
+
+			auto seq = cocos2d::Sequence::create(showThis, moving, NULL);
+
+			i.first->runAction(seq);
+		}
+
+		gainNum--;
+	}
 }
 
 bool player::doHaveThisMagic(const int magicNumber)
@@ -161,6 +253,11 @@ npc::npc()
 	:state(gameMetaData::npcState::npcWait)
 {
 	flagNPC = true;
+}
+
+npc::npc(int idx)
+	: player(idx)
+{
 }
 
 void npc::npcProcess()

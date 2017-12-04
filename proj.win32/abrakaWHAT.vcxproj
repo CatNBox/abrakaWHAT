@@ -166,6 +166,10 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\Classes\deletedCode.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="..\Classes\gameObject\gameMetaData.h" />
     <ClInclude Include="..\Classes\gameObject\magicStone.h" />
     <ClInclude Include="..\Classes\gameObject\player.h" />
@@ -208,6 +212,13 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <Image Include="..\Resources\bg04.jpg" />
     <Image Include="..\Resources\bg_logo.jpg" />
     <Image Include="..\Resources\bg_wait.jpg" />
+    <Image Include="..\Resources\lpToken\lpToken00.png" />
+    <Image Include="..\Resources\lpToken\lpToken01.png" />
+    <Image Include="..\Resources\lpToken\lpToken02.png" />
+    <Image Include="..\Resources\lpToken\lpToken03.png" />
+    <Image Include="..\Resources\lpToken\lpToken04.png" />
+    <Image Include="..\Resources\lpToken\lpToken05.png" />
+    <Image Include="..\Resources\magicStones.png" />
     <Image Include="..\Resources\magicStones\ms1_yongyong.png" />
     <Image Include="..\Resources\magicStones\ms2_bangrang.png" />
     <Image Include="..\Resources\magicStones\ms3_wind.png" />
@@ -217,6 +228,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <Image Include="..\Resources\magicStones\ms7_buljack.png" />
     <Image Include="..\Resources\magicStones\ms8_postion.png" />
     <Image Include="..\Resources\magicStones\ms_bg.png" />
+    <Image Include="..\Resources\particle4SeenCheck.png" />
     <Image Include="..\Resources\seenChecker.png" />
     <Image Include="..\Resources\seenChecker\ms1_notSeen.png" />
     <Image Include="..\Resources\seenChecker\ms1_seen.png" />
@@ -254,6 +266,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <None Include="..\Resources\magicStones.plist">
       <SubType>Designer</SubType>
     </None>
+    <None Include="..\Resources\particle4SeenCheck.plist" />
     <None Include="..\Resources\seenChecker.plist" />
   </ItemGroup>
   <ItemGroup>

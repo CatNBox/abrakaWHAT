@@ -15,15 +15,16 @@ private:
 	void settingCntValues();
 	void createPlayers();
 	void createMagicStones();
+	void createSeenChecker();
+	void createPlayerLpObj();
 
 	void selSecretStone();
 	void shareStone2Player();
 
 	void layerUpdate(float d);
 	void dataUpdate();
-	void seenCheckUpdate();
-	void stoneObjUpdate();
 	void curLPUpdate();
+
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void activeMagic(magicStone* activeStone);
 	void passTurn();
@@ -34,21 +35,11 @@ private:
 	magicStone* pickAStone(const int stateEnum);
 	bool isAllUsed() const; //check to discard all
 
-	int getRandomIndex();
 	int getMsPosRevision(int msListSize, int msOrder);
 
 	int playerCnt;
-	int yongyongCnt;
-	int bangrangCnt;
-	int windCnt;
-	int booungCnt;
-	int bunpokCnt;
-	int nungangCnt;
-	int buljakCnt;
-	int postionCnt;
+	int arrMsCnt[9] = { 0 };
 	int secretCnt;
-
-	int seenCnt[8];
 
 	int stoneMinCnt = 0;
 	int stoneMaxCnt;
@@ -61,6 +52,7 @@ private:
 
 	std::vector<magicStone*> arrStones;
 	std::vector<player*> arrPlayers;
+	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
 
 	cocos2d::EventListenerCustom* uiListener;
 

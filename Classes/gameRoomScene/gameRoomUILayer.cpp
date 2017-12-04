@@ -208,21 +208,21 @@ void gameRoomUILayer::initUI()
 	);
 
 	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprPostion = Sprite::createWithSpriteFrameName("ms8_postion.png");
-	if (sprPostion == nullptr)
+	auto sprPotion = Sprite::createWithSpriteFrameName("ms8_potion.png");
+	if (sprPotion == nullptr)
 	{
-		log("### err ### gameRoomLayer::initUI::sprPostion is nullptr ");
+		log("### err ### gameRoomLayer::initUI::sprPotion is nullptr ");
 		std::abort();
 	}
-	auto btnPostion = MenuItemImage::create();
-	btnPostion->initWithNormalSprite(
-		sprPostion,
+	auto btnPotion = MenuItemImage::create();
+	btnPotion->initWithNormalSprite(
+		sprPotion,
 		sprStoneBackward,
-		sprPostion,
+		sprPotion,
 		CC_CALLBACK_0(
 			gameRoomUILayer::checkMagic,
 			this,
-			(const int)gameMetaData::msType::postion
+			(const int)gameMetaData::msType::potion
 		)
 	);
 	
@@ -259,7 +259,7 @@ void gameRoomUILayer::initUI()
 		btnBunpok,
 		btnNungang,
 		btnBuljak,
-		btnPostion,
+		btnPotion,
 		nullptr
 	);
 	btnPass->setEnabled(false);
@@ -275,7 +275,9 @@ void gameRoomUILayer::initUI()
 
 	this->addChild(seenCheckerBoard);
 
-	roundSpr = gameFlowManager::getInstance()->getNumSprite(roundNum);
+	roundSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+	roundSpr->setPosition(Vec2(50, 710));
+	roundSpr->setScale(0.8f);
 	setRound();
 
 	this->addChild(roundSpr);
@@ -286,11 +288,7 @@ void gameRoomUILayer::setRound()
 	std::cout << "라운드 업" << std::endl;
 
 	//라운드 50 710
-	//auto temp = gameFlowManager::getInstance()->getNumSprite(roundNum);
-	
-	//roundSpr->setTextureRect(temp->getTextureRect());
-	roundSpr->setPosition(Vec2(50, 710));
-	roundSpr->setScale(0.8f);
+	roundSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(roundNum));
 }
 
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
@@ -347,7 +345,7 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_8)
 	{
-		checkMagic(gameMetaData::msType::postion);
+		checkMagic(gameMetaData::msType::potion);
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_F5)
 	{

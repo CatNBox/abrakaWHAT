@@ -16,7 +16,7 @@ namespace gameMetaData
 		"ms5_bunpok.png",
 		"ms6_nungang.png",
 		"ms7_buljack.png",
-		"ms8_postion.png"
+		"ms8_potion.png"
 	}; 
 	const std::string arrNotSeenSpriteName[] = {
 		"ms1_notSeen.png",
@@ -38,6 +38,14 @@ namespace gameMetaData
 		"ms7_seen.png",
 		"ms8_seen.png"
 	};
+	const std::string arrLpTokenName[] = {
+		"lpToken00.png",
+		"lpToken01.png",
+		"lpToken02.png",
+		"lpToken03.png",
+		"lpToken04.png",
+		"lpToken05.png"
+	};
 
 	enum msType
 	{
@@ -49,8 +57,17 @@ namespace gameMetaData
 		bunpok,		//5
 		nungang,	//6
 		buljak,		//7
-		postion,	//8
+		potion,		//8
 		pass		//9
+	};
+
+	enum layerZOrder
+	{
+		backGroundZ,
+		objZ0,
+		objZ1,
+		objZ2,
+		effectZ
 	};
 
 	enum msStatus

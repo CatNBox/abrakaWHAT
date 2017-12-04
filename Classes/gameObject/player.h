@@ -8,7 +8,7 @@ class player
 {
 public:
 	player();
-	player(int seq);
+	player(int idx);
 	void init();
 
 	void pushStone2List(magicStone* ms);
@@ -24,6 +24,9 @@ public:
 	int getCurLP();
 	void decreaseLP(int varyValue);
 	void increaseLP(int varyValue);
+	cocos2d::Sprite* createLpObj(int playerIdx);
+	void initLpObj();
+	void actionGainLp(int gainNum);
 
 	bool doHaveThisMagic(const int magicNumber);
 	bool isNPC() const;
@@ -44,24 +47,26 @@ protected:
 	int defaultX = 384;
 	int defaultY = 0;
 	float rotationValue = 0;
+	int myIndex = 0;
 
 	int roundLP = 5;
 
 	bool flagNPC = false;
-	char* playerIPaddr;
+	//char* playerIPaddr;
 
 	player* nextPlayer = nullptr;
 	player* prevPlayer = nullptr;
 
 	std::list<magicStone*> stoneList;
-	//std::vector<magicStone*> stoneList;
 	std::vector<magicStone*> booungList;
+	std::vector<std::pair<cocos2d::Sprite*, bool>> lpSprList;
 };
 
 class npc : public player
 {
 public:
 	npc();
+	npc(int idx);
 	void npcProcess();
 	void npcTurnOn();
 	void waitTurn();

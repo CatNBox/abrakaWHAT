@@ -44,7 +44,8 @@ void gameFlowManager::changeScene2SingleMode()
 	setBunpokCount(5);
 	setNungangCount(6);
 	setBuljakCount(7);
-	setPostionCount(8);
+	setPotionCount(8);
+	setLifePoint(6);
 
 	auto singleModeScene = TransitionSlideInT::create(0.8f, gameRoomScene::createScene());
 	Director::getInstance()->replaceScene(singleModeScene);
@@ -68,55 +69,61 @@ void gameFlowManager::preloadSprites()
 	
 	auto tempSpr = Sprite::create("UISprite/spr_number.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "spr_number.png");
+
+	tempSpr->initWithFile("lpToken/lpToken00.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken00.png");
+	tempSpr->initWithFile("lpToken/lpToken01.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken01.png");
+	tempSpr->initWithFile("lpToken/lpToken02.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken02.png");
+	tempSpr->initWithFile("lpToken/lpToken03.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken03.png");
+	tempSpr->initWithFile("lpToken/lpToken04.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken04.png");
+	tempSpr->initWithFile("lpToken/lpToken05.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken05.png");
+
+	tempSpr->autorelease();
 }
 
-cocos2d::Sprite * gameFlowManager::getNumSprite(const int num)
+//Rect만 넘겨주도록 수정
+cocos2d::Rect gameFlowManager::getNumSprRect(const int num)
 {
-	Sprite* tempSpr;
+	cocos2d::Rect tempRect;
 	switch (num)
 	{
 	case 1:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(11, 5, 34, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(11, 5, 34, 81);
+		return tempRect;
 	case 2:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(51, 5, 47, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(51, 5, 47, 81);
+		return tempRect;
 	case 3:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(100, 5, 45, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(100, 5, 45, 81);
+		return tempRect;
 	case 4:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(147, 5, 46, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(147, 5, 46, 81);
+		return tempRect;
 	case 5:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(194, 5, 45, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(194, 5, 45, 81);
+		return tempRect;
 	case 6:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(242, 5, 43, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(242, 5, 43, 81);
+		return tempRect;
 	case 7:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(289, 5, 45, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(289, 5, 45, 81);
+		return tempRect;
 	case 8:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(336, 5, 45, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(336, 5, 45, 81);
+		return tempRect;
 	case 9:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(381, 5, 47, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(381, 5, 47, 81);
+		return tempRect;
 	default:
-		tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSpr->setTextureRect(cocos2d::Rect(430, 5, 46, 81));
-		return tempSpr;
+		tempRect = cocos2d::Rect(430, 5, 46, 81);
+		return tempRect;
 	}
-	return nullptr;
+	return tempRect;
 }
 
 void gameFlowManager::setPlayerCount(int cnt)
@@ -199,14 +206,14 @@ int gameFlowManager::getBuljakCount() const
 	return buljakCnt;
 }
 
-void gameFlowManager::setPostionCount(int cnt)
+void gameFlowManager::setPotionCount(int cnt)
 {
-	postionCnt = cnt;
+	potionCnt = cnt;
 }
 
-int gameFlowManager::getPostionCount() const
+int gameFlowManager::getPotionCount() const
 {
-	return postionCnt;
+	return potionCnt;
 }
 
 void gameFlowManager::setSecretCount(int cnt)
@@ -217,6 +224,26 @@ void gameFlowManager::setSecretCount(int cnt)
 int gameFlowManager::getSecretCount() const
 {
 	return secretCnt;
+}
+
+void gameFlowManager::setLifePoint(int cnt)
+{
+	maxLifePoint = cnt;
+}
+
+int gameFlowManager::getMaxLifePoint() const
+{
+	return maxLifePoint;
+}
+
+int gameFlowManager::getRandomInt(int min, int max)
+{
+	std::random_device rd;
+	std::mt19937_64 rnd(rd());
+
+	std::uniform_int_distribution<int> range(min, max);
+
+	return range(rnd);
 }
 
 void gameFlowManager::endGame()

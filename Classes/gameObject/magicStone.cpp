@@ -31,6 +31,8 @@ void magicStone::initObjData()
 	tY = stdAxis;
 	actionActiveChecker = false;
 	this->stopAllActions();
+	this->setOpacity(255);
+	this->setScale(1);
 	this->setVisible(false);
 	this->setRotation(0);
 	this->setPosition(stdAxis, stdAxis);
@@ -67,7 +69,25 @@ void magicStone::actionMove(const float delay, const cocos2d::Vec2 targetPos)
 	auto waitDelay = cocos2d::DelayTime::create(0.5f);
 	auto moving = cocos2d::MoveTo::create(0.8f, targetPos);
 	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
-	auto seq = cocos2d::Sequence::create(preDelay, showThis, waitDelay, moving, callTogLock, NULL);
+	auto seq = cocos2d::Sequence::create(preDelay, showThis, /*waitDelay,*/ moving, callTogLock, NULL);
+
+	this->runAction(seq);
+}
+
+void magicStone::actionActivated()
+{
+	if (isActionRunning())
+		return;
+
+	toggleLockAction();	//Lock runAction
+	initMsSprite();
+	this->setStatus(gameMetaData::msStatus::discard);
+	auto moving = cocos2d::MoveTo::create(0.5f, cocos2d::Vec2(stdAxis, stdAxis));
+	auto scaling = cocos2d::ScaleTo::create(1.0f, 5.0f);
+	auto fadeOut = cocos2d::FadeOut::create(1.0f);
+	auto spawning = cocos2d::Spawn::create(scaling, fadeOut, NULL);
+	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
+	auto seq = cocos2d::Sequence::create(moving, spawning, callTogLock, NULL);
 
 	this->runAction(seq);
 }
@@ -310,32 +330,32 @@ void msBuljak::initMagic()
 /*----------------------------------------
 
 
-msPostion
+msPotion
 
 
 -----------------------------------------*/
-msPostion::msPostion()
+msPotion::msPotion()
 {
-	cocos2d::log("@@@ create POSTION CLASS @@@");
+	cocos2d::log("@@@ create potion CLASS @@@");
 	initMagic();
 }
 
-msPostion::msPostion(const msPostion & clon)
+msPotion::msPotion(const msPotion & clon)
 {
-	cocos2d::log("@@@ cloning POSTION CLASS @@@");
+	cocos2d::log("@@@ cloning potion CLASS @@@");
 	initMagic();
 }
 
-msPostion::~msPostion()
+msPotion::~msPotion()
 {
 }
 
-magicStone * msPostion::clone()
+magicStone * msPotion::clone()
 {
-	return  new msPostion(*this);
+	return  new msPotion(*this);
 }
 
-void msPostion::initMagic()
+void msPotion::initMagic()
 {
-	magic = gameMetaData::msType::postion;
+	magic = gameMetaData::msType::potion;
 }
