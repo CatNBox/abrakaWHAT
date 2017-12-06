@@ -207,9 +207,9 @@ void gameRoomObjLayer::createSeenChecker()
 	for (int msNum = 0; msNum < 8; msNum++)
 	{
 		//seenChecker 스프라이트들의 좌표계산용
-		int defaultX = 205, defaultY = 400, recalibX = 23, recalibY = 40;
+		int defaultX = 245, defaultY = 360, recalibX = 23, recalibY = 40;
 		if (msNum > 3)
-			defaultX = 205 + recalibX * 3 + 35;
+			defaultX = defaultX + recalibX * 3 + 35;
 
 		std::vector<std::pair<Sprite*,bool>> tempVector;
 
@@ -308,7 +308,9 @@ void gameRoomObjLayer::selSecretStone()
 		secretTemp->setStatus(gameMetaData::msStatus::secret);
 		secretTemp->setBaseSprite();
 		//Draw and MoveAction
-		auto targetPos = Vec2(230 + i * 100, 600);
+		auto targetPos = Vec2(310 + i * 50, 530);
+		secretTemp->setScale(0.5f);
+		secretTemp->setLocalZOrder(gameMetaData::layerZOrder::objZ0);
 		secretTemp->actionMove(0.2f * preDelayCnt, targetPos);
 		preDelayCnt++;
 	}
@@ -436,13 +438,16 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
 	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
+	auto curPlayer = arrPlayers[curPlayerNum];
+
 	if (magicEnum == gameMetaData::msType::pass)
 	{
 		passTurn();
 		std::cout << "passTurn : " << magicEnum << std::endl;
 	}
-	else if (arrPlayers[curPlayerNum]->checkOutMagic(magicEnum))
+	else if (curPlayer->checkOutMagic(magicEnum))
 	{
+		std::cout << "magic activate : " << magicEnum << std::endl;
 		//seenChecker update
 		for (auto &i : seenChecker[magicEnum - 1])
 		{
@@ -456,14 +461,35 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 				break;
 			}
 		}
-		std::cout << "magic activate : " << magicEnum << std::endl;
+		
+		//플레이어 핸드 재정렬
+		int playerMsListSize = curPlayer->getStoneListSize();
+		for (int i = 0; i < playerMsListSize; i++)
+		{
+			auto tempMagicStone = curPlayer->getMagicStone(i);
+			int defaultX = curPlayer->getDefaultX();
+			int defaultY = curPlayer->getDefaultY();
+			int revisionValue = getMsPosRevision(playerMsListSize, i);
+			float rotValue = curPlayer->getRotationValue();
+			Vec2 tempVec2(defaultX + revisionValue, defaultY);
+			if (rotValue != 0)
+			{
+				tempVec2.setPoint(defaultX, defaultY + revisionValue);
+			}
+			tempMagicStone->actionMove(0.1f, tempVec2);
+		}
+
 		EventCustom callBackEvent("choicerUIEnabled");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&callBackEvent);
 	}
 	else
 	{
 		std::cout << "not exist : " << magicEnum << std::endl;
-		passTurn();
+		int lostLp = 1;
+		if(magicEnum == gameMetaData::msType::yongyong)
+			lostLp = gameFlowManager::getInstance()->getRandomInt(1, 3);
+		curPlayer->actionLostLp(lostLp);
+		//passTurn();
 	}
 }
 

@@ -1,4 +1,5 @@
 #include "magicStone.h"
+#include "SimpleAudioEngine.h"
 
 /*----------------------------------------
 
@@ -35,6 +36,7 @@ void magicStone::initObjData()
 	this->setScale(1);
 	this->setVisible(false);
 	this->setRotation(0);
+	this->setLocalZOrder(gameMetaData::layerZOrder::objZ2);
 	this->setPosition(stdAxis, stdAxis);
 }
 
@@ -58,27 +60,40 @@ void magicStone::toggleLockAction()
 	actionActiveChecker = !actionActiveChecker;
 }
 
-void magicStone::actionMove(const float delay, const cocos2d::Vec2 targetPos)
+void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos)
 {
-	if (isActionRunning())
-		return;
+	//if (isActionRunning())
+	//	return;
 
+	this->stopAllActions();
 	toggleLockAction();	//Lock runAction
-	auto preDelay = cocos2d::DelayTime::create(delay);
+	auto preDelay = cocos2d::DelayTime::create(priorDelay);
 	auto showThis = cocos2d::Show::create();
 	auto waitDelay = cocos2d::DelayTime::create(0.5f);
 	auto moving = cocos2d::MoveTo::create(0.8f, targetPos);
 	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
-	auto seq = cocos2d::Sequence::create(preDelay, showThis, /*waitDelay,*/ moving, callTogLock, NULL);
+	auto callPlaySFX = cocos2d::CallFunc::create([=]() 
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("soundResource/msMoving00.wav",false,0.3f,0.0f,0.7f); 
+	});
+	cocos2d::Vector<cocos2d::FiniteTimeAction*> actionList;
+	actionList.pushBack(preDelay);
+	actionList.pushBack(showThis);
+	if(priorDelay != 0.1f)
+		actionList.pushBack(callPlaySFX);
+	actionList.pushBack(moving);
+	actionList.pushBack(callTogLock);
+	auto seq = cocos2d::Sequence::create(actionList);
 
 	this->runAction(seq);
 }
 
 void magicStone::actionActivated()
 {
-	if (isActionRunning())
-		return;
+	//if (isActionRunning())
+	//	return;
 
+	this->stopAllActions();
 	toggleLockAction();	//Lock runAction
 	initMsSprite();
 	this->setStatus(gameMetaData::msStatus::discard);

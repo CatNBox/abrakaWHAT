@@ -46,6 +46,10 @@ namespace gameMetaData
 		"lpToken04.png",
 		"lpToken05.png"
 	};
+	const std::string arrSfxName[] = {
+		"soundResource/msMoving00",
+		"soundResource/buljak00",
+	};
 
 	enum msType
 	{

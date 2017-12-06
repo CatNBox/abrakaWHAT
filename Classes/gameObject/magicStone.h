@@ -22,7 +22,7 @@ public:
 
 	bool isActionRunning();
 	void toggleLockAction();
-	void actionMove(const float delay, const cocos2d::Vec2 targetPos);
+	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos);
 	void actionActivated();
 
 	virtual ~magicStone();

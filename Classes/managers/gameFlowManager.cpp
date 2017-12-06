@@ -83,6 +83,9 @@ void gameFlowManager::preloadSprites()
 	tempSpr->initWithFile("lpToken/lpToken05.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken05.png");
 
+	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("soundResource/msMoving00.wav");
+	//CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("soundResource/msMoving00.wav");
+
 	tempSpr->autorelease();
 }
 

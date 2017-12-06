@@ -270,7 +270,7 @@ void gameRoomUILayer::initUI()
 	this->addChild(magicChoicer);
 
 	auto seenCheckerBoard = Sprite::createWithSpriteFrameName("ms_seenBG.png");
-	seenCheckerBoard->setPosition(Vec2(340, 460));
+	seenCheckerBoard->setPosition(Vec2(380, 420));
 	seenCheckerBoard->setRotation(90.0f);
 
 	this->addChild(seenCheckerBoard);
@@ -294,7 +294,7 @@ void gameRoomUILayer::setRound()
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
 	//처리중 버튼메뉴 비활성화 - 이벤트 람다함수를 통해 활성화됨
-	magicChoicer->setEnabled(false);
+	//magicChoicer->setEnabled(false);
 	//this->setKeyboardEnabled(false); //변경할것
 
 	EventCustom checkEvent("checkOwnedMagic");

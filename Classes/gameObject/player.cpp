@@ -136,15 +136,15 @@ void player::actionGainLp(int gainNum)
 			i.second = true;
 
 			//±âÁØ 384,600 / 168,434 / 600,434 / 384,260
-			int revisionX = gameFlowManager::getInstance()->getRandomInt(0, 60);
-			int revisionY = gameFlowManager::getInstance()->getRandomInt(1, 61);
+			int revisionX = gameFlowManager::getInstance()->getRandomInt(0, 50);
+			int revisionY = gameFlowManager::getInstance()->getRandomInt(1, 51);
 
 			int tempX = defaultX;
 			int tempY = defaultY;
 
 			if (tempX == 384)
 			{
-				tempX = tempX - 30 + revisionX;
+				tempX = tempX - 100 + revisionX * 4;
 			}
 			else if(tempX > 384)
 			{
@@ -157,7 +157,7 @@ void player::actionGainLp(int gainNum)
 
 			if (tempY == 434)
 			{
-				tempY = tempY - 30 + revisionY;
+				tempY = tempY - 100 + revisionY * 4;
 			}
 			else if (tempY > 434)
 			{
@@ -171,14 +171,35 @@ void player::actionGainLp(int gainNum)
 			Vec2 tempVec(tempX, tempY);
 
 			auto showThis = cocos2d::Show::create();
+			auto fadeIn = cocos2d::FadeIn::create(0.7f);
 			auto moving = cocos2d::MoveTo::create(0.4f, tempVec);
 
-			auto seq = cocos2d::Sequence::create(showThis, moving, NULL);
+			auto seq = cocos2d::Sequence::create(showThis, fadeIn, moving, NULL);
 
 			i.first->runAction(seq);
+			gainNum--;
 		}
+	}
+}
 
-		gainNum--;
+void player::actionLostLp(int lostNum)
+{
+	for (auto &i : lpSprList)
+	{
+		if (lostNum <= 0)
+			break;
+
+		if (i.second == true)
+		{
+			i.second = false;
+
+			auto scaling = cocos2d::ScaleTo::create(1.0f, 2.0f);
+			auto fadeOut = cocos2d::FadeOut::create(1.0f);
+			auto spawning = cocos2d::Spawn::create(scaling, fadeOut, NULL);
+			
+			i.first->runAction(spawning);
+			lostNum--;
+		}
 	}
 }
 
