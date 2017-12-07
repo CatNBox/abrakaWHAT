@@ -26,7 +26,7 @@ private:
 	void curLPUpdate();
 
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
-	void activeMagic(magicStone* activeStone);
+	void activateMagic(const int magicEnum);
 	void passTurn();
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);

@@ -24,6 +24,13 @@ void player::init()
 void player::pushStone2List(magicStone* ms)
 {
 	stoneList.push_back(ms);
+	ms->setStatus(gameMetaData::msStatus::owned);
+}
+
+void player::pushbooung2List(magicStone * ms)
+{
+	booungList.push_back(ms);
+	ms->setStatus(gameMetaData::msStatus::owned);
 }
 
 int player::getStoneListSize()
@@ -121,11 +128,21 @@ void player::initLpObj()
 		i.first->setRotation(0);
 		i.first->setPosition(defaultX, defaultY);
 	}
-	actionGainLp(gameFlowManager::getInstance()->getMaxLifePoint());
+	actionGainLp(gameMetaData::msType::base);
 }
 
-void player::actionGainLp(int gainNum)
+void player::actionGainLp(const int msTypeEnum)
 {
+	int gainNum = 1;
+	if (msTypeEnum == gameMetaData::msType::base)
+	{
+		gainNum = gameFlowManager::getInstance()->getMaxLifePoint();
+	}
+	else if (msTypeEnum == gameMetaData::msType::wind)
+	{
+		gainNum = gameFlowManager::getInstance()->getRandomInt(1, 3);
+	}
+
 	for (auto &i : lpSprList)
 	{
 		if (gainNum <= 0)
@@ -172,7 +189,7 @@ void player::actionGainLp(int gainNum)
 
 			auto showThis = cocos2d::Show::create();
 			auto fadeIn = cocos2d::FadeIn::create(0.7f);
-			auto moving = cocos2d::MoveTo::create(0.4f, tempVec);
+			auto moving = cocos2d::MoveTo::create(0.2f, tempVec);
 
 			auto seq = cocos2d::Sequence::create(showThis, fadeIn, moving, NULL);
 
@@ -182,11 +199,11 @@ void player::actionGainLp(int gainNum)
 	}
 }
 
-void player::actionLostLp(int lostNum)
+void player::actionLostLp(int lostValue)
 {
 	for (auto &i : lpSprList)
 	{
-		if (lostNum <= 0)
+		if (lostValue <= 0)
 			break;
 
 		if (i.second == true)
@@ -196,9 +213,15 @@ void player::actionLostLp(int lostNum)
 			auto scaling = cocos2d::ScaleTo::create(1.0f, 2.0f);
 			auto fadeOut = cocos2d::FadeOut::create(1.0f);
 			auto spawning = cocos2d::Spawn::create(scaling, fadeOut, NULL);
+			auto setBack = cocos2d::CallFunc::create([=]() 
+			{
+				i.first->setScale(1.0f);
+				i.first->setPosition(stdAxis, stdAxis);
+			});
+			auto seq = cocos2d::Sequence::create(spawning, setBack, NULL);
 			
-			i.first->runAction(spawning);
-			lostNum--;
+			i.first->runAction(seq);
+			lostValue--;
 		}
 	}
 }

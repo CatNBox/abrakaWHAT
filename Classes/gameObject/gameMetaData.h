@@ -4,6 +4,7 @@
 #define NETWORK_MODE_BUILD 2
 #define RELEASE_MODE_BUILD 0
 #define stdAxis 384.0f
+#define secretScale 0.5f
 
 namespace gameMetaData
 {
@@ -68,10 +69,10 @@ namespace gameMetaData
 	enum layerZOrder
 	{
 		backGroundZ,
-		objZ0,
-		objZ1,
+		objZ0,			//----secretStone Zorder
+		objZ1,			//----LP Zorder
 		objZ2,
-		effectZ
+		effectZ			//----Effect Zorder
 	};
 
 	enum msStatus

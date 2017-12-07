@@ -24,6 +24,7 @@ public:
 	void toggleLockAction();
 	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos);
 	void actionActivated();
+	void actionRevealedSecret();
 
 	virtual ~magicStone();
 	virtual magicStone* clone() = 0; //for prototype pattern

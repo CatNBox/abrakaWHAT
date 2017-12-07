@@ -107,6 +107,18 @@ void magicStone::actionActivated()
 	this->runAction(seq);
 }
 
+void magicStone::actionRevealedSecret()
+{
+	//----like flip magicStone
+	auto zOrderUp = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ2); });
+	auto shrinking = cocos2d::ScaleTo::create(0.3f, 0.01f, 1.5f);
+	auto changeTexture = cocos2d::CallFunc::create([=]() {this->initMsSprite(); });
+	auto growing = cocos2d::ScaleTo::create(0.3f, secretScale, secretScale);
+	auto zOrderDown = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ0); });
+	auto seq = cocos2d::Sequence::create(zOrderUp, shrinking, changeTexture, growing, zOrderDown, NULL);
+	this->runAction(seq);
+}
+
 magicStone::~magicStone()
 {
 }

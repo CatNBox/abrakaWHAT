@@ -12,6 +12,7 @@ public:
 	void init();
 
 	void pushStone2List(magicStone* ms);
+	void pushbooung2List(magicStone* ms);
 	int getStoneListSize();
 	int getBooungListSize();
 	magicStone* getBooungMS(const int idx);
@@ -24,8 +25,8 @@ public:
 	void increaseLP(int varyValue);
 	cocos2d::Sprite* createLpObj(int playerIdx);
 	void initLpObj();
-	void actionGainLp(int gainNum);
-	void actionLostLp(int lostNum);
+	void actionGainLp(const int msTypeEnum);
+	void actionLostLp(int lostValue);
 
 	bool doHaveThisMagic(const int magicNumber);
 	bool isNPC() const;

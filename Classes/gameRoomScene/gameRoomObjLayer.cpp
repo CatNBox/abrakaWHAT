@@ -309,7 +309,7 @@ void gameRoomObjLayer::selSecretStone()
 		secretTemp->setBaseSprite();
 		//Draw and MoveAction
 		auto targetPos = Vec2(310 + i * 50, 530);
-		secretTemp->setScale(0.5f);
+		secretTemp->setScale(secretScale);
 		secretTemp->setLocalZOrder(gameMetaData::layerZOrder::objZ0);
 		secretTemp->actionMove(0.2f * preDelayCnt, targetPos);
 		preDelayCnt++;
@@ -333,7 +333,6 @@ void gameRoomObjLayer::shareStone2Player()
 		//Sharing by player order
 		int tempCurPlayerIdx = i%playerCnt;
 		arrPlayers[tempCurPlayerIdx]->pushStone2List(tempSelStone);
-		tempSelStone->setStatus(gameMetaData::msStatus::owned);
 		//if (tempCurPlayerIdx == myPlayerNum)
 		//{
 		//	tempSelStone->setBaseSprite();
@@ -431,13 +430,14 @@ void gameRoomObjLayer::curLPUpdate()
 	}
 }
 
-//보유한 magicStone 체크이벤트
+//----checkEvent owned magicStone
 void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 {
 	std::cout << "check Event in" << std::endl;
-	int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
+	const int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
 	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
+	//----current player pointer
 	auto curPlayer = arrPlayers[curPlayerNum];
 
 	if (magicEnum == gameMetaData::msType::pass)
@@ -448,7 +448,11 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	else if (curPlayer->checkOutMagic(magicEnum))
 	{
 		std::cout << "magic activate : " << magicEnum << std::endl;
-		//seenChecker update
+
+		//----activateMagic
+		activateMagic(magicEnum);
+
+		//----seenChecker update and effect action
 		for (auto &i : seenChecker[magicEnum - 1])
 		{
 			if (i.second == false)
@@ -462,7 +466,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 			}
 		}
 		
-		//플레이어 핸드 재정렬
+		//----reorder player's hand
 		int playerMsListSize = curPlayer->getStoneListSize();
 		for (int i = 0; i < playerMsListSize; i++)
 		{
@@ -485,16 +489,68 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	else
 	{
 		std::cout << "not exist : " << magicEnum << std::endl;
-		int lostLp = 1;
-		if(magicEnum == gameMetaData::msType::yongyong)
-			lostLp = gameFlowManager::getInstance()->getRandomInt(1, 3);
-		curPlayer->actionLostLp(lostLp);
+		//----action checkFail
+		int damage = 1;
+		if (magicEnum == gameMetaData::msType::yongyong)
+			damage = gameFlowManager::getInstance()->getRandomInt(1,3);
+		curPlayer->actionLostLp(damage);
 		//passTurn();
 	}
 }
 
-void gameRoomObjLayer::activeMagic(magicStone * activeStone)
+void gameRoomObjLayer::activateMagic(const int magicEnum)
 {
+	auto currentPlayer = arrPlayers[curPlayerNum];
+	int damage = 1;
+	switch (magicEnum)
+	{
+	case gameMetaData::msType::yongyong:
+	{
+		damage = gameFlowManager::getInstance()->getRandomInt(1, 3);
+	}
+	case gameMetaData::msType::bangrang:
+	{
+		//----yongyong && bangrang damage action
+		for (auto &i : arrPlayers)
+		{
+			if (i == currentPlayer)
+				continue;
+
+			i->actionLostLp(damage);
+		}
+		return;
+	}
+	case gameMetaData::msType::bunpok:
+	case gameMetaData::msType::nungang:
+	case gameMetaData::msType::buljak:
+	{
+		//-----bunpok, nungang, buljak damage action
+		if (magicEnum != gameMetaData::msType::buljak)
+			currentPlayer->getPrevPlayer()->actionLostLp(damage);
+
+		if (magicEnum != gameMetaData::msType::nungang)
+			currentPlayer->getNextPlayer()->actionLostLp(damage);
+
+		return;
+	}
+	case gameMetaData::msType::wind:
+	case gameMetaData::msType::potion:
+	{
+		currentPlayer->actionGainLp(magicEnum);
+		return;
+	}
+	case gameMetaData::msType::booung:
+	{
+		auto tempMs = pickAStone(gameMetaData::msStatus::secret);
+		currentPlayer->pushbooung2List(tempMs);
+		if (curPlayerNum == myPlayerNum)
+			tempMs->actionRevealedSecret();
+		return;
+	}
+	default:
+		assert(magicEnum || " : 잘못된 magicEnum이 activateMagic에 입력됨");
+		return;
+	}
 }
 
 void gameRoomObjLayer::passTurn()
