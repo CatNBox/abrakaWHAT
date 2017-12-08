@@ -494,7 +494,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		if (magicEnum == gameMetaData::msType::yongyong)
 			damage = gameFlowManager::getInstance()->getRandomInt(1,3);
 		curPlayer->actionLostLp(damage);
-		//passTurn();
+		passTurn();
 	}
 }
 
@@ -518,6 +518,8 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 
 			i->actionLostLp(damage);
 		}
+		if (magicEnum == gameMetaData::msType::bangrang)
+			currentPlayer->actionGainLp(magicEnum);
 		return;
 	}
 	case gameMetaData::msType::bunpok:
@@ -593,6 +595,7 @@ void gameRoomObjLayer::passTurn()
 	//턴을 넘긴다
 	if (curPlayer->isNPC())
 	{
+		this->unscheduleAllCallbacks();
 		((npc*)curPlayer)->waitTurn();
 	}
 	//std::cout << "curPlayerNum : " << curPlayerNum << std::endl;
@@ -604,6 +607,7 @@ void gameRoomObjLayer::passTurn()
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{
 			((npc*)arrPlayers[curPlayerNum])->npcTurnOn();
+			this->schedule([=](float d) {((npc*)arrPlayers[curPlayerNum])->npcProcess(); }, 1.0f, CC_REPEAT_FOREVER, 1.0f,"npcPass");
 		}
 		EventCustom passTurnEvent("passTurn2NextUser");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);

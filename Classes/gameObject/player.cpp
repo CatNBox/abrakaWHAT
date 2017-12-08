@@ -186,12 +186,13 @@ void player::actionGainLp(const int msTypeEnum)
 			}
 
 			Vec2 tempVec(tempX, tempY);
-
+			
 			auto showThis = cocos2d::Show::create();
-			auto fadeIn = cocos2d::FadeIn::create(0.7f);
-			auto moving = cocos2d::MoveTo::create(0.2f, tempVec);
+			auto fadeIn = cocos2d::FadeIn::create(0.5f);
+			auto moving = cocos2d::MoveTo::create(0.3f, tempVec);
+			auto spawning = cocos2d::Spawn::create(fadeIn, moving, NULL);
 
-			auto seq = cocos2d::Sequence::create(showThis, fadeIn, moving, NULL);
+			auto seq = cocos2d::Sequence::create(showThis, spawning, NULL);
 
 			i.first->runAction(seq);
 			gainNum--;
@@ -296,12 +297,13 @@ void player::setRotationValue(float rot)
 npc::npc()
 	:state(gameMetaData::npcState::npcWait)
 {
-	flagNPC = true;
 }
 
 npc::npc(int idx)
-	: player(idx)
+	: player(idx),
+	 state(gameMetaData::npcState::npcWait)
 {
+	flagNPC = true;
 }
 
 void npc::npcProcess()

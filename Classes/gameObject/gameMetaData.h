@@ -8,6 +8,7 @@
 
 namespace gameMetaData
 {
+	//0 = ms_bg, 1~8 = ms1~8
 	const std::string arrMsSpriteName[] = {
 		"ms_bg.png",
 		"ms1_yongyong.png",

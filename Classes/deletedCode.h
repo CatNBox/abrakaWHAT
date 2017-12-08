@@ -132,3 +132,159 @@ void gameRoomObjLayer::stoneObjUpdate()
 }
 
 
+
+{
+	auto sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprYongyong = Sprite::createWithSpriteFrameName("ms1_yongyong.png");
+	if (sprYongyong == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprYongyong is nullptr ");
+		std::abort();
+	}
+	auto btnYongyong = MenuItemImage::create();
+
+	btnYongyong->initWithNormalSprite(
+		sprYongyong,
+		sprStoneBackward,
+		sprYongyong,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::yongyong
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprBangrang = Sprite::createWithSpriteFrameName("ms2_bangrang.png");
+	if (sprBangrang == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprBangrang is nullptr ");
+		std::abort();
+	}
+	auto btnBangrang = MenuItemImage::create();
+	btnBangrang->initWithNormalSprite(
+		sprBangrang,
+		sprStoneBackward,
+		sprBangrang,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::bangrang
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprWind = Sprite::createWithSpriteFrameName("ms3_wind.png");
+	if (sprWind == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprWind is nullptr ");
+		std::abort();
+	}
+	auto btnWind = MenuItemImage::create();
+	btnWind->initWithNormalSprite(
+		sprWind,
+		sprStoneBackward,
+		sprWind,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::wind
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprBooung = Sprite::createWithSpriteFrameName("ms4_booung.png");
+	if (sprBooung == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprBooung is nullptr ");
+		std::abort();
+	}
+	auto btnBooung = MenuItemImage::create();
+	btnBooung->initWithNormalSprite(
+		sprBooung,
+		sprStoneBackward,
+		sprBooung,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::booung
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprBunpok = Sprite::createWithSpriteFrameName("ms5_bunpok.png");
+	if (sprBunpok == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprBunpok is nullptr ");
+		std::abort();
+	}
+	auto btnBunpok = MenuItemImage::create();
+	btnBunpok->initWithNormalSprite(
+		sprBunpok,
+		sprStoneBackward,
+		sprBunpok,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::bunpok
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprNungang = Sprite::createWithSpriteFrameName("ms6_nungang.png");
+	if (sprNungang == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprNungang is nullptr ");
+		std::abort();
+	}
+	auto btnNungang = MenuItemImage::create();
+	btnNungang->initWithNormalSprite(
+		sprNungang,
+		sprStoneBackward,
+		sprNungang,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::nungang
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprBuljak = Sprite::createWithSpriteFrameName("ms7_buljack.png");
+	if (sprBuljak == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprBuljak is nullptr ");
+		std::abort();
+	}
+	auto btnBuljak = MenuItemImage::create();
+	btnBuljak->initWithNormalSprite(
+		sprBuljak,
+		sprStoneBackward,
+		sprBuljak,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::buljak
+		)
+	);
+
+	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
+	auto sprPotion = Sprite::createWithSpriteFrameName("ms8_potion.png");
+	if (sprPotion == nullptr)
+	{
+		log("### err ### gameRoomLayer::initUI::sprPotion is nullptr ");
+		std::abort();
+	}
+	auto btnPotion = MenuItemImage::create();
+	btnPotion->initWithNormalSprite(
+		sprPotion,
+		sprStoneBackward,
+		sprPotion,
+		CC_CALLBACK_0(
+			gameRoomUILayer::checkMagic,
+			this,
+			(const int)gameMetaData::msType::potion
+		)
+	);
+
+}

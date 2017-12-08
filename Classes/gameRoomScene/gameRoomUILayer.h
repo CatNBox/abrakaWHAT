@@ -8,6 +8,7 @@ public:
 
 	CREATE_FUNC(gameRoomUILayer);
 private:
+	void settingEventListener();
 	void checkMagic(const int magicStoneNumber);
 	void returnMainMenu();
 	void initUI();
@@ -22,6 +23,9 @@ private:
 	cocos2d::Menu* etcUI; //exit
 	
 	int roundNum = 1;
+	int lastChooseMs = 0;
 	cocos2d::Sprite* roundSpr;
 	cocos2d::Object* roundObj;
+
+	std::vector<cocos2d::MenuItemImage*> arrBtnSelectStone;
 };

@@ -11,6 +11,17 @@ bool gameRoomUILayer::init()
 	{
 		return false;
 	}
+	
+	//arrBtnSelectStone.resize(8);
+	settingEventListener();
+
+	this->initUI();
+
+	return true;
+}
+
+void gameRoomUILayer::settingEventListener()
+{
 
 	//키보드 인벤트 등록
 	keyListener = EventListenerKeyboard::create();
@@ -45,6 +56,7 @@ bool gameRoomUILayer::init()
 		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
 		btnPass->setEnabled(false);
 		magicChoicer->setEnabled(false);
+		lastChooseMs = 0;
 		//this->setKeyboardEnabled(false);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
@@ -52,7 +64,12 @@ bool gameRoomUILayer::init()
 	//내턴이 돌아오면 magicStone선택ui 활성화
 	callBackListener = EventListenerCustom::create("myTurn",
 		[=](EventCustom* event) {
+		std::cout << "my Turn back" << std::endl;
 		magicChoicer->setEnabled(true);
+		for (int i = 0; i < 8; i++)
+		{
+			arrBtnSelectStone[i]->setEnabled(true);
+		}
 		//this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
@@ -65,169 +82,32 @@ bool gameRoomUILayer::init()
 		setRound();
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
-
-	this->initUI();
-
-	return true;
 }
+
 
 void gameRoomUILayer::initUI()
 {
-	auto sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprYongyong = Sprite::createWithSpriteFrameName("ms1_yongyong.png");
-	if (sprYongyong == nullptr)
+	for (int i = 1; i < 9; i++)
 	{
-		log("### err ### gameRoomLayer::initUI::sprYongyong is nullptr ");
-		std::abort();
+		auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrMsSpriteName[i]);
+		auto tempSprDisabled = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrMsSpriteName[i]);
+		tempSprDisabled->setColor(cocos2d::Color3B(125, 125, 125));
+		auto tempSprBackward = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrMsSpriteName[0]);
+		auto tempItem = cocos2d::MenuItemImage::create(); 
+		tempItem->initWithNormalSprite(
+			tempSpr,
+			tempSprBackward,
+			tempSprDisabled,
+			CC_CALLBACK_0(
+				gameRoomUILayer::checkMagic,
+				this,
+				(const int)i
+			)
+		);
+		arrBtnSelectStone.push_back(tempItem);
 	}
-	auto btnYongyong = MenuItemImage::create();
-
-	btnYongyong->initWithNormalSprite(
-		sprYongyong,
-		sprStoneBackward,
-		sprYongyong,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::yongyong
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprBangrang = Sprite::createWithSpriteFrameName("ms2_bangrang.png");
-	if (sprBangrang == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprBangrang is nullptr ");
-		std::abort();
-	}
-	auto btnBangrang = MenuItemImage::create();
-	btnBangrang->initWithNormalSprite(
-		sprBangrang,
-		sprStoneBackward,
-		sprBangrang,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::bangrang
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprWind = Sprite::createWithSpriteFrameName("ms3_wind.png");
-	if (sprWind == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprWind is nullptr ");
-		std::abort();
-	}
-	auto btnWind = MenuItemImage::create();
-	btnWind->initWithNormalSprite(
-		sprWind,
-		sprStoneBackward,
-		sprWind,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::wind
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprBooung = Sprite::createWithSpriteFrameName("ms4_booung.png");
-	if (sprBooung == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprBooung is nullptr ");
-		std::abort();
-	}
-	auto btnBooung = MenuItemImage::create();
-	btnBooung->initWithNormalSprite(
-		sprBooung,
-		sprStoneBackward,
-		sprBooung,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::booung
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprBunpok = Sprite::createWithSpriteFrameName("ms5_bunpok.png");
-	if (sprBunpok == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprBunpok is nullptr ");
-		std::abort();
-	}
-	auto btnBunpok = MenuItemImage::create();
-	btnBunpok->initWithNormalSprite(
-		sprBunpok,
-		sprStoneBackward,
-		sprBunpok,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::bunpok
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprNungang = Sprite::createWithSpriteFrameName("ms6_nungang.png");
-	if (sprNungang == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprNungang is nullptr ");
-		std::abort();
-	}
-	auto btnNungang = MenuItemImage::create();
-	btnNungang->initWithNormalSprite(
-		sprNungang,
-		sprStoneBackward,
-		sprNungang,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::nungang
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprBuljak = Sprite::createWithSpriteFrameName("ms7_buljack.png");
-	if (sprBuljak == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprBuljak is nullptr ");
-		std::abort();
-	}
-	auto btnBuljak = MenuItemImage::create();
-	btnBuljak->initWithNormalSprite(
-		sprBuljak,
-		sprStoneBackward,
-		sprBuljak,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::buljak
-		)
-	);
-
-	sprStoneBackward = Sprite::createWithSpriteFrameName("ms_bg.png");
-	auto sprPotion = Sprite::createWithSpriteFrameName("ms8_potion.png");
-	if (sprPotion == nullptr)
-	{
-		log("### err ### gameRoomLayer::initUI::sprPotion is nullptr ");
-		std::abort();
-	}
-	auto btnPotion = MenuItemImage::create();
-	btnPotion->initWithNormalSprite(
-		sprPotion,
-		sprStoneBackward,
-		sprPotion,
-		CC_CALLBACK_0(
-			gameRoomUILayer::checkMagic,
-			this,
-			(const int)gameMetaData::msType::potion
-		)
-	);
 	
-	auto btnPass = MenuItemImage::create();
-	btnPass->initWithNormalImage(
+	auto btnPass = MenuItemImage::create(
 		"UISprite/ms_pass_abled_normal.png",
 		"UISprite/ms_pass_abled_clicked.png",
 		"UISprite/ms_pass_disabled.png",
@@ -238,8 +118,7 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
-	auto btnExit = MenuItemImage::create();
-	btnExit->initWithNormalImage(
+	auto btnExit = MenuItemImage::create(
 		"UISprite/btnExitNormal.png",
 		"UISprite/btnExitPress.png",
 		"UISprite/btnExitPress.png",
@@ -251,17 +130,12 @@ void gameRoomUILayer::initUI()
 	btnExit->setScale(0.5f);
 	btnExit->setPosition(Vec2(330, 670));
 
-	magicChoicer = Menu::create(
-		btnYongyong,
-		btnBangrang,
-		btnWind,
-		btnBooung,
-		btnBunpok,
-		btnNungang,
-		btnBuljak,
-		btnPotion,
-		nullptr
-	);
+	magicChoicer = cocos2d::Menu::create();
+	for (int i = 0; i < 8; i++)
+	{
+		magicChoicer->addChild(arrBtnSelectStone[i]);
+	}
+
 	btnPass->setEnabled(false);
 	magicChoicer->addChild(btnPass, 0, "btnPass");
 	magicChoicer->alignItemsHorizontallyWithPadding(10.0f);
@@ -290,12 +164,17 @@ void gameRoomUILayer::setRound()
 	//라운드 50 710
 	roundSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(roundNum));
 }
-
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
 	//처리중 버튼메뉴 비활성화 - 이벤트 람다함수를 통해 활성화됨
-	//magicChoicer->setEnabled(false);
+	magicChoicer->setEnabled(false);
 	//this->setKeyboardEnabled(false); //변경할것
+
+	lastChooseMs = magicStoneNumber;
+	for (int i = 0; i < lastChooseMs-1; i++)
+	{
+		arrBtnSelectStone[i]->setEnabled(false);
+	}
 
 	EventCustom checkEvent("checkOwnedMagic");
 	checkEvent.setUserData((void*)magicStoneNumber);

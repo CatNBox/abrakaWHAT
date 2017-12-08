@@ -11,4 +11,5 @@ private:
 	void hostGameBtnCallback();
 	void joinGameBtnCallback();
 	void singleGameBtnCallback();
+	void openBuyURL();
 };
