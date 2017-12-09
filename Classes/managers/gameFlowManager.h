@@ -1,15 +1,12 @@
 #pragma once
 #include "cocos2d.h"
-#include "gameObject\gameMetaData.h"
-#include <random>
-#include <assert.h>
 
 #define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
 
 class networkManager;
 class soundManager;
 
-class gameFlowManager:public cocos2d::Object
+class gameFlowManager
 {
 public:
 	static gameFlowManager* getInstance();

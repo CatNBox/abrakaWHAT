@@ -48,9 +48,26 @@ namespace gameMetaData
 		"lpToken04.png",
 		"lpToken05.png"
 	};
-	const std::string arrSfxName[] = {
+
+	//----using Enum sfxName
+	const std::vector<const char*> arrSfxPath = {
 		"soundResource/msMoving00",
-		"soundResource/buljak00",
+		"soundResource/buljak00"
+	};
+
+	//----tempNpcSound
+	const std::vector<const char*> arrNpcSound = {
+		"soundResource/tempSound/byTheLight.ogg"
+		"soundResource/tempSound/goodgame.ogg"
+		"soundResource/tempSound/greetings.ogg"
+		"soundResource/tempSound/theLightShallBringVictory.ogg"
+		"soundResource/tempSound/theLightShallBurnYou.ogg"
+	};
+
+	enum sfxName
+	{
+		msMoving00,
+		buljak00
 	};
 
 	enum msType

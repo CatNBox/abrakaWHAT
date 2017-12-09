@@ -105,6 +105,9 @@
     <ClCompile Include="..\Classes\gameObject\player.cpp">
       <Filter>src\06_gameObject</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\managers\soundManager.cpp">
+      <Filter>src\00_managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -152,9 +155,6 @@
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomScene.h">
       <Filter>src\04_gameRoomScene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\setupScene\soundManager.h">
-      <Filter>src\00_managers</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\gameObject\magicStone.h">
       <Filter>src\06_gameObject</Filter>
     </ClInclude>
@@ -169,6 +169,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\deletedCode.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\soundManager.h">
+      <Filter>src\00_managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -160,6 +160,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\managers\gameFlowManager.cpp" />
     <ClCompile Include="..\Classes\managers\networkManager.cpp" />
     <ClCompile Include="..\Classes\mainMenuScene\mainMenuScene.cpp" />
+    <ClCompile Include="..\Classes\managers\soundManager.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupScene.cpp" />
     <ClCompile Include="main.cpp" />
@@ -182,9 +183,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuBGLayer.h" />
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuObjLayer.h" />
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuScene.h" />
+    <ClInclude Include="..\Classes\managers\soundManager.h" />
     <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupScene.h" />
-    <ClInclude Include="..\Classes\setupScene\soundManager.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomObjLayer.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h" />

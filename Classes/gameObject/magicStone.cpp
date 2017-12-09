@@ -1,5 +1,5 @@
 #include "magicStone.h"
-#include "SimpleAudioEngine.h"
+#include "managers\gameFlowManager.h"
 
 /*----------------------------------------
 
@@ -74,7 +74,7 @@ void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPo
 	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
 	auto callPlaySFX = cocos2d::CallFunc::create([=]() 
 	{
-		CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("soundResource/msMoving00.wav",false,0.3f,0.0f,0.7f); 
+		
 	});
 	cocos2d::Vector<cocos2d::FiniteTimeAction*> actionList;
 	actionList.pushBack(preDelay);

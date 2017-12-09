@@ -1,7 +1,9 @@
 #include "managers\gameFlowManager.h"
+#include "managers\soundManager.h
 #include "mainMenuScene\mainMenuScene.h"
 #include "gameRoomScene\gameRoomScene.h"
-#include "SimpleAudioEngine.h"
+#include "gameObject\gameMetaData.h"
+#include <random>
 
 using namespace cocos2d;
 
@@ -20,6 +22,7 @@ gameFlowManager * gameFlowManager::getInstance()
 gameFlowManager::gameFlowManager()
 {
 	curSceneState = gameMetaData::curScene::setupScene;
+	objSoundManager = new soundManager();
 }
 
 void gameFlowManager::changeScene2MainMenu()
@@ -82,10 +85,7 @@ void gameFlowManager::preloadSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken04.png");
 	tempSpr->initWithFile("lpToken/lpToken05.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken05.png");
-
-	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("soundResource/msMoving00.wav");
-	//CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("soundResource/msMoving00.wav");
-
+	
 	tempSpr->autorelease();
 }
 
