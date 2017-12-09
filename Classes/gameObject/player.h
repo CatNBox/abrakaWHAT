@@ -72,5 +72,6 @@ public:
 	void waitTurn();
 private:
 
+	float thinkRowhenTime = 1.0f;
 	int state; // gameMetaData::npcState
 };

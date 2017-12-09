@@ -607,7 +607,10 @@ void gameRoomObjLayer::passTurn()
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{
 			((npc*)arrPlayers[curPlayerNum])->npcTurnOn();
-			this->schedule([=](float d) {((npc*)arrPlayers[curPlayerNum])->npcProcess(); }, 1.0f, CC_REPEAT_FOREVER, 1.0f,"npcPass");
+			this->schedule([=](float d) {
+				
+				((npc*)arrPlayers[curPlayerNum])->npcProcess(); 
+			}, 1.0f, CC_REPEAT_FOREVER, 1.0f,"npcPass");
 		}
 		EventCustom passTurnEvent("passTurn2NextUser");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
