@@ -1,4 +1,5 @@
 #pragma once
+#include "cocos2d.h"
 
 #define SINGLE_MODE_BUILD 1
 #define NETWORK_MODE_BUILD 2
@@ -51,17 +52,17 @@ namespace gameMetaData
 
 	//----using Enum sfxName
 	const std::vector<const char*> arrSfxPath = {
-		"soundResource/msMoving00",
-		"soundResource/buljak00"
+		"soundResource/msMoving00.wav",
+		"soundResource/buljak00.wav"
 	};
 
 	//----tempNpcSound
 	const std::vector<const char*> arrNpcSound = {
-		"soundResource/tempSound/byTheLight.ogg"
-		"soundResource/tempSound/goodgame.ogg"
-		"soundResource/tempSound/greetings.ogg"
-		"soundResource/tempSound/theLightShallBringVictory.ogg"
-		"soundResource/tempSound/theLightShallBurnYou.ogg"
+		"soundResource/tempSound/byTheLight.wav",
+		"soundResource/tempSound/goodgame.wav",
+		"soundResource/tempSound/greetings.wav",
+		"soundResource/tempSound/theLightShallBringVictory.wav",
+		"soundResource/tempSound/theLightShallBurnYou.wav"
 	};
 
 	enum sfxName

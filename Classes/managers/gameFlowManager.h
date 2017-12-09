@@ -1,10 +1,10 @@
 #pragma once
 #include "cocos2d.h"
+#include "managers\soundManager.h"
 
 #define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
 
 class networkManager;
-class soundManager;
 
 class gameFlowManager
 {
@@ -46,6 +46,7 @@ public:
 	int getMaxLifePoint() const;
 
 	int getRandomInt(int min, int max);
+	soundManager* getSoundManager();
 
 	void endGame();
 

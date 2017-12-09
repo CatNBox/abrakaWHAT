@@ -506,6 +506,22 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	{
 	case gameMetaData::msType::yongyong:
 	{
+		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(15, 15));	//15,15
+		auto shaking02 = cocos2d::MoveBy::create(0.1f, Vec2(-30, -15));	//-15,0
+		auto shaking03 = cocos2d::MoveBy::create(0.1f, Vec2(30, -15));	//15,-15
+		auto shaking04 = cocos2d::MoveBy::create(0.1f, Vec2(-15, 30));	//0,15
+		auto shaking05 = cocos2d::MoveBy::create(0.1f, Vec2(-15, -30));	//-15,-15
+		auto shaking06 = cocos2d::MoveBy::create(0.1f, Vec2(30, 15));	//15,0
+		auto shaking07 = cocos2d::MoveBy::create(0.1f, Vec2(-30, 15));	//-15,15
+		auto shaking08 = cocos2d::MoveBy::create(0.1f, Vec2(15, -15));	//0,-15
+		auto shaking09 = cocos2d::MoveBy::create(0.1f, Vec2(0, 15)); //0, 0
+		auto seq01 = cocos2d::Sequence::create(shaking01, shaking02, shaking03, 
+			shaking04, shaking05, shaking06, shaking07, shaking08, shaking09, NULL);
+		auto reverseAction = seq01->reverse();
+		auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
+
+		this->runAction(seq02);
+
 		damage = gameFlowManager::getInstance()->getRandomInt(1, 3);
 	}
 	case gameMetaData::msType::bangrang:
@@ -606,9 +622,10 @@ void gameRoomObjLayer::passTurn()
 	{
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{
+			gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
 			((npc*)arrPlayers[curPlayerNum])->npcTurnOn();
 			this->schedule([=](float d) {
-				
+				//gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
 				((npc*)arrPlayers[curPlayerNum])->npcProcess(); 
 			}, 1.0f, CC_REPEAT_FOREVER, 1.0f,"npcPass");
 		}

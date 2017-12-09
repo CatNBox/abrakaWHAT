@@ -8,5 +8,7 @@ public:
 
 	void preLoadSound();
 	void playSfx(const int sfxEnum);
+	void playNpcSound();
 private:
+	unsigned int prevNpcSoundID = 0;
 };

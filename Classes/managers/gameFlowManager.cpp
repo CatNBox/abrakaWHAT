@@ -1,5 +1,4 @@
 #include "managers\gameFlowManager.h"
-#include "managers\soundManager.h
 #include "mainMenuScene\mainMenuScene.h"
 #include "gameRoomScene\gameRoomScene.h"
 #include "gameObject\gameMetaData.h"
@@ -247,6 +246,11 @@ int gameFlowManager::getRandomInt(int min, int max)
 	std::uniform_int_distribution<int> range(min, max);
 
 	return range(rnd);
+}
+
+soundManager * gameFlowManager::getSoundManager()
+{
+	return objSoundManager;
 }
 
 void gameFlowManager::endGame()

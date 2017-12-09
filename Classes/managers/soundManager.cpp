@@ -1,8 +1,11 @@
 #include "managers\soundManager.h"
+#include "managers\gameFlowManager.h"
+#include "gameObject\gameMetaData.h"
 #include <SimpleAudioEngine.h>
 
 soundManager::soundManager()
 {
+	preLoadSound();
 }
 
 soundManager::~soundManager()
@@ -23,5 +26,29 @@ void soundManager::preLoadSound()
 
 void soundManager::playSfx(const int sfxEnum)
 {
-	CocosDenshion::SimpleAudioEngine::getInstance()->playEffect("soundResource/msMoving00.wav", false, 0.3f, 0.0f, 0.7f);
+	switch (sfxEnum)
+	{
+	case gameMetaData::sfxName::msMoving00:
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()
+			->playEffect(gameMetaData::arrSfxPath.at(sfxEnum), false, 0.3f, 0.0f, 0.7f);
+		return;
+	}
+	default:
+	{
+		return;
+	}
+	}
+}
+
+void soundManager::playNpcSound()
+{
+	if (prevNpcSoundID > 0)
+	{
+		CocosDenshion::SimpleAudioEngine::getInstance()
+			->stopEffect(prevNpcSoundID);
+	}
+	int rInt = gameFlowManager::getInstance()->getRandomInt(0, 4);
+	prevNpcSoundID = CocosDenshion::SimpleAudioEngine::getInstance()
+		->playEffect(gameMetaData::arrNpcSound.at(rInt));
 }

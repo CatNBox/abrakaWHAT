@@ -74,7 +74,7 @@ void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPo
 	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
 	auto callPlaySFX = cocos2d::CallFunc::create([=]() 
 	{
-		
+		gameFlowManager::getInstance()->getSoundManager()->playSfx(gameMetaData::sfxName::msMoving00);
 	});
 	cocos2d::Vector<cocos2d::FiniteTimeAction*> actionList;
 	actionList.pushBack(preDelay);
