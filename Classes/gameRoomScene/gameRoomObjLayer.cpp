@@ -351,10 +351,10 @@ void gameRoomObjLayer::shareStone2Player()
 		//Sharing by player order
 		int tempCurPlayerIdx = i%playerCnt;
 		arrPlayers[tempCurPlayerIdx]->pushStone2List(tempSelStone);
-		//if (tempCurPlayerIdx == myPlayerNum)
-		//{
-		//	tempSelStone->setBaseSprite();
-		//}
+		if (tempCurPlayerIdx == myPlayerNum)
+		{
+			tempSelStone->setBaseSprite();
+		}
 		//Draw and MoveAction
 		int defaultX = arrPlayers[tempCurPlayerIdx]->getDefaultX();
 		int defaultY = arrPlayers[tempCurPlayerIdx]->getDefaultY();
@@ -591,10 +591,15 @@ void gameRoomObjLayer::reorderPlayerHand()
 	for (int i = 0; i < playerMsListSize; i++)
 	{
 		auto tempMagicStone = curPlayer->getMagicStone(i);
+		if (curPlayerNum == myPlayerNum)
+		{
+			tempMagicStone->setBaseSprite();
+		}
 		int defaultX = curPlayer->getDefaultX();
 		int defaultY = curPlayer->getDefaultY();
 		int revisionValue = getMsPosRevision(playerMsListSize, i);
 		float rotValue = curPlayer->getRotationValue();
+		tempMagicStone->setRotation(rotValue);
 		Vec2 tempVec2(defaultX + revisionValue, defaultY);
 		if (rotValue != 0)
 		{

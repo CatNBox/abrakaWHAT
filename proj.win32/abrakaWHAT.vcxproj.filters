@@ -64,6 +64,9 @@
     <Filter Include="src\07_popupLayer">
       <UniqueIdentifier>{4cfd7276-a796-4d10-8162-9da0573ac6d7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\popupLayerSpr">
+      <UniqueIdentifier>{ed3d7baf-4248-45cc-b0ed-a8eb8d3e84e1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -114,7 +117,7 @@
     <ClCompile Include="..\Classes\managers\soundManager.cpp">
       <Filter>src\00_managers</Filter>
     </ClCompile>
-    <ClCompile Include="popupLayer.cpp">
+    <ClCompile Include="..\Classes\popupLayer\popupLayer.cpp">
       <Filter>src\07_popupLayer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,7 +185,7 @@
     <ClInclude Include="..\Classes\managers\soundManager.h">
       <Filter>src\00_managers</Filter>
     </ClInclude>
-    <ClInclude Include="popupLayer.h">
+    <ClInclude Include="..\Classes\popupLayer\popupLayer.h">
       <Filter>src\07_popupLayer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -362,6 +365,18 @@
     </Image>
     <Image Include="..\Resources\UISprite\sprPlayer.png">
       <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\popupLayerSpr\popupLayerBG.png">
+      <Filter>resource\popupLayerSpr</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\uiPopMessage.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\popupLayerSpr\popup400245.png">
+      <Filter>resource\popupLayerSpr</Filter>
+    </Image>
+    <Image Include="..\Resources\popupLayerSpr\popup400500.png">
+      <Filter>resource\popupLayerSpr</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

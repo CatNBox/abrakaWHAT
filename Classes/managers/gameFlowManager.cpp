@@ -90,6 +90,14 @@ void gameFlowManager::preloadSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "yongyongRedScreen.png");
 	tempSpr->initWithFile("UISprite/sprScore.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprScore.png");
+	tempSpr->initWithFile("popupLayerSpr/popupLayerBG.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popupLayerBG.png");
+	tempSpr->initWithFile("popupLayerSpr/popup400500.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popup400500.png");
+	tempSpr->initWithFile("popupLayerSpr/popup400245.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popup400245.png");
+	tempSpr->initWithFile("UISprite/uiPopMessage.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "uiPopMessage.png");
 
 	tempSpr->autorelease();
 }
