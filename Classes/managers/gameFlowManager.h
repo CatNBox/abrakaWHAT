@@ -50,6 +50,12 @@ public:
 
 	void endGame();
 
+	void incRunningActionCnt();
+	void decRunningActionCnt();
+	int getRunningActionCnt();
+
+	cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);
+
 private:
 	int playerCount;
 	int yongyongCnt;
@@ -62,6 +68,8 @@ private:
 	int potionCnt;
 	int secretCnt;
 	int maxLifePoint = 0;
+
+	int runningActionCnt = 0;
 
 	int curSceneState;
 

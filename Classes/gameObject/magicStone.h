@@ -20,9 +20,9 @@ public:
 	bool initMsSprite();	//magic에 맞는 스프라이트로 갱신
 	bool setBaseSprite();	//뒷모습 스프라이트로 갱신
 
-	bool isActionRunning();
-	void toggleLockAction();
-	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos);
+	void notifyActionStart();
+	void notifyActionEnd();
+	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum);
 	void actionActivated();
 	void actionRevealedSecret();
 
@@ -33,14 +33,12 @@ protected:
 	int magic = gameMetaData::msType::base;
 	int status = gameMetaData::msStatus::notUse;
 	int actionState = gameMetaData::msActionState::msWait;
+	
+	float curX = STDAXIS;
+	float curY = STDAXIS;
 
-	bool actionActiveChecker = false;
-
-	float curX = stdAxis;
-	float curY = stdAxis;
-
-	float tX = stdAxis;
-	float tY = stdAxis;
+	float tX = STDAXIS;
+	float tY = STDAXIS;
 };
 
 /*----------------------------------------

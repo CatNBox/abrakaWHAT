@@ -13,6 +13,7 @@ private:
 	void returnMainMenu();
 	void initUI();
 	void setRound();
+	bool checkRunningAction();
 
 	void onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
 	void onKeyReleased(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event);
@@ -22,7 +23,7 @@ private:
 	cocos2d::Menu* magicChoicer; //eash stone's front sprite and pass sprite
 	cocos2d::Menu* etcUI; //exit
 	
-	int roundNum = 1;
+	int roundNum = 0;
 	int lastChooseMs = 0;
 	cocos2d::Sprite* roundSpr;
 	cocos2d::Object* roundObj;

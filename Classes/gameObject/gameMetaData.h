@@ -1,11 +1,13 @@
 #pragma once
-#include "cocos2d.h"
+#include <string>
+#include <vector>
 
 #define SINGLE_MODE_BUILD 1
 #define NETWORK_MODE_BUILD 2
 #define RELEASE_MODE_BUILD 0
-#define stdAxis 384.0f
-#define secretScale 0.5f
+#define STDAXIS 384.0f
+#define SECRETSTONE_BASESCALE 0.5f
+#define SCORE_BASESCALE 0.5f
 
 namespace gameMetaData
 {
@@ -22,6 +24,7 @@ namespace gameMetaData
 		"ms8_potion.png"
 	}; 
 	const std::string arrNotSeenSpriteName[] = {
+		"ms_bg.png",
 		"ms1_notSeen.png",
 		"ms2_notSeen.png",
 		"ms3_notSeen.png",
@@ -32,6 +35,7 @@ namespace gameMetaData
 		"ms8_notSeen.png"
 	};
 	const std::string arrSeenSpriteName[] = {
+		"ms_bg.png",
 		"ms1_seen.png",
 		"ms2_seen.png",
 		"ms3_seen.png",
@@ -53,36 +57,89 @@ namespace gameMetaData
 	//----using Enum sfxName
 	const std::vector<const char*> arrSfxPath = {
 		"soundResource/msMoving00.wav",
-		"soundResource/buljak00.wav"
+		"soundResource/buljak00.wav",
+		"soundResource/activateMagic00.wav"
 	};
 
 	//----tempNpcSound
 	const std::vector<const char*> arrNpcSound = {
-		"soundResource/tempSound/byTheLight.wav",
-		"soundResource/tempSound/goodgame.wav",
-		"soundResource/tempSound/greetings.wav",
-		"soundResource/tempSound/theLightShallBringVictory.wav",
-		"soundResource/tempSound/theLightShallBurnYou.wav"
+		"soundResource/tempSound/anduinEng/byTheLight.wav",
+		"soundResource/tempSound/anduinEng/goodgame.wav",
+		"soundResource/tempSound/anduinEng/greetings.wav",
+		"soundResource/tempSound/anduinEng/theLightShallBringVictory.wav",
+		"soundResource/tempSound/anduinEng/theLightShallBurnYou.wav",
+		"soundResource/tempSound/vampyJp/doshiyokana.wav",
+		"soundResource/tempSound/vampyJp/etoneetone.wav",
+		"soundResource/tempSound/vampyJp/ikeike.wav",
+		"soundResource/tempSound/vampyJp/sorejahajimeyoka.wav",
+		"soundResource/tempSound/vampyJp/vampychansaikyodesushi.wav",
+		"soundResource/tempSound/vampyJp/vampychansugoindakara.wav",
+		"soundResource/tempSound/arisaEng/theForestIsAngry.wav",
+		"soundResource/tempSound/arisaEng/thisEndHere.wav",
+		"soundResource/tempSound/arisaEng/youAreDoneFall.wav",
+		"soundResource/tempSound/arisaEng/whatShouldIdo.wav",
+		"soundResource/tempSound/arisaEng/wowYouAreStong.wav"
+	};
+
+	const std::vector<const char*> arrNpcGreeting = {
+		"soundResource/tempSound/vampyJp/sorejahajimeyoka.wav",
+		"soundResource/tempSound/anduinKor/anduinKorStart.wav",
+		"soundResource/tempSound/anduinEng/greetings.wav",
+		"soundResource/tempSound/arisaEng/theForestIsAngry.wav"
+	};
+
+	const std::vector<const char*> arrNpcThreaten = {
+		"soundResource/tempSound/vampyJp/vampychansaikyodesushi.wav",
+		"soundResource/tempSound/anduinKor/anduinKorThreaten.wav",
+		"soundResource/tempSound/anduinEng/theLightShallBurnYou.wav",
+		"soundResource/tempSound/arisaEng/youAreDoneFall.wav"
+	};
+
+	const std::vector<const char*> arrBGSprite = {
+		"bg01.jpg",
+		"bg02.jpg",
+		"bg03.jpg",
+		"bg04.jpg"
+	};
+
+	enum npcCharacter
+	{
+		vampyJp,
+		anduinKor,
+		anduinEng,
+		arisaEng
+	};
+
+	enum npcEmotion
+	{
+		greeting,
+		threaten
+	};
+
+	enum variableMaxCnt
+	{
+		msTypeCnt = 9	//array use index 1 to 8
 	};
 
 	enum sfxName
 	{
 		msMoving00,
-		buljak00
+		buljak00,
+		activateMagic00
 	};
 
 	enum msType
 	{
-		base = 0,	//0
-		yongyong,	//1
-		bangrang,	//2
-		wind,		//3
-		booung,		//4
-		bunpok,		//5
-		nungang,	//6
-		buljak,		//7
-		potion,		//8
-		pass		//9
+		base = 0,	//= 0
+		yongyong,	//= 1
+		bangrang,	//= 2
+		wind,		//= 3
+		booung,		//= 4
+		bunpok,		//= 5
+		nungang,	//= 6
+		buljak,		//= 7
+		potion,		//= 8
+		pass		//= 9
 	};
 
 	enum layerZOrder
@@ -100,6 +157,13 @@ namespace gameMetaData
 		owned,
 		secret,
 		discard
+	};
+
+	enum msMovement
+	{
+		sharing,
+		selected,
+		reordering
 	};
 
 	enum msActionState

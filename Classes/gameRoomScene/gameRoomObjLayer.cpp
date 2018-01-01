@@ -1,5 +1,7 @@
 #include "gameRoomObjLayer.h"
 #include "managers\gameFlowManager.h"
+#include "gameObject\magicStone.h"
+#include "gameObject\player.h"
 #include <iostream>
 
 using namespace cocos2d;
@@ -16,7 +18,10 @@ bool gameRoomObjLayer::init()
 
 	//countOption value setting
 	settingCntValues();
-	
+
+	//create scoreSprite
+	createScoreSpr();
+
 	//create players
 	createPlayers();
 
@@ -70,13 +75,16 @@ void gameRoomObjLayer::settingCntValues()
 		+ arrMsCnt[gameMetaData::msType::nungang]	//nungang
 		+ arrMsCnt[gameMetaData::msType::buljak]	//buljak
 		+ arrMsCnt[gameMetaData::msType::potion];	//potion
+
+	arrScoreSpr.resize(playerCnt);
+	arrPlayers.resize(playerCnt);
+	arrStones.resize(stoneMaxCnt);
 }
 
 void gameRoomObjLayer::createPlayers()
 {
 	//현재 내 플레이어 번호를 기준으로 할 것 - 차후 멀티모드 수정
 	bool bPlayer = true;
-	arrPlayers.resize(playerCnt);
 	int idx = 0;
 	for (auto &i : arrPlayers)
 	{
@@ -106,25 +114,29 @@ void gameRoomObjLayer::createPlayers()
 		int defaultX = 384;
 		int defaultY = 0;
 		float rotValue = 0;
-		if (i == myPlayerNum)	//멀티모드 시 내 플레이어 번호가 되도록
+		if (i == myPlayerNum)	//when multiPlay, it's center Position
 		{
 			defaultY = 160;
+			arrScoreSpr.at(i)->setPosition(Vec2(660, 130));
 		}
 		else if (i == (myPlayerNum + 1) % playerCnt)
 		{
 			defaultX = 700;
-			defaultY = 434;
+			defaultY = 454;
 			rotValue = 90.0f;
+			arrScoreSpr.at(i)->setPosition(Vec2(700, 150));
 		}
 		else if (i == (myPlayerNum + 2) % playerCnt)
 		{
 			defaultY = 700;
+			arrScoreSpr.at(i)->setPosition(Vec2(660, 170));
 		}
 		else if (i == (myPlayerNum + 3) % playerCnt)
 		{
 			defaultX = 68;
-			defaultY = 434;
+			defaultY = 454;
 			rotValue = -90.0f;
+			arrScoreSpr.at(i)->setPosition(Vec2(620, 150));
 		}
 		else
 		{
@@ -134,11 +146,12 @@ void gameRoomObjLayer::createPlayers()
 		arrPlayers[i]->setDefaultY(defaultY);
 		arrPlayers[i]->setRotationValue(rotValue);
 	}
+
+	//scoreSpr 620 660 700 130 150 170
 }
 
 void gameRoomObjLayer::createMagicStones()
 {
-	arrStones.resize(stoneMaxCnt);
 
 	arrStones[0] = new msYongyong;
 
@@ -201,36 +214,35 @@ void gameRoomObjLayer::createMagicStones()
 
 void gameRoomObjLayer::createSeenChecker()
 {
+	seenChecker.resize(gameMetaData::variableMaxCnt::msTypeCnt);
 	//205,400 / 16*32 / y+40 x+23 / +35
-
 	Sprite* seenMs;
-	for (int msNum = 0; msNum < 8; msNum++)
+	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
-		//seenChecker 스프라이트들의 좌표계산용
+		//seenChecker default axis
 		int defaultX = 245, defaultY = 360, recalibX = 23, recalibY = 40;
-		if (msNum > 3)
+		if (msNum > 4)
 			defaultX = defaultX + recalibX * 3 + 35;
 
 		std::vector<std::pair<Sprite*,bool>> tempVector;
 
-		//seenCnt의 값만큼 seen스프라이트 그림, 그 외에는 notSeen스프라이트
-		for (int seenObjNum = 0; seenObjNum < arrMsCnt[msNum + 1]; seenObjNum++)
+		//create seenSprite and addChild, push to vector
+		for (int seenObjNum = 0; seenObjNum < arrMsCnt[msNum]; seenObjNum++)
 		{
 			seenMs = Sprite::createWithSpriteFrameName(gameMetaData::arrNotSeenSpriteName[msNum]);
 
-			seenMs->setPosition(Vec2(defaultX + seenObjNum * recalibX, defaultY + (msNum % 4) * recalibY));
+			seenMs->setPosition(Vec2(defaultX + seenObjNum * recalibX, defaultY + ((msNum-1) % 4) * recalibY));
 			this->addChild(seenMs,gameMetaData::layerZOrder::objZ0);
 			std::pair<Sprite*, bool> tempPair(seenMs,false);
 			tempVector.push_back(tempPair);
 		}
-		seenChecker.push_back(tempVector);
+		seenChecker[msNum] = tempVector;
 	}
 }
 
 void gameRoomObjLayer::createPlayerLpObj()
 {
-	//위치는 플레이어 위치기준 랜덤+-로 무작위로 흩어져보이도록
-	//objLayer가 LP sprite를 갖도록
+	//player have info of LpSprite
 	int idx = 0;
 	for (auto &i : arrPlayers)
 	{
@@ -243,32 +255,43 @@ void gameRoomObjLayer::createPlayerLpObj()
 	}
 }
 
+void gameRoomObjLayer::createScoreSpr()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		auto tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
+		tempSpr->setVisible(false);
+		tempSpr->setScale(SCORE_BASESCALE);
+		arrScoreSpr.at(i) = tempSpr;
+		this->addChild(tempSpr, gameMetaData::layerZOrder::objZ1);
+	}
+}
+
 void gameRoomObjLayer::initRound()
 {
-	//임시코드
-	isChanged = true;
-
 	//0.init each Object
 	//init magicStones
 	for (auto &i : arrStones)
 	{
 		i->initObjData();
 	}
-	//init Players
+	//init Players and update Score Sprite
 	for (auto &i : arrPlayers)
 	{
 		i->init();
+		auto playerIdx = i->getIndex();
+		arrScoreSpr.at(playerIdx)->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(arrScore.at(playerIdx)));
+		arrScoreSpr.at(playerIdx)->setVisible(true);
 	}
 	//init seenChecker
-	for (int msNum = 0; msNum < 8; msNum++)
+	for (int msNum = 1; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
-		for (auto &j : seenChecker[msNum])
+		for (auto &elemSeenChecker : seenChecker[msNum])
 		{
-			j.first->initWithSpriteFrameName(gameMetaData::arrNotSeenSpriteName[msNum]);
-			j.second = false;
+			elemSeenChecker.first->initWithSpriteFrameName(gameMetaData::arrNotSeenSpriteName[msNum]);
+			elemSeenChecker.second = false;
 		}
 	}
-	//init player's LP
 
 	//display RoundCnt
 	EventCustom passTurnEvent("roundUp");
@@ -284,9 +307,6 @@ void gameRoomObjLayer::initRound()
 	starterNum = 0;
 	curPlayerNum = 0;
 	setStartOrder(); //starterNum setting
-
-					 //checkArrStones();
-					 //checkArrPlayers();
 }
 
 void gameRoomObjLayer::selSecretStone()
@@ -299,19 +319,17 @@ void gameRoomObjLayer::selSecretStone()
 		secretTemp = pickAStone(gameMetaData::msStatus::notUse);
 		if (secretTemp == nullptr)
 		{
-			std::cout << "initRound()::secretTemp에서 돌이 모두 사용되어서 분배 불가능" << std::endl;
+			//오류창 팝업 및 종료
 			break;
 		}
-
-		//arrSecret.push_back(secretTemp);	//I think it is not necessary
 
 		secretTemp->setStatus(gameMetaData::msStatus::secret);
 		secretTemp->setBaseSprite();
 		//Draw and MoveAction
 		auto targetPos = Vec2(310 + i * 50, 530);
-		secretTemp->setScale(secretScale);
+		secretTemp->setScale(SECRETSTONE_BASESCALE);
 		secretTemp->setLocalZOrder(gameMetaData::layerZOrder::objZ0);
-		secretTemp->actionMove(0.2f * preDelayCnt, targetPos);
+		secretTemp->actionMove(0.2f * preDelayCnt, targetPos, gameMetaData::msMovement::sharing);
 		preDelayCnt++;
 	}
 }
@@ -326,7 +344,7 @@ void gameRoomObjLayer::shareStone2Player()
 		tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
 		if (tempSelStone == nullptr)
 		{
-			std::cout << "initRound()::tempSelStone에서 돌이 모두 사용되어서 분배 불가능" << std::endl;
+			//오류창 팝업 및 종료
 			break;
 		}
 
@@ -336,10 +354,6 @@ void gameRoomObjLayer::shareStone2Player()
 		//if (tempCurPlayerIdx == myPlayerNum)
 		//{
 		//	tempSelStone->setBaseSprite();
-		//}
-		//else
-		//{
-			tempSelStone->initMsSprite();
 		//}
 		//Draw and MoveAction
 		int defaultX = arrPlayers[tempCurPlayerIdx]->getDefaultX();
@@ -352,7 +366,7 @@ void gameRoomObjLayer::shareStone2Player()
 			tempVec.setPoint(defaultX, defaultY + revisionValue);
 		}
 		tempSelStone->setRotation(rotValue);
-		tempSelStone->actionMove(0.2f * (secretCnt + preDelayCnt), tempVec);
+		tempSelStone->actionMove(0.2f * (secretCnt + preDelayCnt), tempVec, gameMetaData::msMovement::sharing);
 		preDelayCnt++;
 	}
 }
@@ -363,71 +377,23 @@ void gameRoomObjLayer::setStartOrder()
 	starterNum = (rand() % playerCnt) + 1;
 }
 
-void gameRoomObjLayer::layerUpdate(float d)
+void gameRoomObjLayer::callNpcProcess()
 {
-	//update object state
-	dataUpdate();
-
-	if (isChanged)
+	gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
+	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
-		//remove All object
-		//this->removeAllChildren();
-
-		//update screen
-		//seenCheckUpdate();
-		//stoneObjUpdate();
-		//curLPUpdate();
-
-		isChanged = false;
-	}
-}
-
-void gameRoomObjLayer::dataUpdate()
-{
-	//discard된 숫자만큼 해당 ms의 seenCnt증가
-	for (int i = 0; i < 8; i++)
-	{
-		//seenCnt[i] = 0;
-	}
-	for (auto &i : arrStones)
-	{
-		int magicEnum = i->getMagic() - 1;
-		//if (i->getStatus() == gameMetaData::msStatus::discard)
-			//seenCnt[magicEnum]++;
-	}
-
-	if (arrPlayers[curPlayerNum]->isNPC())
-	{
-		npc* tempNpc = (npc*)arrPlayers[curPlayerNum];
-		tempNpc->npcProcess();
-	}
-}
-
-void gameRoomObjLayer::curLPUpdate()
-{
-	//p0 370 330, p1 140 390, p2 380 620, p3 630 390
-
-	for (int i = 0; i < (int)arrPlayers.size(); i++)
-	{
-		std::string tempStrLP = std::to_string(arrPlayers[i]->getCurLP());
-		auto tempLabelLP = Label::createWithTTF(tempStrLP, "fonts/Marker Felt.ttf", 36);
-		
-		switch (i)
+		int discardCnt = 0;
+		for (auto seenObj : seenChecker[msNum])
 		{
-		case 0:
-			tempLabelLP->setPosition(Vec2(370, 330));
-			break;
-		case 1:
-			tempLabelLP->setPosition(Vec2(140, 390));
-			break;
-		case 2:
-			tempLabelLP->setPosition(Vec2(380, 620));
-			break;
-		case 3:
-			tempLabelLP->setPosition(Vec2(630, 390));
+			if (seenObj.second == true)
+				discardCnt++;
 		}
-		this->addChild(tempLabelLP);
+		((npc*)arrPlayers[curPlayerNum])->setDiscardCnt(msNum, discardCnt);
 	}
+	this->schedule([=](float d) {
+		this->unscheduleAllCallbacks();
+		((npc*)arrPlayers[curPlayerNum])->npcProcess();
+	}, 0.0f, 0, 1.0f, "npcPass");
 }
 
 //----checkEvent owned magicStone
@@ -439,61 +405,79 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 
 	//----current player pointer
 	auto curPlayer = arrPlayers[curPlayerNum];
+	bool isCorrectChoice = false;
 
+	//when choose pass
 	if (magicEnum == gameMetaData::msType::pass)
 	{
-		passTurn();
 		std::cout << "passTurn : " << magicEnum << std::endl;
+		passTurn();
+		return;
 	}
+	//check and activate selected magicStone
 	else if (curPlayer->checkOutMagic(magicEnum))
 	{
 		std::cout << "magic activate : " << magicEnum << std::endl;
+		isCorrectChoice = true;
 
 		//----activateMagic
 		activateMagic(magicEnum);
 
 		//----seenChecker update and effect action
-		for (auto &i : seenChecker[magicEnum - 1])
-		{
-			if (i.second == false)
-			{
-				auto seenCheckEffect = cocos2d::ParticleSystemQuad::create("particle4SeenCheck.plist");
-				seenCheckEffect->setPosition(i.first->getPosition());
-				this->addChild(seenCheckEffect,gameMetaData::layerZOrder::effectZ);
-				i.first->initWithSpriteFrameName(gameMetaData::arrSeenSpriteName[magicEnum - 1]);
-				i.second = true;
-				break;
-			}
-		}
+		updateSeenChecker(magicEnum);
 		
 		//----reorder player's hand
-		int playerMsListSize = curPlayer->getStoneListSize();
-		for (int i = 0; i < playerMsListSize; i++)
-		{
-			auto tempMagicStone = curPlayer->getMagicStone(i);
-			int defaultX = curPlayer->getDefaultX();
-			int defaultY = curPlayer->getDefaultY();
-			int revisionValue = getMsPosRevision(playerMsListSize, i);
-			float rotValue = curPlayer->getRotationValue();
-			Vec2 tempVec2(defaultX + revisionValue, defaultY);
-			if (rotValue != 0)
-			{
-				tempVec2.setPoint(defaultX, defaultY + revisionValue);
-			}
-			tempMagicStone->actionMove(0.1f, tempVec2);
-		}
-
-		EventCustom callBackEvent("choicerUIEnabled");
-		Director::getInstance()->getEventDispatcher()->dispatchEvent(&callBackEvent);
+		reorderPlayerHand();
 	}
+	//not exist selected magicStone
 	else
 	{
 		std::cout << "not exist : " << magicEnum << std::endl;
+		isCorrectChoice = false;
+
 		//----action checkFail
 		int damage = 1;
 		if (magicEnum == gameMetaData::msType::yongyong)
 			damage = gameFlowManager::getInstance()->getRandomInt(1,3);
 		curPlayer->actionLostLp(damage);
+		if (curPlayer->isNPC())
+		{
+			((npc*)curPlayer)->choiceFail(magicEnum);
+		}
+	}
+
+	if (isRoundEnd())
+	{
+		//calc score ending round
+		calcScore();
+
+		//checkEndGame
+		//임시코드 / 팝업창 코드 적용할 것
+		for (const auto elemScore : arrScore)
+		{
+			if(elemScore >= 8)
+				gameFlowManager::getInstance()->endGame();
+		}
+
+		//start new Round
+		initRound();
+		return;
+	}
+	
+	if(isCorrectChoice)
+	{
+		if (curPlayer->isNPC())
+		{
+			callNpcProcess();
+		}
+		else //not NPC
+		{
+			EventCustom callBackEvent("choicerUIEnabled");
+			Director::getInstance()->getEventDispatcher()->dispatchEvent(&callBackEvent);
+		}
+	}
+	else
+	{
 		passTurn();
 	}
 }
@@ -506,6 +490,15 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	{
 	case gameMetaData::msType::yongyong:
 	{
+		auto redScreenSpr = cocos2d::Sprite::createWithSpriteFrameName("yongyongRedScreen.png");
+		redScreenSpr->setScale(1.1f);
+		redScreenSpr->setPosition(STDAXIS, STDAXIS);
+		addChild(redScreenSpr, gameMetaData::layerZOrder::effectZ);
+		auto blinking = cocos2d::Blink::create(2.0f, 8);
+		auto callred = cocos2d::CallFunc::create([=]() {redScreenSpr->setVisible(false);});
+		auto seqRed = gameFlowManager::getInstance()->wrapActions(blinking, callred, NULL);
+		redScreenSpr->runAction(seqRed);
+
 		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(15, 15));	//15,15
 		auto shaking02 = cocos2d::MoveBy::create(0.1f, Vec2(-30, -15));	//-15,0
 		auto shaking03 = cocos2d::MoveBy::create(0.1f, Vec2(30, -15));	//15,-15
@@ -518,9 +511,9 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		auto seq01 = cocos2d::Sequence::create(shaking01, shaking02, shaking03, 
 			shaking04, shaking05, shaking06, shaking07, shaking08, shaking09, NULL);
 		auto reverseAction = seq01->reverse();
-		auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
-
-		this->runAction(seq02);
+		//auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
+		auto seqEarthQuake = gameFlowManager::getInstance()->wrapActions(seq01, reverseAction, NULL);
+		this->runAction(seqEarthQuake);
 
 		damage = gameFlowManager::getInstance()->getRandomInt(1, 3);
 	}
@@ -560,6 +553,10 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	case gameMetaData::msType::booung:
 	{
 		auto tempMs = pickAStone(gameMetaData::msStatus::secret);
+		if (tempMs == nullptr)
+		{
+			//팝업창 예외처리
+		}
 		currentPlayer->pushbooung2List(tempMs);
 		if (curPlayerNum == myPlayerNum)
 			tempMs->actionRevealedSecret();
@@ -571,63 +568,119 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	}
 }
 
+void gameRoomObjLayer::updateSeenChecker(const int magicEnum)
+{
+	for (auto &i : seenChecker[magicEnum])
+	{
+		if (i.second == false)
+		{
+			auto seenCheckEffect = cocos2d::ParticleSystemQuad::create("particle4SeenCheck.plist");
+			seenCheckEffect->setPosition(i.first->getPosition());
+			this->addChild(seenCheckEffect, gameMetaData::layerZOrder::effectZ);
+			i.first->initWithSpriteFrameName(gameMetaData::arrSeenSpriteName[magicEnum]);
+			i.second = true;
+			break;
+		}
+	}
+}
+
+void gameRoomObjLayer::reorderPlayerHand()
+{
+	auto curPlayer = arrPlayers[curPlayerNum];
+	int playerMsListSize = curPlayer->getStoneListSize();
+	for (int i = 0; i < playerMsListSize; i++)
+	{
+		auto tempMagicStone = curPlayer->getMagicStone(i);
+		int defaultX = curPlayer->getDefaultX();
+		int defaultY = curPlayer->getDefaultY();
+		int revisionValue = getMsPosRevision(playerMsListSize, i);
+		float rotValue = curPlayer->getRotationValue();
+		Vec2 tempVec2(defaultX + revisionValue, defaultY);
+		if (rotValue != 0)
+		{
+			tempVec2.setPoint(defaultX, defaultY + revisionValue);
+		}
+		tempMagicStone->actionMove(0.1f, tempVec2, gameMetaData::msMovement::reordering);
+	}
+}
+
+bool gameRoomObjLayer::isRoundEnd()
+{
+	//players's life check. if anyone have zero LPCnt, roundEnd is True
+	for (const auto &playerPointer : arrPlayers)
+	{
+		if (playerPointer->getCurLP() == 0)
+			return true;
+	}
+
+	//count curPlayer's rest hand
+	if (arrPlayers[curPlayerNum]->getStoneListSize() == 0)
+		return true;
+
+	return false;
+}
+
+void gameRoomObjLayer::calcScore()
+{
+	//check lp / check booung / if curPlayer's lp is zero, no point
+	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
+		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
+
+	for (const auto &elemPlayer : arrPlayers)
+	{
+		//check Lp
+		if (elemPlayer->getCurLP() > 0)
+		{
+			//at least have 1 Lp, get 1 point
+			arrScore.at(elemPlayer->getIndex()) += 1;
+
+			//check booung
+			arrScore.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
+		}
+	}
+}
+
 void gameRoomObjLayer::passTurn()
 {
-	//임시코드
-	isChanged = true;
-
 	//current Player
 	auto curPlayer = arrPlayers[curPlayerNum];
 
 	//magicStone의 보유개수가 5개가 아니고 사용되지않은 magicStone이 있다면 보충한다
-	//모두 사용되었다면 라운드를 종료한다
-	if (isAllUsed())
+	//Draw magicStone
+	int curPlayerReqCnt = 5 - curPlayer->getStoneListSize();
+	int drawCnt = 0;
+	for (int i = 0; i < curPlayerReqCnt; i++)
 	{
-		//라운드종료
-		//win(curPlayer);
-		checkArrStones();
-		std::cout << "All MagicStone is used" << std::endl;
-	}
-	else
-	{
-		//Draw magicStone
-		int curPlayerReqCnt = 5 - curPlayer->getStoneListSize();
-		for (int i = 0; i < curPlayerReqCnt; i++)
+		auto tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
+		if (tempSelStone == nullptr)
 		{
-			auto tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
-			if (tempSelStone == nullptr)
-			{
-				break;
-			}
-			else
-			{
-				curPlayer->pushStone2List(tempSelStone);
-				tempSelStone->setStatus(gameMetaData::msStatus::owned);
-			}
+			//not enough notUseMagicStone then just break
+			break;
+		}
+		else
+		{
+			curPlayer->pushStone2List(tempSelStone);
+			drawCnt++;
 		}
 	}
+	if (curPlayer->isNPC())
+		((npc*)curPlayer)->setNewHandCnt(drawCnt);
 
-
-	//턴을 넘긴다
+	reorderPlayerHand();
+	
+	//update curPlayerNum
 	if (curPlayer->isNPC())
 	{
-		this->unscheduleAllCallbacks();
 		((npc*)curPlayer)->waitTurn();
 	}
-	//std::cout << "curPlayerNum : " << curPlayerNum << std::endl;
 	curPlayerNum = (curPlayerNum == playerCnt - 1) ? (0) : (curPlayerNum + 1);
-	//std::cout << "curPlayerNum : " << curPlayerNum << std::endl;
-
+	
 	if (curPlayerNum != myPlayerNum)
 	{
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{
-			gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
 			((npc*)arrPlayers[curPlayerNum])->npcTurnOn();
-			this->schedule([=](float d) {
-				//gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
-				((npc*)arrPlayers[curPlayerNum])->npcProcess(); 
-			}, 1.0f, CC_REPEAT_FOREVER, 1.0f,"npcPass");
+			callNpcProcess();
 		}
 		EventCustom passTurnEvent("passTurn2NextUser");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
@@ -647,7 +700,7 @@ cocos2d::Sprite* gameRoomObjLayer::getMSSprite(const int magicEnum)
 //random pick magicStone
 magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 {
-	if (isAllUsed())
+	if ((stateEnum == gameMetaData::msStatus::notUse) && isAllUsed())
 	{
 		checkArrStones();
 		std::cout << "All MagicStone is used" << std::endl;
@@ -673,9 +726,12 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 
 bool gameRoomObjLayer::isAllUsed() const
 {
-	for (auto const &i : arrStones)
+	int secretCnt = 0;
+	int ownedCnt = 0;
+	for (auto const &elemMagicStone : arrStones)
 	{
-		if (i->getStatus() == gameMetaData::msStatus::notUse)
+		auto elemStatus = elemMagicStone->getStatus();
+		if (elemStatus == gameMetaData::msStatus::notUse)
 		{
 			return false;
 		}

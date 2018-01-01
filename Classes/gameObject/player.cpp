@@ -1,6 +1,7 @@
 #include "gameObject/player.h"
 #include "gameObject/magicStone.h"
 #include "managers/gameFlowManager.h"
+#include <iostream>
 
 using namespace cocos2d;
 
@@ -19,6 +20,9 @@ void player::init()
 	booungList.clear();
 	if (!lpSprList.empty())
 		initLpObj();
+
+	if (flagNPC)
+		((npc*)this)->initNpc();
 }
 
 void player::pushStone2List(magicStone* ms)
@@ -67,13 +71,13 @@ magicStone* player::getMagicStone(const int idx)
 
 bool player::checkOutMagic(const int magicEnum)
 {
-	for (auto &i : stoneList)
+	for (auto &elemStone : stoneList)
 	{
-		if (magicEnum == i->getMagic())
+		if (magicEnum == elemStone->getMagic())
 		{
 			//Activate magicStone
-			i->actionActivated();
-			stoneList.remove(i);
+			elemStone->actionActivated();
+			stoneList.remove(elemStone);
 			return true;
 		}
 	}
@@ -217,7 +221,7 @@ void player::actionLostLp(int lostValue)
 			auto setBack = cocos2d::CallFunc::create([=]() 
 			{
 				i.first->setScale(1.0f);
-				i.first->setPosition(stdAxis, stdAxis);
+				i.first->setPosition(STDAXIS, STDAXIS);
 			});
 			auto seq = cocos2d::Sequence::create(spawning, setBack, NULL);
 			
@@ -264,6 +268,11 @@ void player::setPrevPlayer(player * next)
 	prevPlayer = next;
 }
 
+int player::getIndex() const
+{
+	return myIndex;
+}
+
 int player::getDefaultX() const
 {
 	return defaultX;
@@ -294,6 +303,11 @@ void player::setRotationValue(float rot)
 	rotationValue = rot;
 }
 
+/*-------------------------------------------------
+
+			class NPC
+
+--------------------------------------------------*/
 npc::npc()
 	:state(gameMetaData::npcState::npcWait)
 {
@@ -303,25 +317,146 @@ npc::npc(int idx)
 	: player(idx),
 	 state(gameMetaData::npcState::npcWait)
 {
+	arrPrevFailList.reserve(gameMetaData::variableMaxCnt::msTypeCnt);
+	initNpc();
+}
+
+void npc::initNpc()
+{
 	flagNPC = true;
+	for (auto &i : arrMsScore)
+	{
+		i = std::make_pair(0, 0);
+	}
+
+	for (auto &i : arrDiscardCnt)
+	{
+		i = 0;
+	}
+	arrPrevFailList.clear();
 }
 
 void npc::npcProcess()
 {
 	if (state == gameMetaData::npcState::npcTurnOn)
 	{
-		EventCustom checkEvent("checkOwnedMagic");
-		checkEvent.setUserData((void*)gameMetaData::msType::pass);
-		Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
+		if (newHandCnt > 0)
+			arrPrevFailList.clear();
+
+		duplArrDiscardCnt2ArrMsScore();
+		countAnotherPlayerHand();
+		countMySecret();
+		calcScoreMsList();
+		int targetMagic = chooseMs();
+		std::cout << "선택된 번호 : " << targetMagic << std::endl;
+
+		prevChoice = targetMagic;
+		//계산후 이 부분의 선택한 magicStone값을 설정한 후 스케줄로 호출
+		cocos2d::Director::getInstance()->getScheduler()->schedule(
+			[targetMagic](float dt)
+		{
+			cocos2d::EventCustom checkEvent("checkOwnedMagic");
+			checkEvent.setUserData((void*)targetMagic);
+			Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
+		}, this, 0.0f, 0, thinkRowhenTime, false, "npcChoice");
 	}
 }
 
 void npc::npcTurnOn()
 {
 	state = gameMetaData::npcState::npcTurnOn;
+	prevChoice = gameMetaData::msType::yongyong;
+	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
+	{
+		arrMsScore[msNum].first = arrDiscardCnt[msNum];
+	}
 }
 
 void npc::waitTurn()
 {
 	state = gameMetaData::npcState::npcWait;
+}
+
+void npc::choiceFail(int magicEnum)
+{
+	arrPrevFailList.push_back(magicEnum);
+}
+
+void npc::countAnotherPlayerHand()
+{
+	auto playerCursor = this->nextPlayer;
+	for (int anotherPlayerCnt = 0; anotherPlayerCnt < 3; anotherPlayerCnt++)
+	{
+		for (int msHandIdx = 0; msHandIdx < playerCursor->getStoneListSize(); msHandIdx++)
+		{
+			arrMsScore[playerCursor->getMagicStone(msHandIdx)->getMagic()].first++;
+		}
+		playerCursor = playerCursor->getNextPlayer();
+	}
+}
+
+void npc::countMySecret()
+{
+	for (auto i : booungList)
+	{
+		arrMsScore[i->getMagic()].first++;
+	}
+}
+
+void npc::setDiscardCnt(const int magicEnum, const int cnt)
+{
+	arrDiscardCnt[magicEnum] = cnt;
+}
+
+void npc::setNewHandCnt(const int cnt)
+{
+	newHandCnt = cnt;
+}
+
+void npc::duplArrDiscardCnt2ArrMsScore()
+{
+	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
+	{
+		arrMsScore[msNum].first = arrDiscardCnt[msNum];
+	}
+}
+
+void npc::calcScoreMsList()
+{
+	int msIdx = gameMetaData::msType::base;
+	for (auto &elemMsScore : arrMsScore)
+	{
+		if (msIdx > 0)
+		{
+			elemMsScore.second = (msIdx - elemMsScore.first) * 100 / msIdx;
+			std::cout << myIndex << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
+		}
+		msIdx++;
+	}
+}
+
+int npc::chooseMs()
+{
+	//<msIdx, score>
+	std::pair<int, int> maxScore = std::make_pair(gameMetaData::msType::pass, 0);
+	
+	std::cout << std::endl << "chooseMs prevChoice value : " << prevChoice <<  std::endl << std::endl;
+	for (int msNum = prevChoice; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
+	{
+		if (std::find(arrPrevFailList.begin(), arrPrevFailList.end(), msNum) != arrPrevFailList.end())
+			continue;
+
+		if (arrMsScore[msNum].second > maxScore.second)
+		{
+			maxScore.first = msNum;
+			maxScore.second = arrMsScore[msNum].second;
+			if (msNum == gameMetaData::msType::yongyong)
+				maxScore.second = 50 * gameFlowManager::getInstance()->getRandomInt(0,2);
+		}
+
+		if (maxScore.second > 65)
+			break;
+	}
+	//return maxScore.second < 50 ? gameMetaData::msType::pass : maxScore.first + 1;
+	return maxScore.first;
 }

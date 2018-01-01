@@ -1,5 +1,6 @@
 #include "setupScene\setupLoadingLayer.h"
 #include "managers\gameFlowManager.h"
+#include "gameObject\gameMetaData.h"
 
 using namespace cocos2d;
 
@@ -26,7 +27,8 @@ bool setupLodingLayer::init()
 	this->addChild(label, 1);
 
 	// add "HelloWorld" splash screen"
-	auto sprite = Sprite::create("bg01.jpg");
+	int bgIdx = gameFlowManager::getInstance()->getRandomInt(0, 3);
+	auto sprite = Sprite::create(gameMetaData::arrBGSprite.at(bgIdx));
 
 	// position the sprite on the center of the screen
 	sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));

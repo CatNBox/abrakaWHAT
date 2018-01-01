@@ -1,5 +1,6 @@
 #include "magicStone.h"
 #include "managers\gameFlowManager.h"
+//#include <iostream>
 
 /*----------------------------------------
 
@@ -26,18 +27,18 @@ void magicStone::setStatus(const gameMetaData::msStatus newStatus)
 void magicStone::initObjData()
 {
 	status = gameMetaData::msStatus::notUse;
-	curX = stdAxis;
-	curY = stdAxis;
-	tX = stdAxis;
-	tY = stdAxis;
-	actionActiveChecker = false;
+	curX = STDAXIS;
+	curY = STDAXIS;
+	tX = STDAXIS;
+	tY = STDAXIS;
+	this->initMsSprite();
 	this->stopAllActions();
 	this->setOpacity(255);
 	this->setScale(1);
 	this->setVisible(false);
 	this->setRotation(0);
 	this->setLocalZOrder(gameMetaData::layerZOrder::objZ2);
-	this->setPosition(stdAxis, stdAxis);
+	this->setPosition(STDAXIS, STDAXIS);
 }
 
 bool magicStone::initMsSprite()
@@ -50,59 +51,52 @@ bool magicStone::setBaseSprite()
 	return this->initWithSpriteFrameName(gameMetaData::arrMsSpriteName[gameMetaData::msType::base]);
 }
 
-bool magicStone::isActionRunning()
+void magicStone::notifyActionStart()
 {
-	return actionActiveChecker;
+	gameFlowManager::getInstance()->incRunningActionCnt();
 }
 
-void magicStone::toggleLockAction()
+void magicStone::notifyActionEnd()
 {
-	actionActiveChecker = !actionActiveChecker;
+	gameFlowManager::getInstance()->decRunningActionCnt();
 }
 
-void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos)
+void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum)
 {
-	//if (isActionRunning())
-	//	return;
-
 	this->stopAllActions();
-	toggleLockAction();	//Lock runAction
 	auto preDelay = cocos2d::DelayTime::create(priorDelay);
 	auto showThis = cocos2d::Show::create();
 	auto waitDelay = cocos2d::DelayTime::create(0.5f);
 	auto moving = cocos2d::MoveTo::create(0.8f, targetPos);
-	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
 	auto callPlaySFX = cocos2d::CallFunc::create([=]() 
 	{
 		gameFlowManager::getInstance()->getSoundManager()->playSfx(gameMetaData::sfxName::msMoving00);
 	});
-	cocos2d::Vector<cocos2d::FiniteTimeAction*> actionList;
-	actionList.pushBack(preDelay);
-	actionList.pushBack(showThis);
-	if(priorDelay != 0.1f)
-		actionList.pushBack(callPlaySFX);
-	actionList.pushBack(moving);
-	actionList.pushBack(callTogLock);
-	auto seq = cocos2d::Sequence::create(actionList);
+
+	cocos2d::Sequence* seq;
+	if(movementEnum != gameMetaData::msMovement::reordering)
+		seq = gameFlowManager::getInstance()->wrapActions(preDelay, showThis, callPlaySFX, moving, NULL);
+	else
+		seq = gameFlowManager::getInstance()->wrapActions(preDelay, showThis, moving, NULL);
 
 	this->runAction(seq);
 }
 
 void magicStone::actionActivated()
 {
-	//if (isActionRunning())
-	//	return;
-
 	this->stopAllActions();
-	toggleLockAction();	//Lock runAction
-	initMsSprite();
+	this->initMsSprite();
 	this->setStatus(gameMetaData::msStatus::discard);
-	auto moving = cocos2d::MoveTo::create(0.5f, cocos2d::Vec2(stdAxis, stdAxis));
+	auto moving = cocos2d::MoveTo::create(0.5f, cocos2d::Vec2(STDAXIS, STDAXIS));
 	auto scaling = cocos2d::ScaleTo::create(1.0f, 5.0f);
 	auto fadeOut = cocos2d::FadeOut::create(1.0f);
 	auto spawning = cocos2d::Spawn::create(scaling, fadeOut, NULL);
-	auto callTogLock = cocos2d::CallFunc::create(CC_CALLBACK_0(magicStone::toggleLockAction, this));
-	auto seq = cocos2d::Sequence::create(moving, spawning, callTogLock, NULL);
+	auto callPlaySFX = cocos2d::CallFunc::create([=]()
+	{
+		gameFlowManager::getInstance()->getSoundManager()->playSfx(gameMetaData::sfxName::activateMagic00);
+	});
+
+	auto seq = gameFlowManager::getInstance()->wrapActions(moving, callPlaySFX, spawning, NULL);
 
 	this->runAction(seq);
 }
@@ -113,9 +107,11 @@ void magicStone::actionRevealedSecret()
 	auto zOrderUp = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ2); });
 	auto shrinking = cocos2d::ScaleTo::create(0.3f, 0.01f, 1.5f);
 	auto changeTexture = cocos2d::CallFunc::create([=]() {this->initMsSprite(); });
-	auto growing = cocos2d::ScaleTo::create(0.3f, secretScale, secretScale);
+	auto growing = cocos2d::ScaleTo::create(0.3f, SECRETSTONE_BASESCALE, SECRETSTONE_BASESCALE);
 	auto zOrderDown = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ0); });
-	auto seq = cocos2d::Sequence::create(zOrderUp, shrinking, changeTexture, growing, zOrderDown, NULL);
+	
+	auto seq = gameFlowManager::getInstance()->wrapActions(zOrderUp, shrinking, changeTexture, growing, zOrderDown, NULL);
+
 	this->runAction(seq);
 }
 

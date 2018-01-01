@@ -58,6 +58,12 @@
     <Filter Include="resource\lpToken">
       <UniqueIdentifier>{d0ff8cba-ae40-4b41-8591-22edce610bba}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resource\msEffectSpr">
+      <UniqueIdentifier>{57babec6-204e-4f87-aff3-06bc06b2e405}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\07_popupLayer">
+      <UniqueIdentifier>{4cfd7276-a796-4d10-8162-9da0573ac6d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -107,6 +113,9 @@
     </ClCompile>
     <ClCompile Include="..\Classes\managers\soundManager.cpp">
       <Filter>src\00_managers</Filter>
+    </ClCompile>
+    <ClCompile Include="popupLayer.cpp">
+      <Filter>src\07_popupLayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\managers\soundManager.h">
       <Filter>src\00_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="popupLayer.h">
+      <Filter>src\07_popupLayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -315,12 +327,6 @@
     <Image Include="..\Resources\UISprite\spr_number.png">
       <Filter>resource\UISprites</Filter>
     </Image>
-    <Image Include="..\Resources\UISprite\spr_player.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\spr_rank.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
     <Image Include="..\Resources\particle4SeenCheck.png">
       <Filter>resource</Filter>
     </Image>
@@ -344,6 +350,18 @@
     </Image>
     <Image Include="..\Resources\lpToken\lpToken05.png">
       <Filter>resource\lpToken</Filter>
+    </Image>
+    <Image Include="..\Resources\msEffectSpr\yongyongRedScreen.png">
+      <Filter>resource\msEffectSpr</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprScore.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprRank.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprPlayer.png">
+      <Filter>resource\UISprites</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

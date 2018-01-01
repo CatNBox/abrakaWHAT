@@ -1,7 +1,10 @@
 #pragma once
 #include "cocos2d.h"
-#include "Classes\gameObject\magicStone.h"
-#include "Classes\gameObject\player.h"
+#include "gameObject/gameMetaData.h"
+#include <array>
+
+class magicStone;
+class player;
 
 class gameRoomObjLayer : public cocos2d::Layer
 {
@@ -17,42 +20,48 @@ private:
 	void createMagicStones();
 	void createSeenChecker();
 	void createPlayerLpObj();
+	void createScoreSpr();
 
 	void selSecretStone();
 	void shareStone2Player();
 
-	void layerUpdate(float d);
-	void dataUpdate();
-	void curLPUpdate();
-
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void activateMagic(const int magicEnum);
+	void updateSeenChecker(const int magicEnum);
+	void reorderPlayerHand();
+	bool isRoundEnd();
+	void calcScore();
 	void passTurn();
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
 	void setStartOrder();
+
+	void callNpcProcess();
 
 	magicStone* pickAStone(const int stateEnum);
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
 
-	int playerCnt;
-	int arrMsCnt[9] = { 0 };
-	int secretCnt;
+	int playerCnt = 0;
+	int secretCnt = 0;
+	int arrMsCnt[gameMetaData::variableMaxCnt::msTypeCnt] = { 0 };
 
 	int stoneMinCnt = 0;
-	int stoneMaxCnt;
+	int stoneMaxCnt = 0;
 
-	int starterNum;
-	int curPlayerNum;
+	int starterNum = 0;
+	int curPlayerNum = 0;
 	int myPlayerNum = 0;
+	int roundWinPlayerNum = -1;
 
 	bool isChanged = true;
 
 	std::vector<magicStone*> arrStones;
 	std::vector<player*> arrPlayers;
 	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
+	std::vector<cocos2d::Sprite*> arrScoreSpr;
+	std::array<int, 4> arrScore{ 0 };
 
 	cocos2d::EventListenerCustom* uiListener;
 

@@ -1,6 +1,9 @@
 #pragma once
-#include "cocos2d.h"
+#include <array>
 #include <list>
+#include <vector>
+#include "cocos2d.h"
+#include "gameObject\gameMetaData.h"
 
 class magicStone;
 
@@ -35,6 +38,7 @@ public:
 	void setNextPlayer(player* next);
 	player* getPrevPlayer() const;
 	void setPrevPlayer(player* next);
+	int getIndex() const;
 
 	int getDefaultX() const;
 	void setDefaultX(int posX);
@@ -67,11 +71,27 @@ class npc : public player
 public:
 	npc();
 	npc(int idx);
+	void initNpc();
 	void npcProcess();
 	void npcTurnOn();
 	void waitTurn();
-private:
+	void choiceFail(const int magicEnum);
+	void setDiscardCnt(const int magicEnum, const int cnt);
+	void setNewHandCnt(const int cnt);
 
-	float thinkRowhenTime = 1.0f;
+private:
+	void countAnotherPlayerHand();
+	void countMySecret();
+	void duplArrDiscardCnt2ArrMsScore();
+	void calcScoreMsList();
+	int chooseMs();
+
+	int prevChoice = gameMetaData::msType::yongyong;
+	int newHandCnt = 0;
+
+	std::array<std::pair<int, int>, gameMetaData::variableMaxCnt::msTypeCnt> arrMsScore;
+	std::array<int, gameMetaData::variableMaxCnt::msTypeCnt> arrDiscardCnt;
+	std::vector<int> arrPrevFailList;
+	float thinkRowhenTime = 1.5f;
 	int state; // gameMetaData::npcState
 };

@@ -1,6 +1,6 @@
 #include "gameRoomUILayer.h"
-#include "managers\gameFlowManager.h"
 #include "gameObject\gameMetaData.h"
+#include "managers\gameFlowManager.h"
 #include <iostream>
 
 using namespace cocos2d;
@@ -79,6 +79,11 @@ void gameRoomUILayer::settingEventListener()
 		[=](EventCustom* event) {
 		roundNum++;
 		std::cout << " 라운드 업 : " << roundNum << std::endl;
+		magicChoicer->setEnabled(true);
+		for (int i = 0; i < 8; i++)
+		{
+			arrBtnSelectStone[i]->setEnabled(true);
+		}
 		setRound();
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
@@ -155,6 +160,12 @@ void gameRoomUILayer::initUI()
 	setRound();
 
 	this->addChild(roundSpr);
+
+	auto scoreSpr = Sprite::createWithSpriteFrameName("sprScore.png");
+	scoreSpr->setPosition(Vec2(660, 216));
+	scoreSpr->setScale(0.5f);
+
+	this->addChild(scoreSpr);
 }
 
 void gameRoomUILayer::setRound()
@@ -164,8 +175,23 @@ void gameRoomUILayer::setRound()
 	//라운드 50 710
 	roundSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(roundNum));
 }
+bool gameRoomUILayer::checkRunningAction()
+{
+	int actionCnt = gameFlowManager::getInstance()->getRunningActionCnt();
+	std::cout << "actionCnt : " << actionCnt << std::endl;
+	if (actionCnt != 0)
+	{
+		if (actionCnt < 0)
+			std::cout << "ERROR actionCnt : " << actionCnt << std::endl;
+		return true;
+	}
+	return false;
+}
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
+	if (checkRunningAction())
+		return;
+
 	//처리중 버튼메뉴 비활성화 - 이벤트 람다함수를 통해 활성화됨
 	magicChoicer->setEnabled(false);
 	//this->setKeyboardEnabled(false); //변경할것
@@ -190,6 +216,9 @@ void gameRoomUILayer::returnMainMenu()
 
 void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
 {
+	if (checkRunningAction())
+		return;
+
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
 		gameFlowManager::getInstance()->endGame();

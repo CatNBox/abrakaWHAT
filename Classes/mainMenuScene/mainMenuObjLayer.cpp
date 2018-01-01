@@ -1,5 +1,6 @@
 #include "mainMenuScene\mainMenuObjLayer.h"
 #include "managers\gameFlowManager.h"
+#include "gameObject\gameMetaData.h"
 
 using namespace cocos2d;
 

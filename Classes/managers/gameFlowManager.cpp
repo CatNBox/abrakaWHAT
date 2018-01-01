@@ -1,8 +1,9 @@
 #include "managers\gameFlowManager.h"
+#include "gameObject\gameMetaData.h"
 #include "mainMenuScene\mainMenuScene.h"
 #include "gameRoomScene\gameRoomScene.h"
-#include "gameObject\gameMetaData.h"
 #include <random>
+#include <cstdarg>
 
 using namespace cocos2d;
 
@@ -48,8 +49,9 @@ void gameFlowManager::changeScene2SingleMode()
 	setBuljakCount(7);
 	setPotionCount(8);
 	setLifePoint(6);
+	this->runningActionCnt = 0;
 
-	auto singleModeScene = TransitionSlideInT::create(0.8f, gameRoomScene::createScene());
+	auto singleModeScene = TransitionSlideInT::create(0.6f, gameRoomScene::createScene());
 	Director::getInstance()->replaceScene(singleModeScene);
 	curSceneState = gameMetaData::curScene::gameRoom;
 }
@@ -84,7 +86,11 @@ void gameFlowManager::preloadSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken04.png");
 	tempSpr->initWithFile("lpToken/lpToken05.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken05.png");
-	
+	tempSpr->initWithFile("msEffectSpr/yongyongRedScreen.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "yongyongRedScreen.png");
+	tempSpr->initWithFile("UISprite/sprScore.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprScore.png");
+
 	tempSpr->autorelease();
 }
 
@@ -265,4 +271,43 @@ void gameFlowManager::endGame()
 
 	//EventCustom customEndEvent("game_scene_close_event");
 	//_eventDispatcher->dispatchEvent(&customEndEvent);
+}
+
+void gameFlowManager::incRunningActionCnt()
+{
+	runningActionCnt++;
+}
+
+void gameFlowManager::decRunningActionCnt()
+{
+	runningActionCnt--;
+}
+
+int gameFlowManager::getRunningActionCnt()
+{
+	return runningActionCnt;
+}
+
+cocos2d::Sequence * gameFlowManager::wrapActions(cocos2d::FiniteTimeAction * action01, ...)
+{
+	va_list ap;
+	va_start(ap, action01);
+
+	cocos2d::FiniteTimeAction * now = action01;
+	cocos2d::Vector<cocos2d::FiniteTimeAction*> vecAction;
+	auto callNotifyActionStart = cocos2d::CallFunc::create([=]() {incRunningActionCnt(); });
+	vecAction.pushBack(callNotifyActionStart);
+	while (action01)
+	{
+		vecAction.pushBack(now);
+		now = va_arg(ap, cocos2d::FiniteTimeAction*);
+		if (now == NULL)
+			break;
+	}
+	auto callNotifyActionEnd = cocos2d::CallFunc::create([=]() {decRunningActionCnt(); });
+	vecAction.pushBack(callNotifyActionEnd);
+
+	va_end(ap);
+
+	return cocos2d::Sequence::create(vecAction);
 }
