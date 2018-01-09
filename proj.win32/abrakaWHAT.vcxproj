@@ -265,9 +265,14 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <Image Include="..\Resources\UISprite\ms_pass_abled_clicked.png" />
     <Image Include="..\Resources\UISprite\ms_pass_abled_normal.png" />
     <Image Include="..\Resources\UISprite\ms_pass_disabled.png" />
+    <Image Include="..\Resources\UISprite\sprBooung.png" />
+    <Image Include="..\Resources\UISprite\sprCancel.png" />
+    <Image Include="..\Resources\UISprite\sprLive.png" />
+    <Image Include="..\Resources\UISprite\sprOk.png" />
     <Image Include="..\Resources\UISprite\sprPlayer.png" />
     <Image Include="..\Resources\UISprite\sprRank.png" />
     <Image Include="..\Resources\UISprite\sprScore.png" />
+    <Image Include="..\Resources\UISprite\sprWin.png" />
     <Image Include="..\Resources\UISprite\spr_number.png" />
     <Image Include="..\Resources\UISprite\uiPopMessage.png" />
   </ItemGroup>

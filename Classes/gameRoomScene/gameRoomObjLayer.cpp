@@ -38,6 +38,7 @@ bool gameRoomObjLayer::init()
 	this->scheduleOnce([=](float d) {initRound();}, 0.7f, "schedulerKey");
 	//this->schedule([=](float d) {initRound(); },10.0f,CC_REPEAT_FOREVER,10.0f,"initRepeat");
 
+
 	return true;
 }
 
@@ -292,6 +293,12 @@ void gameRoomObjLayer::initRound()
 			elemSeenChecker.second = false;
 		}
 	}
+	//init buf4RoundEndPopUp
+	//buf4RoundEndPopUp.fill(0);
+	for (int i = 0; i < 5; i++)
+	{
+		buf4RoundEndPopUp[i] = 0;
+	}
 
 	//display RoundCnt
 	EventCustom passTurnEvent("roundUp");
@@ -306,7 +313,11 @@ void gameRoomObjLayer::initRound()
 	//3. setting firstTurn Player
 	starterNum = 0;
 	curPlayerNum = 0;
-	setStartOrder(); //starterNum setting
+	//setStartOrder(); //starterNum setting
+
+	//EventCustom popupEndRound("popupEndRound");
+	//popupEndRound.setUserData((void*)buf4RoundEndPopUp);
+	//Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
 }
 
 void gameRoomObjLayer::selSecretStone()
@@ -451,16 +462,21 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		//calc score ending round
 		calcScore();
 
-		//checkEndGame
-		//임시코드 / 팝업창 코드 적용할 것
+		//checkEndGame - call gameEnd popup eventName : popupEndGame
 		for (const auto elemScore : arrScore)
 		{
-			if(elemScore >= 8)
-				gameFlowManager::getInstance()->endGame();
+			if (elemScore >= 8)
+			{
+				EventCustom popupEndRound("popupEndGame");
+				Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+			}
 		}
 
-		//start new Round
-		initRound();
+		//call roundEnd popup eventName : popupEndRound
+		EventCustom popupEndRound("popupEndRound");
+		popupEndRound.setUserData((void*)buf4RoundEndPopUp);
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+
 		return;
 	}
 	
@@ -499,15 +515,15 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		auto seqRed = gameFlowManager::getInstance()->wrapActions(blinking, callred, NULL);
 		redScreenSpr->runAction(seqRed);
 
-		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(15, 15));	//15,15
-		auto shaking02 = cocos2d::MoveBy::create(0.1f, Vec2(-30, -15));	//-15,0
-		auto shaking03 = cocos2d::MoveBy::create(0.1f, Vec2(30, -15));	//15,-15
-		auto shaking04 = cocos2d::MoveBy::create(0.1f, Vec2(-15, 30));	//0,15
-		auto shaking05 = cocos2d::MoveBy::create(0.1f, Vec2(-15, -30));	//-15,-15
-		auto shaking06 = cocos2d::MoveBy::create(0.1f, Vec2(30, 15));	//15,0
-		auto shaking07 = cocos2d::MoveBy::create(0.1f, Vec2(-30, 15));	//-15,15
-		auto shaking08 = cocos2d::MoveBy::create(0.1f, Vec2(15, -15));	//0,-15
-		auto shaking09 = cocos2d::MoveBy::create(0.1f, Vec2(0, 15)); //0, 0
+		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(10, 10));	//15,15
+		auto shaking02 = cocos2d::MoveBy::create(0.1f, Vec2(-20, -10));	//-15,0
+		auto shaking03 = cocos2d::MoveBy::create(0.1f, Vec2(20, -10));	//15,-15
+		auto shaking04 = cocos2d::MoveBy::create(0.1f, Vec2(-10, 20));	//0,15
+		auto shaking05 = cocos2d::MoveBy::create(0.1f, Vec2(-10, -20));	//-15,-15
+		auto shaking06 = cocos2d::MoveBy::create(0.1f, Vec2(20, 10));	//15,0
+		auto shaking07 = cocos2d::MoveBy::create(0.1f, Vec2(-20, 10));	//-15,15
+		auto shaking08 = cocos2d::MoveBy::create(0.1f, Vec2(10, -10));	//0,-15
+		auto shaking09 = cocos2d::MoveBy::create(0.1f, Vec2(0, 10)); //0, 0
 		auto seq01 = cocos2d::Sequence::create(shaking01, shaking02, shaking03, 
 			shaking04, shaking05, shaking06, shaking07, shaking08, shaking09, NULL);
 		auto reverseAction = seq01->reverse();
@@ -629,7 +645,10 @@ void gameRoomObjLayer::calcScore()
 {
 	//check lp / check booung / if curPlayer's lp is zero, no point
 	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
+	{
 		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
+		buf4RoundEndPopUp[arrPlayers[curPlayerNum]->getIndex()] += 2;
+	}
 
 	for (const auto &elemPlayer : arrPlayers)
 	{
@@ -638,11 +657,14 @@ void gameRoomObjLayer::calcScore()
 		{
 			//at least have 1 Lp, get 1 point
 			arrScore.at(elemPlayer->getIndex()) += 1;
+			buf4RoundEndPopUp[elemPlayer->getIndex()] += 1;
 
 			//check booung
 			arrScore.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
+			buf4RoundEndPopUp[elemPlayer->getIndex()] += elemPlayer->getBooungListSize();
 		}
 	}
+	buf4RoundEndPopUp[4] = curPlayerNum;
 }
 
 void gameRoomObjLayer::passTurn()

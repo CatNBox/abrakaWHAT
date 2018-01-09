@@ -63,6 +63,11 @@ private:
 	std::vector<cocos2d::Sprite*> arrScoreSpr;
 	std::array<int, 4> arrScore{ 0 };
 
+	//init each round in initRound()
+	//last elem is victoryPlayer's Index
+	//std::array<int, 5> buf4RoundEndPopUp{ 0 }; 
+	int buf4RoundEndPopUp[5] = { 0 };
+
 	cocos2d::EventListenerCustom* uiListener;
 
 	void checkArrStones(); //for debug

@@ -378,6 +378,21 @@
     <Image Include="..\Resources\popupLayerSpr\popup400500.png">
       <Filter>resource\popupLayerSpr</Filter>
     </Image>
+    <Image Include="..\Resources\UISprite\sprCancel.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprOk.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprBooung.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprLive.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
+    <Image Include="..\Resources\UISprite\sprWin.png">
+      <Filter>resource\UISprites</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\magicStones.plist">

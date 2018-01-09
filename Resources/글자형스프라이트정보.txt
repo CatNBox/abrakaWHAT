@@ -5,3 +5,4 @@ glowcolor#7a288d
 glowsize8
 feather19
 http://www4.flamingtext.com/net-fu/dynamic.cgi?script=glow-logo&text=host&fontsize=90&fontname=Action+Is+JL&textColor=%23988f5e&glowColor=%237a288d&glowSize=8&feather=19&backgroundRadio=0
+http://www4.flamingtext.com/net-fu/dynamic.cgi?script=glow-logo&text=+OK+&fontsize=90&fontname=Action+Is+JL&textColor=%23f9eeb0&glowColor=%23bb5ad2&glowSize=7&feather=9&backgroundRadio=0
