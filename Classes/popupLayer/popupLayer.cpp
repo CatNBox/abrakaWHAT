@@ -26,9 +26,11 @@ bool popupLayer::init()
 		CC_CALLBACK_1(popupLayer::setEndRound, this));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 
-	eventListener = cocos2d::EventListenerCustom::create("popupBtnWarning",
+	eventListener = cocos2d::EventListenerCustom::create("popupWarning",
 		CC_CALLBACK_1(popupLayer::setWarning, this));
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+	playerSpr.resize(4);
 
 	this->setVisible(false);
 
@@ -51,6 +53,37 @@ void popupLayer::setBGSpr()
 	this->addChild(BGSpr, gameMetaData::layerZOrder::backGroundZ);
 
 	this->setVisible(true);
+}
+
+void popupLayer::setPopupBoard(enum class gameMetaData::popupBoardSize popupSizeEnum)
+{
+	gameMetaData::popupBoardSize key = popupSizeEnum;
+	if (gameMetaData::mapPopupBoardSpr.find(key) != gameMetaData::mapPopupBoardSpr.end())
+	{
+		auto popupBoard = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::mapPopupBoardSpr.at(key));
+		popupBoard->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS));
+		this->addChild(popupBoard, gameMetaData::layerZOrder::objZ0);
+	}
+}
+
+void popupLayer::setDisplayPlayer()
+{
+	for (int playerNum = 0; playerNum < 4; playerNum++)
+	{
+		auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName("sprPlayer.png");
+		auto tempNumSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+		tempNumSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect((playerNum + 1)));
+		tempNumSpr->setPosition(cocos2d::Vec2(280.0f + 90.0f, STDAXIS - (63.0f * playerNum)));
+		tempSpr->setPosition(cocos2d::Vec2(280.0f, STDAXIS - (65.0f * playerNum)));
+		tempNumSpr->setScale(0.6f);
+		tempSpr->setScale(0.6f);
+
+		playerSpr.at(playerNum).first = tempSpr;
+		playerSpr.at(playerNum).second = tempNumSpr;
+
+		this->addChild(tempSpr, gameMetaData::layerZOrder::objZ1);
+		this->addChild(tempNumSpr, gameMetaData::layerZOrder::objZ1);
+	}
 }
 
 void popupLayer::initSprCntNum()
@@ -89,12 +122,18 @@ cocos2d::Sequence * popupLayer::cntNumAction(int cntStartNum)
 
 void popupLayer::setEndGame(cocos2d::EventCustom* checkOwnedMagicEvent)
 {
+	this->setOpacity(255);
 	this->removeAllChildren();
 	setBGSpr();
+	setPopupBoard(gameMetaData::popupBoardSize::popup400500);
 
-	auto popupBoard = cocos2d::Sprite::createWithSpriteFrameName("popup400500.png");
-	popupBoard->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS));
-	this->addChild(popupBoard, gameMetaData::layerZOrder::objZ0);
+	//get Data
+	std::array<int, 4>* arrEndScore;
+	arrEndScore = (std::array<int,4>*)checkOwnedMagicEvent->getUserData();
+	std::for_each(arrEndScore->begin(), arrEndScore->end(), [](int i) {std::cout << i << std::endl; });
+
+	//display player
+	setDisplayPlayer();
 
 	this->setVisible(true);
 }
@@ -104,36 +143,23 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 	this->setOpacity(255);
 	this->removeAllChildren();
 	setBGSpr();
-
-	//settting popupBoard
-	auto popupBoard = cocos2d::Sprite::createWithSpriteFrameName("popup400500.png");
-	popupBoard->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS));
-	this->addChild(popupBoard,gameMetaData::layerZOrder::objZ0);
+	setPopupBoard(gameMetaData::popupBoardSize::popup400500);
 
 	//get Data
-	int* arrScoreGetBuf = new int[5];
-	arrScoreGetBuf = (int*)checkOwnedMagicEvent->getUserData();
+	std::array<int, 5>* arrRoundScore;
+	arrRoundScore = (std::array<int, 5>*)checkOwnedMagicEvent->getUserData();
 
 	//display player
-	for (int playerNum = 0; playerNum < 4; playerNum++)
+	setDisplayPlayer();
+
+	//if player live score is zero, sprite color turn gray
+	for (int playerNum = 0; playerNum < (int)arrRoundScore->size(); playerNum++)
 	{
-		auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName("sprPlayer.png");
-		auto tempNumSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempNumSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect((playerNum+1)));
-		tempNumSpr->setPosition(cocos2d::Vec2(280.0f + 90.0f, STDAXIS - (63.0f * playerNum)));
-		tempSpr->setPosition(cocos2d::Vec2(280.0f, STDAXIS - (65.0f * playerNum)));
-		tempNumSpr->setScale(0.6f);
-		tempSpr->setScale(0.6f);
-
-		//if player live score is zero, sprite color turn gray
-		if (arrScoreGetBuf[playerNum] == 0)
+		if (arrRoundScore->at(playerNum) == 0)
 		{
-			tempSpr->setColor(cocos2d::Color3B(150, 150, 150));
-			tempNumSpr->setColor(cocos2d::Color3B(150, 150, 150));
+			playerSpr.at(playerNum).first->setColor(cocos2d::Color3B::GRAY);
+			playerSpr.at(playerNum).second->setColor(cocos2d::Color3B::GRAY);
 		}
-
-		this->addChild(tempSpr,gameMetaData::layerZOrder::objZ1);
-		this->addChild(tempNumSpr, gameMetaData::layerZOrder::objZ1);
 	}
 
 	//display markSprite
@@ -154,18 +180,18 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 	for (int playerNum = 0; playerNum < 4; playerNum++)
 	{
 		int liveScore = 0, winScore = 0, booungScore = 0;
-		if (arrScoreGetBuf[playerNum] > 0)
+		if (arrRoundScore->at(playerNum) > 0)
 		{
 			liveScore = 1;
-			arrScoreGetBuf[playerNum] -= liveScore;
+			arrRoundScore->at(playerNum) -= liveScore;
 
-			if (arrScoreGetBuf[4] == playerNum)
+			if (arrRoundScore->at(4) == playerNum)
 			{
 				winScore = 2;
-				arrScoreGetBuf[playerNum] -= winScore;
+				arrRoundScore->at(playerNum) -= winScore;
 			}
 
-			booungScore = arrScoreGetBuf[playerNum];
+			booungScore = arrRoundScore->at(playerNum);
 		}
 
 		auto tempSprLiveScore = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");

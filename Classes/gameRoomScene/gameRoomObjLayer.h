@@ -14,6 +14,7 @@ public:
 
 	CREATE_FUNC(gameRoomObjLayer);
 private:
+	void delay01secCallWrapper(void (gameRoomObjLayer::*targetFunc)(void));
 	void settingEventListener();
 	void settingCntValues();
 	void createPlayers();
@@ -31,6 +32,7 @@ private:
 	void reorderPlayerHand();
 	bool isRoundEnd();
 	void calcScore();
+	void callEndRoundEvent();
 	void passTurn();
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
@@ -65,13 +67,14 @@ private:
 
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index
-	//std::array<int, 5> buf4RoundEndPopUp{ 0 }; 
-	int buf4RoundEndPopUp[5] = { 0 };
+	std::array<int, 5> buf4RoundEndPopUp{ 0 }; 
 
 	cocos2d::EventListenerCustom* uiListener;
 
 	void checkArrStones(); //for debug
 	void checkArrPlayers(); //for debug
+
+	short loopError = 0;
 
 	//멀티에서는 서버에서만 세팅 및 드로우 동작
 	//클라에서는 서버에서 출력해야할 정보만 얻어옴

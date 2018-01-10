@@ -102,6 +102,18 @@ namespace gameMetaData
 		"bg04.jpg"
 	};
 
+	enum class popupBoardSize
+	{
+		popup400245,
+		popup400500
+	};
+
+	const std::unordered_map<popupBoardSize, const char*> mapPopupBoardSpr =
+	{
+		{ popupBoardSize::popup400245, "popup400245.png" },
+		{ popupBoardSize::popup400500, "popup400500.png" }
+	};
+
 	enum npcCharacter
 	{
 		vampyJp,
@@ -126,6 +138,12 @@ namespace gameMetaData
 		msMoving00,
 		buljak00,
 		activateMagic00
+	};
+
+	enum class errCode
+	{
+		infinityLoop,
+		unknown
 	};
 
 	enum msType

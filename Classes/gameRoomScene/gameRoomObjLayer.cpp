@@ -42,6 +42,14 @@ bool gameRoomObjLayer::init()
 	return true;
 }
 
+void gameRoomObjLayer::delay01secCallWrapper(void(gameRoomObjLayer::* targetFunc)(void))
+{
+	this->scheduleOnce([=](float d)
+	{
+		(this->*targetFunc)();
+	}, 0.1f, "delayedCallObjLayer");
+}
+
 void gameRoomObjLayer::settingEventListener()
 {
 	uiListener = EventListenerCustom::create("initRound",
@@ -294,12 +302,8 @@ void gameRoomObjLayer::initRound()
 		}
 	}
 	//init buf4RoundEndPopUp
-	//buf4RoundEndPopUp.fill(0);
-	for (int i = 0; i < 5; i++)
-	{
-		buf4RoundEndPopUp[i] = 0;
-	}
-
+	buf4RoundEndPopUp.fill(0);
+	
 	//display RoundCnt
 	EventCustom passTurnEvent("roundUp");
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
@@ -314,10 +318,6 @@ void gameRoomObjLayer::initRound()
 	starterNum = 0;
 	curPlayerNum = 0;
 	//setStartOrder(); //starterNum setting
-
-	//EventCustom popupEndRound("popupEndRound");
-	//popupEndRound.setUserData((void*)buf4RoundEndPopUp);
-	//Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
 }
 
 void gameRoomObjLayer::selSecretStone()
@@ -468,14 +468,14 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 			if (elemScore >= 8)
 			{
 				EventCustom popupEndRound("popupEndGame");
+				popupEndRound.setUserData(&arrScore);
 				Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+				return;
 			}
 		}
 
 		//call roundEnd popup eventName : popupEndRound
-		EventCustom popupEndRound("popupEndRound");
-		popupEndRound.setUserData((void*)buf4RoundEndPopUp);
-		Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+		delay01secCallWrapper(&gameRoomObjLayer::callEndRoundEvent);
 
 		return;
 	}
@@ -647,7 +647,7 @@ void gameRoomObjLayer::calcScore()
 	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
 	{
 		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
-		buf4RoundEndPopUp[arrPlayers[curPlayerNum]->getIndex()] += 2;
+		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
 	}
 
 	for (const auto &elemPlayer : arrPlayers)
@@ -657,14 +657,38 @@ void gameRoomObjLayer::calcScore()
 		{
 			//at least have 1 Lp, get 1 point
 			arrScore.at(elemPlayer->getIndex()) += 1;
-			buf4RoundEndPopUp[elemPlayer->getIndex()] += 1;
+			buf4RoundEndPopUp.at(elemPlayer->getIndex()) += 1;
 
 			//check booung
 			arrScore.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
-			buf4RoundEndPopUp[elemPlayer->getIndex()] += elemPlayer->getBooungListSize();
+			buf4RoundEndPopUp.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
 		}
 	}
-	buf4RoundEndPopUp[4] = curPlayerNum;
+	buf4RoundEndPopUp.at(4) = curPlayerNum;
+}
+
+void gameRoomObjLayer::callEndRoundEvent()
+{
+	int checkActionCnt = gameFlowManager::getInstance()->getRunningActionCnt();
+	if (checkActionCnt > 0)
+	{
+		loopError++;
+		if (loopError > 50)
+		{
+			cocos2d::EventCustom errorWarning("popupWarning");
+			errorWarning.setUserData((void*)gameMetaData::errCode::infinityLoop);
+			Director::getInstance()->getEventDispatcher()->dispatchEvent(&errorWarning);
+			return;
+		}
+		delay01secCallWrapper(&gameRoomObjLayer::callEndRoundEvent);
+	}
+	else
+	{
+		loopError = 0;
+		EventCustom popupEndRound("popupEndRound");
+		popupEndRound.setUserData(&buf4RoundEndPopUp);
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+	}
 }
 
 void gameRoomObjLayer::passTurn()
