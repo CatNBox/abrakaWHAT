@@ -146,6 +146,11 @@ namespace gameMetaData
 		unknown
 	};
 
+	enum class warningCode
+	{
+		exitBtnWarning
+	};
+
 	enum msType
 	{
 		base = 0,	//= 0

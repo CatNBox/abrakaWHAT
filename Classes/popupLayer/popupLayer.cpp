@@ -33,17 +33,28 @@ bool popupLayer::init()
 	playerSpr.resize(4);
 
 	this->setVisible(false);
-
-	/*
-	auto tempOkSpr = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
-	auto tempCancelSpr = cocos2d::Sprite::createWithSpriteFrameName("sprCancel.png");
-	tempCancelSpr->setColor(cocos2d::Color3B(150, 150, 150));
-	btnOk = cocos2d::MenuItemImage::create();
-	btnOk->initWithNormalSprite(tempOkSpr, tempCancelSpr, tempCancelSpr)
-	*/
+			
 	this->setCascadeOpacityEnabled(true);
 
 	return true;
+}
+
+void popupLayer::callbackPopupClose()
+{
+	auto layerFadeOut = cocos2d::FadeOut::create(0.3f);
+	auto layerHide = cocos2d::Hide::create();
+	auto layerCloseSeq = cocos2d::Sequence::create(layerFadeOut, layerHide, NULL);
+	this->runAction(layerFadeOut);
+}
+
+void popupLayer::callbackGameExit()
+{
+	callbackPopupClose();
+
+	this->scheduleOnce([=](float d) 
+	{
+		gameFlowManager::getInstance()->changeScene2MainMenu();
+	}, 0.5f, "gameExitFromPopup");
 }
 
 void popupLayer::setBGSpr()
@@ -120,7 +131,7 @@ cocos2d::Sequence * popupLayer::cntNumAction(int cntStartNum)
 	return seq;
 }
 
-void popupLayer::setEndGame(cocos2d::EventCustom* checkOwnedMagicEvent)
+void popupLayer::setEndGame(cocos2d::EventCustom* endGameEvent)
 {
 	this->setOpacity(255);
 	this->removeAllChildren();
@@ -129,16 +140,40 @@ void popupLayer::setEndGame(cocos2d::EventCustom* checkOwnedMagicEvent)
 
 	//get Data
 	std::array<int, 4>* arrEndScore;
-	arrEndScore = (std::array<int,4>*)checkOwnedMagicEvent->getUserData();
+	arrEndScore = (std::array<int,4>*)endGameEvent->getUserData();
 	std::for_each(arrEndScore->begin(), arrEndScore->end(), [](int i) {std::cout << i << std::endl; });
 
 	//display player
 	setDisplayPlayer();
 
+	//display score
+	for (int playerNum = 0; playerNum < arrEndScore->size(); playerNum++)
+	{
+		int tempScore = arrEndScore->at(playerNum);
+		auto tempScoreSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+		tempScoreSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(tempScore));
+		tempScoreSpr->setPosition(cocos2d::Vec2(450.0f, STDAXIS - (63.0f*playerNum)));
+		tempScoreSpr->setScale(0.6f);
+		this->addChild(tempScoreSpr, gameMetaData::layerZOrder::objZ1);
+	}
+
+	//setBtn	
+	auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
+	auto tempOkSprPress = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+	auto tempOkSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+	tempOkSprPress->setColor(cocos2d::Color3B::GRAY);
+	tempOkSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+	btnOk = cocos2d::MenuItemImage::create();
+	btnOk->initWithNormalSprite(tempOkSprNormal, tempOkSprPress, tempOkSprDisable, CC_CALLBACK_0(popupLayer::callbackGameExit, this));
+	btnMenu = cocos2d::Menu::create();
+	btnMenu->addChild(btnOk);
+	btnMenu->setPosition(cocos2d::Vec2(STDAXIS, 520.0f));
+	this->addChild(btnMenu, gameMetaData::layerZOrder::objZ1);
+
 	this->setVisible(true);
 }
 
-void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
+void popupLayer::setEndRound(cocos2d::EventCustom* endRoundEvent)
 {
 	this->setOpacity(255);
 	this->removeAllChildren();
@@ -147,13 +182,13 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 
 	//get Data
 	std::array<int, 5>* arrRoundScore;
-	arrRoundScore = (std::array<int, 5>*)checkOwnedMagicEvent->getUserData();
-
+	arrRoundScore = (std::array<int, 5>*)endRoundEvent->getUserData();
+	
 	//display player
 	setDisplayPlayer();
 
 	//if player live score is zero, sprite color turn gray
-	for (int playerNum = 0; playerNum < (int)arrRoundScore->size(); playerNum++)
+	for (int playerNum = 0; playerNum < playerCnt; playerNum++)
 	{
 		if (arrRoundScore->at(playerNum) == 0)
 		{
@@ -177,7 +212,7 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 	addChild(sprMarkBooung, gameMetaData::layerZOrder::objZ1);
 
 	//display score inc/dec each live/victory/booung
-	for (int playerNum = 0; playerNum < 4; playerNum++)
+	for (int playerNum = 0; playerNum < playerCnt; playerNum++)
 	{
 		int liveScore = 0, winScore = 0, booungScore = 0;
 		if (arrRoundScore->at(playerNum) > 0)
@@ -185,7 +220,7 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 			liveScore = 1;
 			arrRoundScore->at(playerNum) -= liveScore;
 
-			if (arrRoundScore->at(4) == playerNum)
+			if (arrRoundScore->at(roundWinnerIdx) == playerNum)
 			{
 				winScore = 2;
 				arrRoundScore->at(playerNum) -= winScore;
@@ -213,9 +248,9 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 		//if player live score is zero, sprite color turn gray
 		if (liveScore == 0)
 		{
-			tempSprLiveScore->setColor(cocos2d::Color3B(150, 150, 150));
-			tempSprWinScore->setColor(cocos2d::Color3B(150, 150, 150));
-			tempSprBooungScore->setColor(cocos2d::Color3B(150, 150, 150));
+			tempSprLiveScore->setColor(cocos2d::Color3B::GRAY);
+			tempSprWinScore->setColor(cocos2d::Color3B::GRAY);
+			tempSprBooungScore->setColor(cocos2d::Color3B::GRAY);
 		}
 
 		this->addChild(tempSprLiveScore, gameMetaData::layerZOrder::objZ1);
@@ -234,10 +269,7 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 	
 	this->scheduleOnce([=](float d) 
 	{
-		auto layerFadeOut = cocos2d::FadeOut::create(0.3f);
-		auto layerHide = cocos2d::Hide::create();
-		auto layerCloseSeq = cocos2d::Sequence::create(layerFadeOut, layerHide, NULL);
-		this->runAction(layerFadeOut);
+		callbackPopupClose();
 
 		cocos2d::EventCustom initRound("initRound");
 		cocos2d::Director::getInstance()->getEventDispatcher()->dispatchEvent(&initRound);
@@ -246,10 +278,53 @@ void popupLayer::setEndRound(cocos2d::EventCustom* checkOwnedMagicEvent)
 	this->setVisible(true);
 }
 
-void popupLayer::setWarning(cocos2d::EventCustom* checkOwnedMagicEvent)
+void popupLayer::setWarning(cocos2d::EventCustom* warningEvent)
 {
+	this->setOpacity(255);
 	this->removeAllChildren();
 	setBGSpr();
+	setPopupBoard(gameMetaData::popupBoardSize::popup400245);
+
+	//get data
+	auto warningFlag = (enum class gameMetaData::warningCode*)warningEvent->getUserData();
+
+	//setTextLabel
+	setWarningLabel(*warningFlag);
+
+	//setBtn	
+	auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
+	auto tempOkSprPress = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+	auto tempOkSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+	tempOkSprPress->setColor(cocos2d::Color3B::GRAY);
+	tempOkSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+	btnOk = cocos2d::MenuItemImage::create();
+	btnOk->initWithNormalSprite(tempOkSprNormal, tempOkSprPress, tempOkSprDisable, CC_CALLBACK_0(popupLayer::callbackGameExit, this));
+	btnOk->setScale(0.6f);
+
+	auto tempCancelSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprCancel.png");
+	auto tempCancelSprPress = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
+	auto tempCancelSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
+	tempCancelSprPress->setColor(cocos2d::Color3B::GRAY);
+	tempCancelSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+	btnCancle = cocos2d::MenuItemImage::create();
+	btnCancle->initWithNormalSprite(tempCancelSprNormal, tempCancelSprPress, tempCancelSprDisable, CC_CALLBACK_0(popupLayer::callbackPopupClose, this));
+	btnCancle->setScale(0.6f);
+
+	btnMenu = cocos2d::Menu::create(btnOk, btnCancle, NULL);
+	btnMenu->alignItemsHorizontallyWithPadding(3.0f);
+	btnMenu->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS - 30.0f));
+	this->addChild(btnMenu, gameMetaData::layerZOrder::objZ1);
 
 	this->setVisible(true);
+}
+
+void popupLayer::setWarningLabel(gameMetaData::warningCode warningCodeEnum)
+{
+	if (warningCodeEnum == gameMetaData::warningCode::exitBtnWarning)
+	{
+		auto tempLabel = cocos2d::Label::createWithTTF("Are you sure exiting current game?", "fonts/Xiomara-Script.ttf", 26.0f,cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
+		//tempLabel->setBMFontSize(14.0f);
+		tempLabel->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS + 50.0f));
+		this->addChild(tempLabel, gameMetaData::layerZOrder::objZ1);
+	}
 }

@@ -57,7 +57,8 @@ private:
 	int myPlayerNum = 0;
 	int roundWinPlayerNum = -1;
 
-	bool isChanged = true;
+	bool isMyNumPlayer = true;
+	bool abrakaWHAT = false;
 
 	std::vector<magicStone*> arrStones;
 	std::vector<player*> arrPlayers;

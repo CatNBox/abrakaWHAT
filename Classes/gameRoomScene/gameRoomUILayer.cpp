@@ -87,6 +87,16 @@ void gameRoomUILayer::settingEventListener()
 		setRound();
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
+
+	//disable all inupt method
+	callBackListener = EventListenerCustom::create("disableInput",
+		[=](EventCustom* event) {
+		for (int i = 0; i < 8; i++)
+		{
+			arrBtnSelectStone[i]->setEnabled(false);
+		}
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 }
 
 
@@ -209,14 +219,15 @@ void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 
 void gameRoomUILayer::returnMainMenu()
 {
-	//ÆË¾÷Ã¢ ±¸Çö
-	log("### gameRoomUILayer::returnMainMenu in");
-	gameFlowManager::getInstance()->changeScene2MainMenu();
+	EventCustom popupEvent("popupWarning");
+	auto warningFlag = gameMetaData::warningCode::exitBtnWarning;
+	popupEvent.setUserData(&warningFlag);
+	Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEvent);
 }
 
 void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
 {
-	if (checkRunningAction())
+	if (checkRunningAction() || !(magicChoicer->isEnabled()))
 		return;
 
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)

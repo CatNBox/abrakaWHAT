@@ -110,6 +110,11 @@ void gameRoomObjLayer::createPlayers()
 		i = tempPlayer;
 		idx++;
 	}
+	if (arrPlayers[myPlayerNum]->isNPC())
+	{
+		isMyNumPlayer = false;
+	}
+
 	//Each player pointed next/prevPlayer and DefaultPosition setting
 	for (int i = 0; i < playerCnt; i++)
 	{
@@ -318,6 +323,15 @@ void gameRoomObjLayer::initRound()
 	starterNum = 0;
 	curPlayerNum = 0;
 	//setStartOrder(); //starterNum setting
+
+	if (arrPlayers[starterNum]->isNPC())
+	{
+		this->scheduleOnce([=](float d)
+		{
+			((npc*)arrPlayers[starterNum])->npcTurnOn();
+			callNpcProcess();
+		}, 5.0f, "starterIsNpc");
+	}
 }
 
 void gameRoomObjLayer::selSecretStone()
@@ -362,7 +376,7 @@ void gameRoomObjLayer::shareStone2Player()
 		//Sharing by player order
 		int tempCurPlayerIdx = i%playerCnt;
 		arrPlayers[tempCurPlayerIdx]->pushStone2List(tempSelStone);
-		if (tempCurPlayerIdx == myPlayerNum)
+		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayerNum))
 		{
 			tempSelStone->setBaseSprite();
 		}
@@ -607,7 +621,7 @@ void gameRoomObjLayer::reorderPlayerHand()
 	for (int i = 0; i < playerMsListSize; i++)
 	{
 		auto tempMagicStone = curPlayer->getMagicStone(i);
-		if (curPlayerNum == myPlayerNum)
+		if ((isMyNumPlayer) && (curPlayerNum == myPlayerNum))
 		{
 			tempMagicStone->setBaseSprite();
 		}
@@ -636,18 +650,31 @@ bool gameRoomObjLayer::isRoundEnd()
 
 	//count curPlayer's rest hand
 	if (arrPlayers[curPlayerNum]->getStoneListSize() == 0)
+	{
+		abrakaWHAT = true;
 		return true;
+	}
 
 	return false;
 }
 
 void gameRoomObjLayer::calcScore()
 {
+	//roundfinisher
+	buf4RoundEndPopUp.at(4) = curPlayerNum;
+
 	//check lp / check booung / if curPlayer's lp is zero, no point
 	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
 	{
 		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
 		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
+	}
+
+	if (abrakaWHAT)
+	{
+		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
+		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
+		return;
 	}
 
 	for (const auto &elemPlayer : arrPlayers)
@@ -664,7 +691,6 @@ void gameRoomObjLayer::calcScore()
 			buf4RoundEndPopUp.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
 		}
 	}
-	buf4RoundEndPopUp.at(4) = curPlayerNum;
 }
 
 void gameRoomObjLayer::callEndRoundEvent()
@@ -726,7 +752,7 @@ void gameRoomObjLayer::passTurn()
 	}
 	curPlayerNum = (curPlayerNum == playerCnt - 1) ? (0) : (curPlayerNum + 1);
 	
-	if (curPlayerNum != myPlayerNum)
+	if ((!isMyNumPlayer) || (curPlayerNum != myPlayerNum))
 	{
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{
