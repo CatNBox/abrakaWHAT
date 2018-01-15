@@ -10,62 +10,29 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\01_setupScene">
-      <UniqueIdentifier>{250fc03c-029e-402f-aab4-1c6aa79b0867}</UniqueIdentifier>
+    <Filter Include="src\01_managers">
+      <UniqueIdentifier>{c8b03114-d89b-4cb9-945c-69ab748b55c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\01_setupScene\layers">
-      <UniqueIdentifier>{415d7181-0088-4144-ac63-a1be4265116f}</UniqueIdentifier>
+    <Filter Include="src\02_setupScene">
+      <UniqueIdentifier>{3f32a390-5cb3-426a-bec8-f4e53d044318}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\00_managers">
-      <UniqueIdentifier>{84b3d966-a37e-46e0-8a25-db19f2b16054}</UniqueIdentifier>
+    <Filter Include="src\00_gameObject">
+      <UniqueIdentifier>{3e1935fa-1c0e-4d34-971d-afd7990639e6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\02_mainMenuScene">
-      <UniqueIdentifier>{71668a29-1ca6-4cb0-83c2-ece7dc78c86d}</UniqueIdentifier>
+    <Filter Include="src\99_gameResultScene">
+      <UniqueIdentifier>{d8cbcc5f-00b8-43a0-a2a2-5d185de1ace1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\02_mainMenuScene\layers">
-      <UniqueIdentifier>{621f26a6-1016-4cc6-9e94-4d5a785b204e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\03_waitingRoomScene">
-      <UniqueIdentifier>{66cac09a-34c6-4f50-8439-8d24c5de47c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\03_waitingRoomScene\layers">
-      <UniqueIdentifier>{30f3743e-8431-438d-83c0-5d3f431704d2}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\05_gameResultScene">
-      <UniqueIdentifier>{b341d098-4a6b-4155-9382-6eb428ef30e4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\05_gameResultScene\layers">
-      <UniqueIdentifier>{608255f2-a7b4-4ed0-ba5c-d19e559a495d}</UniqueIdentifier>
+    <Filter Include="src\03_mainMenuScene">
+      <UniqueIdentifier>{9c672647-77f0-40de-a185-f4794018ebe1}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\04_gameRoomScene">
-      <UniqueIdentifier>{4d8cf9da-98a8-4b32-bb34-83913a717586}</UniqueIdentifier>
+      <UniqueIdentifier>{b2064450-3d3e-4a17-ac8e-233785f09302}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\04_gameRoomScene\layers">
-      <UniqueIdentifier>{985ed7ea-3b2b-4d90-8ad3-0ea55659568d}</UniqueIdentifier>
+    <Filter Include="src\05_waitingRoomScene">
+      <UniqueIdentifier>{e558fbb0-d9e6-40d0-b0a2-aa0246d364ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\06_gameObject">
-      <UniqueIdentifier>{faabce89-f2a5-4eb7-b5df-029f73c460e0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\seenChecker">
-      <UniqueIdentifier>{5d7e8989-87e1-43c3-9ae6-b169df4e82b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\magicStones">
-      <UniqueIdentifier>{1ebccb24-1af0-4e97-996a-13f5b9e83314}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\UISprites">
-      <UniqueIdentifier>{760e63ca-b4a2-490f-a965-74e8d48c9080}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\lpToken">
-      <UniqueIdentifier>{d0ff8cba-ae40-4b41-8591-22edce610bba}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\msEffectSpr">
-      <UniqueIdentifier>{57babec6-204e-4f87-aff3-06bc06b2e405}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\07_popupLayer">
-      <UniqueIdentifier>{4cfd7276-a796-4d10-8162-9da0573ac6d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="resource\popupLayerSpr">
-      <UniqueIdentifier>{ed3d7baf-4248-45cc-b0ed-a8eb8d3e84e1}</UniqueIdentifier>
+    <Filter Include="src\06_popupLayer">
+      <UniqueIdentifier>{c6971501-7ad8-4d52-87f1-407bd4c9f55f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,50 +42,50 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\managers\gameFlowManager.cpp">
-      <Filter>src\00_managers</Filter>
+    <ClCompile Include="..\Classes\gameObject\magicStone.cpp">
+      <Filter>src\00_gameObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\managers\networkManager.cpp">
-      <Filter>src\00_managers</Filter>
+    <ClCompile Include="..\Classes\gameObject\player.cpp">
+      <Filter>src\00_gameObject</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\setupScene\setupScene.cpp">
-      <Filter>src\01_setupScene</Filter>
+    <ClCompile Include="..\Classes\gameRoomScene\gameRoomBGLayer.cpp">
+      <Filter>src\04_gameRoomScene</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp">
-      <Filter>src\01_setupScene\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\mainMenuScene\mainMenuScene.cpp">
-      <Filter>src\02_mainMenuScene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\mainMenuScene\mainMenuBGLayer.cpp">
-      <Filter>src\02_mainMenuScene\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\mainMenuScene\mainMenuObjLayer.cpp">
-      <Filter>src\02_mainMenuScene\layers</Filter>
+    <ClCompile Include="..\Classes\gameRoomScene\gameRoomObjLayer.cpp">
+      <Filter>src\04_gameRoomScene</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\gameRoomScene\gameRoomScene.cpp">
       <Filter>src\04_gameRoomScene</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\gameRoomScene\gameRoomBGLayer.cpp">
-      <Filter>src\04_gameRoomScene\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\gameRoomScene\gameRoomObjLayer.cpp">
-      <Filter>src\04_gameRoomScene\layers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\gameObject\magicStone.cpp">
-      <Filter>src\06_gameObject</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\gameRoomScene\gameRoomUILayer.cpp">
-      <Filter>src\04_gameRoomScene\layers</Filter>
+      <Filter>src\04_gameRoomScene</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\gameObject\player.cpp">
-      <Filter>src\06_gameObject</Filter>
+    <ClCompile Include="..\Classes\mainMenuScene\mainMenuBGLayer.cpp">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mainMenuScene\mainMenuObjLayer.cpp">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\mainMenuScene\mainMenuScene.cpp">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\managers\gameFlowManager.cpp">
+      <Filter>src\01_managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\managers\networkManager.cpp">
+      <Filter>src\01_managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\managers\soundManager.cpp">
-      <Filter>src\00_managers</Filter>
+      <Filter>src\01_managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp">
+      <Filter>src\02_setupScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\setupScene\setupScene.cpp">
+      <Filter>src\02_setupScene</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\popupLayer\popupLayer.cpp">
-      <Filter>src\07_popupLayer</Filter>
+      <Filter>src\06_popupLayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,286 +95,70 @@
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\managers\gameFlowManager.h">
-      <Filter>src\00_managers</Filter>
+    <ClInclude Include="..\Classes\deletedCode.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\managers\networkManager.h">
-      <Filter>src\00_managers</Filter>
+    <ClInclude Include="..\Classes\gameObject\gameMetaData.h">
+      <Filter>src\00_gameObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\setupScene\setupScene.h">
-      <Filter>src\01_setupScene</Filter>
+    <ClInclude Include="..\Classes\gameObject\magicStone.h">
+      <Filter>src\00_gameObject</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h">
-      <Filter>src\01_setupScene\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h">
-      <Filter>src\03_waitingRoomScene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomObjLayer.h">
-      <Filter>src\03_waitingRoomScene\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h">
-      <Filter>src\03_waitingRoomScene\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mainMenuScene\mainMenuScene.h">
-      <Filter>src\02_mainMenuScene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mainMenuScene\mainMenuObjLayer.h">
-      <Filter>src\02_mainMenuScene\layers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\mainMenuScene\mainMenuBGLayer.h">
-      <Filter>src\02_mainMenuScene\layers</Filter>
+    <ClInclude Include="..\Classes\gameObject\player.h">
+      <Filter>src\00_gameObject</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomBGLayer.h">
-      <Filter>src\04_gameRoomScene\layers</Filter>
+      <Filter>src\04_gameRoomScene</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomObjLayer.h">
-      <Filter>src\04_gameRoomScene\layers</Filter>
+      <Filter>src\04_gameRoomScene</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomScene.h">
       <Filter>src\04_gameRoomScene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\gameObject\magicStone.h">
-      <Filter>src\06_gameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\gameObject\gameMetaData.h">
-      <Filter>src\06_gameObject</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\gameObject\player.h">
-      <Filter>src\06_gameObject</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\gameRoomScene\gameRoomUILayer.h">
-      <Filter>src\04_gameRoomScene\layers</Filter>
+      <Filter>src\04_gameRoomScene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\deletedCode.h">
-      <Filter>src</Filter>
+    <ClInclude Include="..\Classes\mainMenuScene\mainMenuBGLayer.h">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mainMenuScene\mainMenuObjLayer.h">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\mainMenuScene\mainMenuScene.h">
+      <Filter>src\03_mainMenuScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\gameFlowManager.h">
+      <Filter>src\01_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\networkManager.h">
+      <Filter>src\01_managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\managers\soundManager.h">
-      <Filter>src\00_managers</Filter>
+      <Filter>src\01_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomObjLayer.h">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h">
+      <Filter>src\02_setupScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\setupScene\setupScene.h">
+      <Filter>src\02_setupScene</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\popupLayer\popupLayer.h">
-      <Filter>src\07_popupLayer</Filter>
+      <Filter>src\06_popupLayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="game.rc">
       <Filter>resource</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="..\Resources\bg_logo.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\bg_wait.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\bg01.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\bg02.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\bg03.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\bg04.jpg">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker.png">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms_seenBG.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms1_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms1_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms2_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms2_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms3_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms3_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms4_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms4_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms5_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms5_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms6_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms6_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms7_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms7_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms8_notSeen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\seenChecker\ms8_seen.png">
-      <Filter>resource\seenChecker</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms_bg.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms1_yongyong.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms2_bangrang.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms3_wind.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms4_booung.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms5_bunpok.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms6_nungang.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms7_buljack.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones\ms8_postion.png">
-      <Filter>resource\magicStones</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnExitNormal.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnExitPress.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnHostNormal.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnHostPress.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnJoinNormal.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnJoinPress.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnSingleNormal.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\btnSinglePress.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\ms_pass_abled_clicked.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\ms_pass_abled_normal.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\ms_pass_disabled.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\spr_number.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\particle4SeenCheck.png">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\magicStones.png">
-      <Filter>resource</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken00.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken01.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken02.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken03.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken04.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\lpToken\lpToken05.png">
-      <Filter>resource\lpToken</Filter>
-    </Image>
-    <Image Include="..\Resources\msEffectSpr\yongyongRedScreen.png">
-      <Filter>resource\msEffectSpr</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprScore.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprRank.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprPlayer.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\popupLayerSpr\popupLayerBG.png">
-      <Filter>resource\popupLayerSpr</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\uiPopMessage.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\popupLayerSpr\popup400245.png">
-      <Filter>resource\popupLayerSpr</Filter>
-    </Image>
-    <Image Include="..\Resources\popupLayerSpr\popup400500.png">
-      <Filter>resource\popupLayerSpr</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprCancel.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprOk.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprBooung.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprLive.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-    <Image Include="..\Resources\UISprite\sprWin.png">
-      <Filter>resource\UISprites</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\Resources\magicStones.plist">
-      <Filter>resource</Filter>
-    </None>
-    <None Include="..\Resources\seenChecker.plist">
-      <Filter>resource</Filter>
-    </None>
-    <None Include="..\Resources\particle4SeenCheck.plist">
-      <Filter>resource</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="toDoTasks.txt">
-      <Filter>src</Filter>
-    </Text>
   </ItemGroup>
 </Project>

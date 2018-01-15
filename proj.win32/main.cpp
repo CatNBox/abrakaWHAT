@@ -1,7 +1,7 @@
 #include "main.h"
 #include "AppDelegate.h"
 #include "cocos2d.h"
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+#include "managers\gameFlowManager.h"
 
 USING_NS_CC;
 
@@ -15,5 +15,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
 
     // create the application instance
     AppDelegate app;
+	gameFlowManager::getInstance();
     return Application::getInstance()->run();
 }

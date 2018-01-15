@@ -7,22 +7,20 @@
 
 using namespace cocos2d;
 
-static gameFlowManager *theGameFlowManager = nullptr;
-
-gameFlowManager * gameFlowManager::getInstance()
+gameFlowManager & gameFlowManager::getInstance()
 {
-	if (!theGameFlowManager)
-	{
-		theGameFlowManager = new gameFlowManager();
-	}
-
-	return theGameFlowManager;
+	static gameFlowManager instance;
+	return instance;
 }
 
 gameFlowManager::gameFlowManager()
 {
 	curSceneState = gameMetaData::curScene::setupScene;
 	objSoundManager = new soundManager();
+}
+
+gameFlowManager::~gameFlowManager()
+{
 }
 
 void gameFlowManager::changeScene2MainMenu()
@@ -114,8 +112,6 @@ void gameFlowManager::preloadSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprWin.png");
 	tempSpr->initWithFile("UISprite/sprBooung.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprBooung.png");
-
-	tempSpr->autorelease();
 }
 
 //Rect만 넘겨주도록 수정

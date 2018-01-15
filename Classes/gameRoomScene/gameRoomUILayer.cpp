@@ -183,11 +183,11 @@ void gameRoomUILayer::setRound()
 	std::cout << "라운드 업" << std::endl;
 
 	//라운드 50 710
-	roundSpr->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(roundNum));
+	roundSpr->setTextureRect(gameFlowManager::getInstance().getNumSprRect(roundNum));
 }
 bool gameRoomUILayer::checkRunningAction()
 {
-	int actionCnt = gameFlowManager::getInstance()->getRunningActionCnt();
+	int actionCnt = gameFlowManager::getInstance().getRunningActionCnt();
 	std::cout << "actionCnt : " << actionCnt << std::endl;
 	if (actionCnt != 0)
 	{
@@ -232,7 +232,7 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
-		gameFlowManager::getInstance()->endGame();
+		gameFlowManager::getInstance().endGame();
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{

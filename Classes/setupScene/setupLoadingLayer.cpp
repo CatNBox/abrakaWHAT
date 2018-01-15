@@ -27,8 +27,8 @@ bool setupLodingLayer::init()
 	this->addChild(label, 1);
 
 	// add "HelloWorld" splash screen"
-	int bgIdx = gameFlowManager::getInstance()->getRandomInt(0, 3);
-	auto sprite = Sprite::create(gameMetaData::arrBGSprite.at(bgIdx));
+	//int bgIdx = gameFlowManager::getInstance()->getRandomInt(0, 3);
+	auto sprite = Sprite::create(gameMetaData::arrBGSprite.at(2));
 
 	// position the sprite on the center of the screen
 	sprite->setPosition(Vec2(visibleSize.width / 2 + origin.x, visibleSize.height / 2 + origin.y));
@@ -37,7 +37,7 @@ bool setupLodingLayer::init()
 	this->addChild(sprite, 0);
 
 	log("### preload sprite / call in setupLoadingLayer");
-	gameFlowManager::getInstance()->preloadSprites();
+	gameFlowManager::getInstance().preloadSprites();
 
 	this->scheduleOnce(SEL_SCHEDULE(&setupLodingLayer::callChangeScene2MainMenu), 1.5f);
 
@@ -63,5 +63,5 @@ void setupLodingLayer::menuCloseCallback(cocos2d::Ref * pSender)
 void setupLodingLayer::callChangeScene2MainMenu(float d)
 {
 	log("### setupLoadingLayer::callChangeScene2MainMenu in");
-	gameFlowManager::getInstance()->changeScene2MainMenu();
+	gameFlowManager::getInstance().changeScene2MainMenu();
 }

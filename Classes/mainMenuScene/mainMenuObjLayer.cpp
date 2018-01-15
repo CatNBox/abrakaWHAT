@@ -77,7 +77,7 @@ bool mainMenuObjLayer::init()
 
 void mainMenuObjLayer::exitBtnCallback()
 {
-	gameFlowManager::getInstance()->endGame();
+	gameFlowManager::getInstance().endGame();
 }
 
 void mainMenuObjLayer::hostGameBtnCallback()
@@ -90,7 +90,7 @@ void mainMenuObjLayer::joinGameBtnCallback()
 
 void mainMenuObjLayer::singleGameBtnCallback()
 {
-	gameFlowManager::getInstance()->changeScene2SingleMode();
+	gameFlowManager::getInstance().changeScene2SingleMode();
 }
 
 void mainMenuObjLayer::openBuyURL()

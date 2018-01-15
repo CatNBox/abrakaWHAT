@@ -63,17 +63,17 @@ void gameRoomObjLayer::settingEventListener()
 
 void gameRoomObjLayer::settingCntValues()
 {
-	playerCnt = gameFlowManager::getInstance()->getPlayerCount();
-	secretCnt = gameFlowManager::getInstance()->getSecretCount();
+	playerCnt = gameFlowManager::getInstance().getPlayerCount();
+	secretCnt = gameFlowManager::getInstance().getSecretCount();
 
-	arrMsCnt[gameMetaData::msType::yongyong] = gameFlowManager::getInstance()->getYongyongCount();
-	arrMsCnt[gameMetaData::msType::bangrang] = gameFlowManager::getInstance()->getBangrangCount();
-	arrMsCnt[gameMetaData::msType::wind] = gameFlowManager::getInstance()->getWindCount();
-	arrMsCnt[gameMetaData::msType::booung] = gameFlowManager::getInstance()->getBooungCount();
-	arrMsCnt[gameMetaData::msType::bunpok] = gameFlowManager::getInstance()->getBunpokCount();
-	arrMsCnt[gameMetaData::msType::nungang] = gameFlowManager::getInstance()->getNungangCount();
-	arrMsCnt[gameMetaData::msType::buljak] = gameFlowManager::getInstance()->getBuljakCount();
-	arrMsCnt[gameMetaData::msType::potion] = gameFlowManager::getInstance()->getPotionCount();
+	arrMsCnt[gameMetaData::msType::yongyong] = gameFlowManager::getInstance().getYongyongCount();
+	arrMsCnt[gameMetaData::msType::bangrang] = gameFlowManager::getInstance().getBangrangCount();
+	arrMsCnt[gameMetaData::msType::wind] = gameFlowManager::getInstance().getWindCount();
+	arrMsCnt[gameMetaData::msType::booung] = gameFlowManager::getInstance().getBooungCount();
+	arrMsCnt[gameMetaData::msType::bunpok] = gameFlowManager::getInstance().getBunpokCount();
+	arrMsCnt[gameMetaData::msType::nungang] = gameFlowManager::getInstance().getNungangCount();
+	arrMsCnt[gameMetaData::msType::buljak] = gameFlowManager::getInstance().getBuljakCount();
+	arrMsCnt[gameMetaData::msType::potion] = gameFlowManager::getInstance().getPotionCount();
 
 	stoneMaxCnt = 
 		arrMsCnt[gameMetaData::msType::yongyong]		//yongyong 
@@ -260,7 +260,7 @@ void gameRoomObjLayer::createPlayerLpObj()
 	int idx = 0;
 	for (auto &i : arrPlayers)
 	{
-		for (int j = 0; j < gameFlowManager::getInstance()->getMaxLifePoint(); j++)
+		for (int j = 0; j < gameFlowManager::getInstance().getMaxLifePoint(); j++)
 		{
 			auto temp = i->createLpObj(idx + 1);
 			this->addChild(temp, gameMetaData::layerZOrder::objZ1);
@@ -294,7 +294,7 @@ void gameRoomObjLayer::initRound()
 	{
 		i->init();
 		auto playerIdx = i->getIndex();
-		arrScoreSpr.at(playerIdx)->setTextureRect(gameFlowManager::getInstance()->getNumSprRect(arrScore.at(playerIdx)));
+		arrScoreSpr.at(playerIdx)->setTextureRect(gameFlowManager::getInstance().getNumSprRect(arrScore.at(playerIdx)));
 		arrScoreSpr.at(playerIdx)->setVisible(true);
 	}
 	//init seenChecker
@@ -404,7 +404,7 @@ void gameRoomObjLayer::setStartOrder()
 
 void gameRoomObjLayer::callNpcProcess()
 {
-	gameFlowManager::getInstance()->getSoundManager()->playNpcSound();
+	gameFlowManager::getInstance().getSoundManager()->playNpcSound();
 	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
 		int discardCnt = 0;
@@ -463,7 +463,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		//----action checkFail
 		int damage = 1;
 		if (magicEnum == gameMetaData::msType::yongyong)
-			damage = gameFlowManager::getInstance()->getRandomInt(1,3);
+			damage = gameFlowManager::getInstance().getRandomInt(1,3);
 		curPlayer->actionLostLp(damage);
 		if (curPlayer->isNPC())
 		{
@@ -526,7 +526,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		addChild(redScreenSpr, gameMetaData::layerZOrder::effectZ);
 		auto blinking = cocos2d::Blink::create(2.0f, 8);
 		auto callred = cocos2d::CallFunc::create([=]() {redScreenSpr->setVisible(false);});
-		auto seqRed = gameFlowManager::getInstance()->wrapActions(blinking, callred, NULL);
+		auto seqRed = gameFlowManager::getInstance().wrapActions(blinking, callred, NULL);
 		redScreenSpr->runAction(seqRed);
 
 		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(10, 10));	//15,15
@@ -542,10 +542,10 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 			shaking04, shaking05, shaking06, shaking07, shaking08, shaking09, NULL);
 		auto reverseAction = seq01->reverse();
 		//auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
-		auto seqEarthQuake = gameFlowManager::getInstance()->wrapActions(seq01, reverseAction, NULL);
+		auto seqEarthQuake = gameFlowManager::getInstance().wrapActions(seq01, reverseAction, NULL);
 		this->runAction(seqEarthQuake);
 
-		damage = gameFlowManager::getInstance()->getRandomInt(1, 3);
+		damage = gameFlowManager::getInstance().getRandomInt(1, 3);
 	}
 	case gameMetaData::msType::bangrang:
 	{
@@ -674,6 +674,7 @@ void gameRoomObjLayer::calcScore()
 	{
 		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
 		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
+		abrakaWHAT = false;
 		return;
 	}
 
@@ -695,7 +696,7 @@ void gameRoomObjLayer::calcScore()
 
 void gameRoomObjLayer::callEndRoundEvent()
 {
-	int checkActionCnt = gameFlowManager::getInstance()->getRunningActionCnt();
+	int checkActionCnt = gameFlowManager::getInstance().getRunningActionCnt();
 	if (checkActionCnt > 0)
 	{
 		loopError++;
@@ -791,7 +792,7 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 	int rndIndex = 0;
 	while (true)
 	{
-		rndIndex = gameFlowManager::getInstance()->getRandomInt(stoneMinCnt, stoneMaxCnt - 1);
+		rndIndex = gameFlowManager::getInstance().getRandomInt(stoneMinCnt, stoneMaxCnt - 1);
 		if (arrStones[rndIndex]->getStatus() == stateEnum)
 		{
 			ptempMS = arrStones[rndIndex];

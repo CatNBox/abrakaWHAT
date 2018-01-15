@@ -9,8 +9,7 @@ class networkManager;
 class gameFlowManager
 {
 public:
-	static gameFlowManager* getInstance();
-	gameFlowManager();
+	static gameFlowManager& getInstance();
 
 	void changeScene2MainMenu();
 	void changeScene2SingleMode();
@@ -57,6 +56,9 @@ public:
 	cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);
 
 private:
+	gameFlowManager();
+	virtual ~gameFlowManager();
+
 	int playerCount;
 	int yongyongCnt;
 	int bangrangCnt;

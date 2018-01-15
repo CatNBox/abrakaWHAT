@@ -1,6 +1,21 @@
 #include "AppDelegate.h"
 #include "setupScene\setupScene.h"
 
+// #define USE_AUDIO_ENGINE 1
+// #define USE_SIMPLE_AUDIO_ENGINE 1
+
+#if USE_AUDIO_ENGINE && USE_SIMPLE_AUDIO_ENGINE
+#error "Don't use AudioEngine and SimpleAudioEngine at the same time. Please just select one in your game!"
+#endif
+
+#if USE_AUDIO_ENGINE
+#include "audio/include/AudioEngine.h"
+using namespace cocos2d::experimental;
+#elif USE_SIMPLE_AUDIO_ENGINE
+#include "audio/include/SimpleAudioEngine.h"
+using namespace CocosDenshion;
+#endif
+
 USING_NS_CC;
 
 static cocos2d::Size designResolutionSize = cocos2d::Size(768, 768);
@@ -14,6 +29,11 @@ AppDelegate::AppDelegate()
 
 AppDelegate::~AppDelegate() 
 {
+#if USE_AUDIO_ENGINE
+    AudioEngine::end();
+#elif USE_SIMPLE_AUDIO_ENGINE
+    SimpleAudioEngine::end();
+#endif
 }
 
 // if you want a different context, modify the value of glContextAttrs
@@ -39,12 +59,9 @@ bool AppDelegate::applicationDidFinishLaunching() {
     auto glview = director->getOpenGLView();
     if(!glview) {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WIN32) || (CC_TARGET_PLATFORM == CC_PLATFORM_MAC) || (CC_TARGET_PLATFORM == CC_PLATFORM_LINUX)
-        glview = GLViewImpl::createWithRect("abrakaWHAT", cocos2d::Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
-
-		auto window = static_cast<GLViewImpl*>(glview)->getWindow();
-		glfwSetWindowPos(window, 0, 0);
+        glview = GLViewImpl::createWithRect("releaseTest", cocos2d::Rect(0, 0, designResolutionSize.width, designResolutionSize.height));
 #else
-        glview = GLViewImpl::create("abrakaWHAT");
+        glview = GLViewImpl::create("releaseTest");
 #endif
         director->setOpenGLView(glview);
     }
@@ -89,14 +106,22 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
     Director::getInstance()->stopAnimation();
 
-    // if you use SimpleAudioEngine, it must be paused
-    // SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+#if USE_AUDIO_ENGINE
+    AudioEngine::pauseAll();
+#elif USE_SIMPLE_AUDIO_ENGINE
+    SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
+    SimpleAudioEngine::getInstance()->pauseAllEffects();
+#endif
 }
 
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
     Director::getInstance()->startAnimation();
 
-    // if you use SimpleAudioEngine, it must resume here
-    // SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+#if USE_AUDIO_ENGINE
+    AudioEngine::resumeAll();
+#elif USE_SIMPLE_AUDIO_ENGINE
+    SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
+    SimpleAudioEngine::getInstance()->resumeAllEffects();
+#endif
 }

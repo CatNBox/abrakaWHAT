@@ -54,7 +54,7 @@ void soundManager::playNpcSound()
 		CocosDenshion::SimpleAudioEngine::getInstance()
 			->stopEffect(prevNpcSoundID);
 	}
-	int rInt = gameFlowManager::getInstance()->getRandomInt(0, 15);
+	int rInt = gameFlowManager::getInstance().getRandomInt(0, 15);
 	prevNpcSoundID = CocosDenshion::SimpleAudioEngine::getInstance()
 		->playEffect(gameMetaData::arrNpcSound.at(rInt));
 }
