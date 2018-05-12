@@ -62,58 +62,6 @@ void gameFlowManager::changeScene2JoinMode()
 {
 }
 
-void gameFlowManager::preloadSprites()
-{
-	log("### preload sprite ###");
-	auto spriteCache = SpriteFrameCache::getInstance();
-	spriteCache->addSpriteFramesWithFile("magicStones.plist","magicStones.png");
-	spriteCache->addSpriteFramesWithFile("seenChecker.plist", "seenChecker.png");
-	
-	auto tempSpr = Sprite::create("UISprite/spr_number.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "spr_number.png");
-
-	tempSpr->initWithFile("lpToken/lpToken00.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken00.png");
-	tempSpr->initWithFile("lpToken/lpToken01.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken01.png");
-	tempSpr->initWithFile("lpToken/lpToken02.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken02.png");
-	tempSpr->initWithFile("lpToken/lpToken03.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken03.png");
-	tempSpr->initWithFile("lpToken/lpToken04.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken04.png");
-	tempSpr->initWithFile("lpToken/lpToken05.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "lpToken05.png");
-
-	tempSpr->initWithFile("msEffectSpr/yongyongRedScreen.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "yongyongRedScreen.png");
-
-	tempSpr->initWithFile("UISprite/sprScore.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprScore.png");
-	tempSpr->initWithFile("UISprite/sprPlayer.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprPlayer.png");
-
-	tempSpr->initWithFile("popupLayerSpr/popupLayerBG.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popupLayerBG.png");
-	tempSpr->initWithFile("popupLayerSpr/popup400500.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popup400500.png");
-	tempSpr->initWithFile("popupLayerSpr/popup400245.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "popup400245.png");
-	tempSpr->initWithFile("UISprite/uiPopMessage.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "uiPopMessage.png");
-
-	tempSpr->initWithFile("UISprite/sprCancel.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprCancel.png");
-	tempSpr->initWithFile("UISprite/sprOk.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprOk.png");
-	tempSpr->initWithFile("UISprite/sprLive.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprLive.png");
-	tempSpr->initWithFile("UISprite/sprWin.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprWin.png");
-	tempSpr->initWithFile("UISprite/sprBooung.png");
-	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprBooung.png");
-}
-
 //Rect만 넘겨주도록 수정
 cocos2d::Rect gameFlowManager::getNumSprRect(const int num)
 {

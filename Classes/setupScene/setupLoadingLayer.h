@@ -13,5 +13,5 @@ private:
 	void menuCloseCallback(cocos2d::Ref * pSender);
 	void callChangeScene2MainMenu(float d);
 
-
+	void preloadSprites();
 };

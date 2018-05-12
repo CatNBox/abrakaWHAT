@@ -2,7 +2,7 @@
 #include "cocos2d.h"
 #include "managers\soundManager.h"
 
-#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
+#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD	//static variable
 
 class networkManager;
 
@@ -11,14 +11,14 @@ class gameFlowManager
 public:
 	static gameFlowManager& getInstance();
 
-	void changeScene2MainMenu();
-	void changeScene2SingleMode();
-	void changeScene2HostMode();
-	void changeScene2JoinMode();
+	void changeScene2MainMenu();	//setupScene
+	void changeScene2SingleMode();	//mainMenuScene
+	void changeScene2HostMode();	//mainMenuScene
+	void changeScene2JoinMode();	//mainMenuScene
 
-	void preloadSprites();
-	cocos2d::Rect getNumSprRect(const int num); //0-9 only
+	cocos2d::Rect getNumSprRect(const int num); //0-9 only	//numSpriteClass
 
+	//---------------------------------------------
 	void setPlayerCount(int cnt);
 	int getPlayerCount() const;
 
@@ -43,17 +43,19 @@ public:
 	int getSecretCount() const;
 	void setLifePoint(int cnt);
 	int getMaxLifePoint() const;
+	//----------------option File R/W create----------
 
-	int getRandomInt(int min, int max);
-	soundManager* getSoundManager();
+	int getRandomInt(int min, int max);	//randomGenClass
+	soundManager* getSoundManager();	//delete
 
-	void endGame();
+	void endGame();	//case by case
 
-	void incRunningActionCnt();
-	void decRunningActionCnt();
-	int getRunningActionCnt();
+	void incRunningActionCnt();	//actionManagerClass
+	void decRunningActionCnt();	//actionManagerClass
+	int getRunningActionCnt();	//actionManagerClass
 
-	cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);
+	cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);	//actionManagerClass
+
 
 private:
 	gameFlowManager();
