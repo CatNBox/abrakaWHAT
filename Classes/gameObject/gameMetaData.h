@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <random>
 
 #define SINGLE_MODE_BUILD 1
 #define NETWORK_MODE_BUILD 2
@@ -9,8 +10,41 @@
 #define SECRETSTONE_BASESCALE 0.5f
 #define SCORE_BASESCALE 0.5f
 
+#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
+
+//-------------------
+//header for manage
+//enum and const, inline function
+//-------------------
+
+namespace inlineFunc 
+{
+	inline int getRandomInt(int min, int max)
+	{
+		std::random_device rd;
+		std::mt19937_64 rnd(rd());
+
+		std::uniform_int_distribution<int> range(min, max);
+
+		return range(rnd);
+	}
+}
+
 namespace gameMetaData
 {
+	//option.ini defaultValue
+	const int defaultPlayerCnt = 4;
+	const int defaultSecretCnt = 4;
+	const int defaultYongCnt = 1;
+	const int defaultBangrangCnt = 2;
+	const int defaultWindCnt = 3;
+	const int defaultBooungCnt = 4;
+	const int defaultBunpokCnt = 5;
+	const int defaultNungangCnt = 6;
+	const int defaultBuljakCnt = 7;
+	const int defaultPotionCnt = 8;
+	const int defaultMaxLifePoint = 6;
+
 	//0 = ms_bg, 1~8 = ms1~8
 	const std::string arrMsSpriteName[] = {
 		"ms_bg.png",

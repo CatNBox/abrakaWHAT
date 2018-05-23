@@ -1,6 +1,7 @@
 #include "mainMenuScene\mainMenuObjLayer.h"
-#include "managers\gameFlowManager.h"
 #include "gameObject\gameMetaData.h"
+#include "gameRoomScene\gameRoomScene.h"
+
 
 using namespace cocos2d;
 
@@ -45,6 +46,7 @@ bool mainMenuObjLayer::init()
 	int mainMenuX = 384;
 	int mainMenuY = 300;
 
+	//buildMode set in gameMetaData.h
 #if (CURRENT_BUILD_MODE == SINGLE_MODE_BUILD)
 	auto mainMenu = Menu::create(btnSingle, btnExit,  nullptr);
 	mainMenu->alignItemsVerticallyWithPadding(4.0f);
@@ -60,10 +62,6 @@ bool mainMenuObjLayer::init()
 	mainMenuY = 190;
 	mainMenu->setPosition(Vec2(mainMenuX, mainMenuY));
 	btnSingle->setPosition(Vec2(0, 450));
-
-	//포폴용코드
-	btnHost->setEnabled(false);
-	btnJoin->setEnabled(false);
 #endif
 
 	mainMenu->addChild(btnURL);
@@ -77,7 +75,7 @@ bool mainMenuObjLayer::init()
 
 void mainMenuObjLayer::exitBtnCallback()
 {
-	gameFlowManager::getInstance().endGame();
+	Director::getInstance()->end();
 }
 
 void mainMenuObjLayer::hostGameBtnCallback()
@@ -90,11 +88,12 @@ void mainMenuObjLayer::joinGameBtnCallback()
 
 void mainMenuObjLayer::singleGameBtnCallback()
 {
-	gameFlowManager::getInstance().changeScene2SingleMode();
+	auto singleModeScene = TransitionSlideInT::create(0.6f, gameRoomScene::createScene());
+	Director::getInstance()->replaceScene(singleModeScene);
 }
 
 void mainMenuObjLayer::openBuyURL()
 {
-	cocos2d::Application::getInstance()->openURL("http://www.koreaboardgames.com/product_list.htm?mode=view&cat=8%BC%BC%C0%CC%BB%F3&no=281&p=1&sort=a#games_003");
+	cocos2d::Application::getInstance()->openURL("http://www.koreaboardgames.com/boardgame/game_view.php?prd_idx=15937");
 	cocos2d::Application::getInstance()->openURL("http://www.divedice.com/site/game/gds_detail01.php?mode=view&prd_idx=15937");
 }

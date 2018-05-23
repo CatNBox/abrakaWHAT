@@ -1,6 +1,8 @@
 #pragma once
 #include "cocos2d.h"
 
+class spriteManager;
+
 class setupLodingLayer : public cocos2d::Layer
 {
 public:
@@ -11,7 +13,9 @@ public:
 
 private:
 	void menuCloseCallback(cocos2d::Ref * pSender);
-	void callChangeScene2MainMenu(float d);
+	void changeScene2MainMenu(float d);
+	bool checkExistINI();
+	void setINI();
 
-	void preloadSprites();
+	spriteManager* sprManager;
 };

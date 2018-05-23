@@ -87,6 +87,12 @@
     <ClCompile Include="..\Classes\popupLayer\popupLayer.cpp">
       <Filter>src\06_popupLayer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\managers\actionManager.cpp">
+      <Filter>src\01_managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\managers\spriteManager.cpp">
+      <Filter>src\01_managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -154,6 +160,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\popupLayer\popupLayer.h">
       <Filter>src\06_popupLayer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\actionManager.h">
+      <Filter>src\01_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\spriteManager.h">
+      <Filter>src\01_managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

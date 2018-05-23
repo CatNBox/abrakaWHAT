@@ -159,9 +159,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\mainMenuScene\mainMenuBGLayer.cpp" />
     <ClCompile Include="..\Classes\mainMenuScene\mainMenuObjLayer.cpp" />
     <ClCompile Include="..\Classes\mainMenuScene\mainMenuScene.cpp" />
+    <ClCompile Include="..\Classes\managers\actionManager.cpp" />
     <ClCompile Include="..\Classes\managers\gameFlowManager.cpp" />
     <ClCompile Include="..\Classes\managers\networkManager.cpp" />
     <ClCompile Include="..\Classes\managers\soundManager.cpp" />
+    <ClCompile Include="..\Classes\managers\spriteManager.cpp" />
     <ClCompile Include="..\Classes\popupLayer\popupLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupScene.cpp" />
@@ -180,9 +182,11 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuBGLayer.h" />
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuObjLayer.h" />
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuScene.h" />
+    <ClInclude Include="..\Classes\managers\actionManager.h" />
     <ClInclude Include="..\Classes\managers\gameFlowManager.h" />
     <ClInclude Include="..\Classes\managers\networkManager.h" />
     <ClInclude Include="..\Classes\managers\soundManager.h" />
+    <ClInclude Include="..\Classes\managers\spriteManager.h" />
     <ClInclude Include="..\Classes\popupLayer\popupLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupScene.h" />

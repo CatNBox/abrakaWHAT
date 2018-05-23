@@ -5,6 +5,7 @@
 
 class magicStone;
 class player;
+class spriteManager;
 
 class gameRoomObjLayer : public cocos2d::Layer
 {
@@ -47,6 +48,7 @@ private:
 
 	int playerCnt = 0;
 	int secretCnt = 0;
+	int maxLifePoint = 0;
 	int arrMsCnt[gameMetaData::variableMaxCnt::msTypeCnt] = { 0 };
 
 	int stoneMinCnt = 0;
@@ -65,6 +67,7 @@ private:
 	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
 	std::vector<cocos2d::Sprite*> arrScoreSpr;
 	std::array<int, 4> arrScore{ 0 };
+	spriteManager* sprManager;
 
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index

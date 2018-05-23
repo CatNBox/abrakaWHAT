@@ -1,7 +1,7 @@
 #include "gameRoomObjLayer.h"
-#include "managers\gameFlowManager.h"
 #include "gameObject\magicStone.h"
 #include "gameObject\player.h"
+#include "managers\spriteManager.h"
 #include <iostream>
 
 using namespace cocos2d;
@@ -12,6 +12,8 @@ bool gameRoomObjLayer::init()
 	{
 		return false;
 	}
+
+	sprManager = new spriteManager;
 
 	//eventListener setting
 	settingEventListener();
@@ -63,22 +65,23 @@ void gameRoomObjLayer::settingEventListener()
 
 void gameRoomObjLayer::settingCntValues()
 {
-	playerCnt = gameFlowManager::getInstance().getPlayerCount();
-	secretCnt = gameFlowManager::getInstance().getSecretCount();
+	playerCnt = GetPrivateProfileInt(L"RoundOption", L"playerCnt", gameMetaData::defaultPlayerCnt, L"option.ini");
+	secretCnt = GetPrivateProfileInt(L"RoundOption", L"secretCnt", gameMetaData::defaultSecretCnt, L"option.ini");
+	maxLifePoint = GetPrivateProfileInt(L"RoundOption", L"maxLifePoint", gameMetaData::defaultMaxLifePoint, L"option.ini");
 
-	arrMsCnt[gameMetaData::msType::yongyong] = gameFlowManager::getInstance().getYongyongCount();
-	arrMsCnt[gameMetaData::msType::bangrang] = gameFlowManager::getInstance().getBangrangCount();
-	arrMsCnt[gameMetaData::msType::wind] = gameFlowManager::getInstance().getWindCount();
-	arrMsCnt[gameMetaData::msType::booung] = gameFlowManager::getInstance().getBooungCount();
-	arrMsCnt[gameMetaData::msType::bunpok] = gameFlowManager::getInstance().getBunpokCount();
-	arrMsCnt[gameMetaData::msType::nungang] = gameFlowManager::getInstance().getNungangCount();
-	arrMsCnt[gameMetaData::msType::buljak] = gameFlowManager::getInstance().getBuljakCount();
-	arrMsCnt[gameMetaData::msType::potion] = gameFlowManager::getInstance().getPotionCount();
+	arrMsCnt[gameMetaData::msType::yongyong] =	GetPrivateProfileInt(L"RoundOption", L"yongCnt", gameMetaData::defaultYongCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::bangrang] =	GetPrivateProfileInt(L"RoundOption", L"bangrangCnt", gameMetaData::defaultBangrangCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::wind]=		GetPrivateProfileInt(L"RoundOption", L"windCnt", gameMetaData::defaultWindCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::booung] =	GetPrivateProfileInt(L"RoundOption", L"booungCnt", gameMetaData::defaultBooungCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::bunpok] =	GetPrivateProfileInt(L"RoundOption", L"bunpokCnt", gameMetaData::defaultBunpokCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::nungang] =	GetPrivateProfileInt(L"RoundOption", L"nungangCnt", gameMetaData::defaultNungangCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::buljak] =	GetPrivateProfileInt(L"RoundOption", L"buljakCnt", gameMetaData::defaultBuljakCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::potion] =	GetPrivateProfileInt(L"RoundOption", L"potionCnt", gameMetaData::defaultPotionCnt, L"option.ini");
 
 	stoneMaxCnt = 
-		arrMsCnt[gameMetaData::msType::yongyong]		//yongyong 
+		arrMsCnt[gameMetaData::msType::yongyong]	//yongyong 
 		+ arrMsCnt[gameMetaData::msType::bangrang]	//bangrang
-		+ arrMsCnt[gameMetaData::msType::wind]	//wind
+		+ arrMsCnt[gameMetaData::msType::wind]		//wind
 		+ arrMsCnt[gameMetaData::msType::booung]	//booung
 		+ arrMsCnt[gameMetaData::msType::bunpok]	//bunpok
 		+ arrMsCnt[gameMetaData::msType::nungang]	//nungang
@@ -260,7 +263,7 @@ void gameRoomObjLayer::createPlayerLpObj()
 	int idx = 0;
 	for (auto &i : arrPlayers)
 	{
-		for (int j = 0; j < gameFlowManager::getInstance().getMaxLifePoint(); j++)
+		for (int j = 0; j < maxLifePoint; j++)
 		{
 			auto temp = i->createLpObj(idx + 1);
 			this->addChild(temp, gameMetaData::layerZOrder::objZ1);
@@ -294,7 +297,7 @@ void gameRoomObjLayer::initRound()
 	{
 		i->init();
 		auto playerIdx = i->getIndex();
-		arrScoreSpr.at(playerIdx)->setTextureRect(gameFlowManager::getInstance().getNumSprRect(arrScore.at(playerIdx)));
+		arrScoreSpr.at(playerIdx)->setTextureRect(sprManager->getNumSprRect(arrScore.at(playerIdx)));
 		arrScoreSpr.at(playerIdx)->setVisible(true);
 	}
 	//init seenChecker
@@ -463,7 +466,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		//----action checkFail
 		int damage = 1;
 		if (magicEnum == gameMetaData::msType::yongyong)
-			damage = gameFlowManager::getInstance().getRandomInt(1,3);
+			damage = inlineFunc::getRandomInt(1,3);
 		curPlayer->actionLostLp(damage);
 		if (curPlayer->isNPC())
 		{
@@ -545,7 +548,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		auto seqEarthQuake = gameFlowManager::getInstance().wrapActions(seq01, reverseAction, NULL);
 		this->runAction(seqEarthQuake);
 
-		damage = gameFlowManager::getInstance().getRandomInt(1, 3);
+		damage = inlineFunc::getRandomInt(1, 3);
 	}
 	case gameMetaData::msType::bangrang:
 	{
@@ -792,7 +795,7 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 	int rndIndex = 0;
 	while (true)
 	{
-		rndIndex = gameFlowManager::getInstance().getRandomInt(stoneMinCnt, stoneMaxCnt - 1);
+		rndIndex = inlineFunc::getRandomInt(stoneMinCnt, stoneMaxCnt - 1);
 		if (arrStones[rndIndex]->getStatus() == stateEnum)
 		{
 			ptempMS = arrStones[rndIndex];

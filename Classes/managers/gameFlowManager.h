@@ -2,16 +2,16 @@
 #include "cocos2d.h"
 #include "managers\soundManager.h"
 
-#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD	//static variable
+//#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD	//static variable
 
-class networkManager;
+//class networkManager;
 
 class gameFlowManager
 {
 public:
 	static gameFlowManager& getInstance();
 
-	void changeScene2MainMenu();	//setupScene
+	//void changeScene2MainMenu();	//setupScene
 	void changeScene2SingleMode();	//mainMenuScene
 	void changeScene2HostMode();	//mainMenuScene
 	void changeScene2JoinMode();	//mainMenuScene
@@ -45,21 +45,21 @@ public:
 	int getMaxLifePoint() const;
 	//----------------option File R/W create----------
 
-	int getRandomInt(int min, int max);	//randomGenClass
-	soundManager* getSoundManager();	//delete
+	//int getRandomInt(int min, int max);	//inline gameMetaData
+	//soundManager* getSoundManager();	//delete
 
 	void endGame();	//case by case
 
-	void incRunningActionCnt();	//actionManagerClass
-	void decRunningActionCnt();	//actionManagerClass
-	int getRunningActionCnt();	//actionManagerClass
+	//void incRunningActionCnt();	//actionManagerClass
+	//void decRunningActionCnt();	//actionManagerClass
+	//int getRunningActionCnt();	//actionManagerClass
 
-	cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);	//actionManagerClass
+	//cocos2d::Sequence* wrapActions(cocos2d::FiniteTimeAction* action01, ...);	//actionManagerClass
 
 
 private:
-	gameFlowManager();
-	virtual ~gameFlowManager();
+	//gameFlowManager();
+	//virtual ~gameFlowManager();
 
 	int playerCount;
 	int yongyongCnt;
@@ -78,5 +78,5 @@ private:
 	int curSceneState;
 
 	soundManager* objSoundManager;
-	networkManager* objNetworkManager;
+	//networkManager* objNetworkManager;
 };
