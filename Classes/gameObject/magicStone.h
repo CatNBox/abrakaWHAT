@@ -1,6 +1,13 @@
 #pragma once
 #include "cocos2d.h"
-#include "gameMetaData.h"
+
+class actionManager;
+class soundManager;
+namespace gameMetaData
+{
+	enum msStatus;
+	enum msType;
+}
 
 /*----------------------------------------
 
@@ -20,183 +27,25 @@ public:
 	bool initMsSprite();	//magic에 맞는 스프라이트로 갱신
 	bool setBaseSprite();	//뒷모습 스프라이트로 갱신
 
-	void notifyActionStart();
-	void notifyActionEnd();
 	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum);
 	void actionActivated();
 	void actionRevealedSecret();
 
-	virtual ~magicStone();
-	virtual magicStone* clone() = 0; //for prototype pattern
-
-protected:
-	int magic = gameMetaData::msType::base;
-	int status = gameMetaData::msStatus::notUse;
-	int actionState = gameMetaData::msActionState::msWait;
-	
-	float curX = STDAXIS;
-	float curY = STDAXIS;
-
-	float tX = STDAXIS;
-	float tY = STDAXIS;
-};
-
-/*----------------------------------------
-
-
-msYongyong
-
-
------------------------------------------*/
-class msYongyong : public magicStone
-{
-public:
-	msYongyong();
-	msYongyong(const msYongyong& clon);
-	~msYongyong();
-
-	magicStone* clone() override;
+	magicStone();
+	magicStone(const gameMetaData::msType msType);
+	~magicStone();
+	magicStone* clone();
 
 private:
-	void initMagic();
-};
+	actionManager* actManager;
+	soundManager* sndManager;
 
-/*----------------------------------------
+	gameMetaData::msType magic;
+	gameMetaData::msStatus status;
+		
+	float curX;
+	float curY;
 
-
-msBangrang
-
-
------------------------------------------*/
-class msBangrang : public magicStone
-{
-public:
-	msBangrang();
-	msBangrang(const msBangrang& clon);
-	~msBangrang();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-msWind
-
-
------------------------------------------*/
-class msWind : public magicStone
-{
-public:
-	msWind();
-	msWind(const msWind& clon);
-	~msWind();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-msBooung
-
-
------------------------------------------*/
-class msBooung : public magicStone
-{
-public:
-	msBooung();
-	msBooung(const msBooung& clon);
-	~msBooung();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-msBunpok
-
-
------------------------------------------*/
-class msBunpok : public magicStone
-{
-public:
-	msBunpok();
-	msBunpok(const msBunpok& clon);
-	~msBunpok();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-msNungang
-
-
------------------------------------------*/
-class msNungang : public magicStone
-{
-public:
-	msNungang();
-	msNungang(const msNungang& clon);
-	~msNungang();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-msBuljak
-
-
------------------------------------------*/
-class msBuljak : public magicStone
-{
-public:
-	msBuljak();
-	msBuljak(const msBuljak& clon);
-	~msBuljak();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
-};
-
-/*----------------------------------------
-
-
-mspotion
-
-
------------------------------------------*/
-class msPotion : public magicStone
-{
-public:
-	msPotion();
-	msPotion(const msPotion& clon);
-	~msPotion();
-
-	magicStone* clone() override;
-
-private:
-	void initMagic() ;
+	float tX;
+	float tY;
 };

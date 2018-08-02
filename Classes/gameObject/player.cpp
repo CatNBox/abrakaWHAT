@@ -1,6 +1,5 @@
 #include "gameObject/player.h"
 #include "gameObject/magicStone.h"
-#include "managers/gameFlowManager.h"
 #include <iostream>
 
 using namespace cocos2d;
@@ -45,14 +44,6 @@ int player::getStoneListSize()
 int player::getBooungListSize()
 {
 	return booungList.size();
-}
-
-magicStone* player::getBooungMS(const int idx)
-{
-	if (idx < getBooungListSize())
-	{
-		return booungList[idx];
-	}
 }
 
 magicStone* player::getMagicStone(const int idx)
@@ -140,11 +131,11 @@ void player::actionGainLp(const int msTypeEnum)
 	int gainNum = 1;
 	if (msTypeEnum == gameMetaData::msType::base)
 	{
-		gainNum = gameFlowManager::getInstance().getMaxLifePoint();
+		gainNum = GetPrivateProfileInt(L"RoundOption", L"maxLifePoint", gameMetaData::defaultMaxLifePoint, L"option.ini");
 	}
 	else if (msTypeEnum == gameMetaData::msType::wind)
 	{
-		gainNum = gameFlowManager::getInstance().getRandomInt(1, 3);
+		gainNum = inlineFunc::getRandomInt(1, 3);
 	}
 
 	for (auto &i : lpSprList)
@@ -157,8 +148,8 @@ void player::actionGainLp(const int msTypeEnum)
 			i.second = true;
 
 			//±âÁØ 384,600 / 168,434 / 600,434 / 384,260
-			int revisionX = gameFlowManager::getInstance().getRandomInt(0, 50);
-			int revisionY = gameFlowManager::getInstance().getRandomInt(1, 51);
+			int revisionX = inlineFunc::getRandomInt(10, 50);
+			int revisionY = inlineFunc::getRandomInt(11, 51);
 
 			int tempX = defaultX;
 			int tempY = defaultY;
@@ -451,7 +442,7 @@ int npc::chooseMs()
 			maxScore.first = msNum;
 			maxScore.second = arrMsScore[msNum].second;
 			if (msNum == gameMetaData::msType::yongyong)
-				maxScore.second = 50 * gameFlowManager::getInstance().getRandomInt(0,2);
+				maxScore.second = 50 * inlineFunc::getRandomInt(0,2);
 		}
 
 		if (maxScore.second > 65)

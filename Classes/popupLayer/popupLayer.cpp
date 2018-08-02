@@ -1,6 +1,7 @@
 #include "popupLayer.h"
+#include "mainMenuScene\mainMenuScene.h"
+#include "managers\spriteManager.h"
 #include "gameObject\gameMetaData.h"
-#include "managers\gameFlowManager.h"
 #include <iostream>
 
 popupLayer::popupLayer()
@@ -36,6 +37,8 @@ bool popupLayer::init()
 			
 	this->setCascadeOpacityEnabled(true);
 
+	sprManager = new spriteManager;
+
 	return true;
 }
 
@@ -53,7 +56,8 @@ void popupLayer::callbackGameExit()
 
 	this->scheduleOnce([=](float d) 
 	{
-		gameFlowManager::getInstance().changeScene2MainMenu();
+		auto mainMenuScene = cocos2d::TransitionFade::create(1.0f, mainMenuScene::createScene());
+		cocos2d::Director::getInstance()->replaceScene(mainMenuScene);
 	}, 0.5f, "gameExitFromPopup");
 }
 
@@ -83,7 +87,8 @@ void popupLayer::setDisplayPlayer()
 	{
 		auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName("sprPlayer.png");
 		auto tempNumSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempNumSpr->setTextureRect(gameFlowManager::getInstance().getNumSprRect((playerNum + 1)));
+		auto tempSprRect = sprManager->getNumSprRect(playerNum + 1);
+		tempNumSpr->setTextureRect(tempSprRect);
 		tempNumSpr->setPosition(cocos2d::Vec2(280.0f + 90.0f, STDAXIS - (63.0f * playerNum)));
 		tempSpr->setPosition(cocos2d::Vec2(280.0f, STDAXIS - (65.0f * playerNum)));
 		tempNumSpr->setScale(0.6f);
@@ -97,12 +102,13 @@ void popupLayer::setDisplayPlayer()
 	}
 }
 
-void popupLayer::initSprCntNum()
+void popupLayer::initSprCntdwnNum()
 {
-	sprCntNum = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-	sprCntNum->setTextureRect(gameFlowManager::getInstance().getNumSprRect(5));
-	sprCntNum->setVisible(false);
-	sprCntNum->setPosition(STDAXIS, STDAXIS);
+	sprCntdwnNum = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+	auto tempSprRect = sprManager->getNumSprRect(5);
+	sprCntdwnNum->setTextureRect(tempSprRect);
+	sprCntdwnNum->setVisible(false);
+	sprCntdwnNum->setPosition(STDAXIS, STDAXIS);
 }
 
 cocos2d::Sequence * popupLayer::cntNumAction(int cntStartNum)
@@ -113,7 +119,7 @@ cocos2d::Sequence * popupLayer::cntNumAction(int cntStartNum)
 	for (int i = cntStartNum; i > 0; i--)
 	{
 		auto tempFuncChangeCntNum = cocos2d::CallFunc::create([=]() {
-			sprCntNum->setTextureRect(gameFlowManager::getInstance().getNumSprRect(i));
+			sprCntdwnNum->setTextureRect(sprManager->getNumSprRect(i));
 		});
 		vecAction.pushBack(tempFuncChangeCntNum);
 
@@ -122,7 +128,7 @@ cocos2d::Sequence * popupLayer::cntNumAction(int cntStartNum)
 	}
 	//zero
 	auto tempFuncChangeCntNum = cocos2d::CallFunc::create([=]() {
-		sprCntNum->setTextureRect(gameFlowManager::getInstance().getNumSprRect(0));
+		sprCntdwnNum->setTextureRect(sprManager->getNumSprRect(0));
 	});
 	vecAction.pushBack(tempFuncChangeCntNum);
 
@@ -151,7 +157,7 @@ void popupLayer::setEndGame(cocos2d::EventCustom* endGameEvent)
 	{
 		int tempScore = arrEndScore->at(playerNum);
 		auto tempScoreSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempScoreSpr->setTextureRect(gameFlowManager::getInstance().getNumSprRect(tempScore));
+		tempScoreSpr->setTextureRect(sprManager->getNumSprRect(tempScore));
 		tempScoreSpr->setPosition(cocos2d::Vec2(450.0f, STDAXIS - (63.0f*playerNum)));
 		tempScoreSpr->setScale(0.6f);
 		this->addChild(tempScoreSpr, gameMetaData::layerZOrder::objZ1);
@@ -230,11 +236,11 @@ void popupLayer::setEndRound(cocos2d::EventCustom* endRoundEvent)
 		}
 
 		auto tempSprLiveScore = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSprLiveScore->setTextureRect(gameFlowManager::getInstance().getNumSprRect(liveScore));
+		tempSprLiveScore->setTextureRect(sprManager->getNumSprRect(liveScore));
 		auto tempSprWinScore = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSprWinScore->setTextureRect(gameFlowManager::getInstance().getNumSprRect(winScore));
+		tempSprWinScore->setTextureRect(sprManager->getNumSprRect(winScore));
 		auto tempSprBooungScore = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempSprBooungScore->setTextureRect(gameFlowManager::getInstance().getNumSprRect(booungScore));
+		tempSprBooungScore->setTextureRect(sprManager->getNumSprRect(booungScore));
 
 		//yAxis = playerSprite, xAxis = sprMark
 		tempSprLiveScore->setPosition(cocos2d::Vec2(410.0f, STDAXIS - (63.0f * playerNum)));
@@ -259,13 +265,13 @@ void popupLayer::setEndRound(cocos2d::EventCustom* endRoundEvent)
 	}
 
 	//close popup after 3sec
-	initSprCntNum();
-	sprCntNum->setPosition(cocos2d::Vec2(STDAXIS, 520.0f));
-	sprCntNum->setVisible(true);
-	this->addChild(sprCntNum, gameMetaData::layerZOrder::objZ1);
+	initSprCntdwnNum();
+	sprCntdwnNum->setPosition(cocos2d::Vec2(STDAXIS, 520.0f));
+	sprCntdwnNum->setVisible(true);
+	this->addChild(sprCntdwnNum, gameMetaData::layerZOrder::objZ1);
 	
 	auto seqChangeCntSpr = cntNumAction(5);
-	sprCntNum->runAction(seqChangeCntSpr);
+	sprCntdwnNum->runAction(seqChangeCntSpr);
 	
 	this->scheduleOnce([=](float d) 
 	{

@@ -18,7 +18,6 @@ public:
 	void pushbooung2List(magicStone* ms);
 	int getStoneListSize();
 	int getBooungListSize();
-	magicStone* getBooungMS(const int idx);
 	magicStone* getMagicStone(const int idx);
 
 	bool checkOutMagic(const int magicEnum);

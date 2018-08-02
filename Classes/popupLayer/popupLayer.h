@@ -2,6 +2,8 @@
 #include "cocos2d.h"
 #include <array>
 
+class spriteManager;
+
 namespace gameMetaData{
 	enum class popupBoardSize;
 	enum class warningCode;
@@ -22,7 +24,7 @@ private:
 	void setBGSpr();
 	void setPopupBoard(enum class gameMetaData::popupBoardSize popupSizeEnum);
 	void setDisplayPlayer();
-	void initSprCntNum();
+	void initSprCntdwnNum();
 	cocos2d::Sequence* cntNumAction(int cntStartNum);
 	void setEndGame(cocos2d::EventCustom* endGameEvent);
 	void setEndRound(cocos2d::EventCustom* endRoundEvent);
@@ -30,7 +32,9 @@ private:
 
 	void setWarningLabel(enum class gameMetaData::warningCode warningCodeEnum);
 
-	cocos2d::Sprite* sprCntNum;
+	spriteManager* sprManager;
+
+	cocos2d::Sprite* sprCntdwnNum;
 
 	cocos2d::EventListenerCustom* eventListener;
 

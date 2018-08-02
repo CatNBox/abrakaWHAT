@@ -1,6 +1,9 @@
 #pragma once
 #include "cocos2d.h"
 
+class spriteManager;
+class actionManager;
+
 class gameRoomUILayer : public cocos2d::Layer
 {
 public:
@@ -21,7 +24,10 @@ private:
 	cocos2d::EventListenerKeyboard* keyListener;
 	cocos2d::EventListenerCustom* callBackListener;
 	cocos2d::Menu* magicChoicer; //eash stone's front sprite and pass sprite
-	cocos2d::Menu* etcUI; //exit
+	//cocos2d::Menu* etcUI; //exit
+	
+	spriteManager* sprManager;
+	actionManager* actManager;
 	
 	int roundNum = 0;
 	int lastChooseMs = 0;

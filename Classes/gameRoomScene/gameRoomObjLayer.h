@@ -6,6 +6,7 @@
 class magicStone;
 class player;
 class spriteManager;
+class actionManager;
 
 class gameRoomObjLayer : public cocos2d::Layer
 {
@@ -68,6 +69,7 @@ private:
 	std::vector<cocos2d::Sprite*> arrScoreSpr;
 	std::array<int, 4> arrScore{ 0 };
 	spriteManager* sprManager;
+	actionManager* actManager;
 
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index

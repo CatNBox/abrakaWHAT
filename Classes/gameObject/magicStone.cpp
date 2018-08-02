@@ -1,6 +1,7 @@
 #include "magicStone.h"
-#include "managers\gameFlowManager.h"
-//#include <iostream>
+#include "managers\actionManager.h"
+#include "managers\soundManager.h"
+#include "gameMetaData.h"
 
 /*----------------------------------------
 
@@ -49,16 +50,6 @@ bool magicStone::initMsSprite()
 bool magicStone::setBaseSprite()
 {
 	return this->initWithSpriteFrameName(gameMetaData::arrMsSpriteName[gameMetaData::msType::base]);
-}
-
-void magicStone::notifyActionStart()
-{
-	gameFlowManager::getInstance().incRunningActionCnt();
-}
-
-void magicStone::notifyActionEnd()
-{
-	gameFlowManager::getInstance().decRunningActionCnt();
 }
 
 void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum)
@@ -115,270 +106,28 @@ void magicStone::actionRevealedSecret()
 	this->runAction(seq);
 }
 
+magicStone::magicStone()
+{
+	actManager = actionManager::getInstance();
+
+	magic = gameMetaData::msType::base;
+	initObjData();
+}
+
+magicStone::magicStone(const gameMetaData::msType msType)
+{
+	actManager = actionManager::getInstance();
+
+	magic = msType;
+	initObjData();
+}
+
 magicStone::~magicStone()
 {
+	delete sndManager;
 }
 
-/*----------------------------------------
-
-
-msYongyong
-
-
------------------------------------------*/
-msYongyong::msYongyong()
+magicStone * magicStone::clone()
 {
-	cocos2d::log("@@@ create YONGYONG CLASS @@@");
-	initMagic();
-}
-
-msYongyong::msYongyong(const msYongyong& clon)
-{
-	cocos2d::log("@@@ cloning YONGYONG CLASS @@@");
-	initMagic();
-}
-
-magicStone * msYongyong::clone()
-{
-	return  new msYongyong(*this);
-}
-
-msYongyong::~msYongyong()
-{
-}
-
-void msYongyong::initMagic()
-{
-	magic = gameMetaData::msType::yongyong;
-}
-
-/*----------------------------------------
-
-
-msBangrang
-
-
------------------------------------------*/
-msBangrang::msBangrang()
-{
-	cocos2d::log("@@@ create BANGRANG CLASS @@@");
-	initMagic();
-}
-
-msBangrang::msBangrang(const msBangrang & clon)
-{
-	cocos2d::log("@@@ cloning BANGRANG CLASS @@@");
-	initMagic();
-}
-
-magicStone * msBangrang::clone()
-{
-	return  new msBangrang(*this);
-}
-
-void msBangrang::initMagic()
-{
-	magic = gameMetaData::msType::bangrang;
-}
-
-msBangrang::~msBangrang()
-{
-}
-
-/*----------------------------------------
-
-
-msWind
-
-
------------------------------------------*/
-msWind::msWind()
-{
-	cocos2d::log("@@@ create WIND CLASS @@@");
-	initMagic();
-}
-
-msWind::msWind(const msWind & clon)
-{
-	cocos2d::log("@@@ cloning WIND CLASS @@@");
-	initMagic();
-}
-
-magicStone * msWind::clone()
-{
-	return  new msWind(*this);
-}
-
-void msWind::initMagic()
-{
-	magic = gameMetaData::msType::wind;
-}
-
-msWind::~msWind()
-{
-}
-
-/*----------------------------------------
-
-
-msBooung
-
-
------------------------------------------*/
-msBooung::msBooung()
-{
-	cocos2d::log("@@@ create BOOUNG CLASS @@@");
-	initMagic();
-}
-
-msBooung::msBooung(const msBooung & clon)
-{
-	cocos2d::log("@@@ cloning BOOUNG CLASS @@@");
-	initMagic();
-}
-
-magicStone * msBooung::clone()
-{
-	return  new msBooung(*this);
-}
-
-void msBooung::initMagic()
-{
-	magic = gameMetaData::msType::booung;
-}
-
-msBooung::~msBooung()
-{
-}
-
-/*----------------------------------------
-
-
-msBunpok
-
-
------------------------------------------*/
-msBunpok::msBunpok()
-{
-	cocos2d::log("@@@ create BUNPOK CLASS @@@");
-	initMagic();
-}
-
-msBunpok::msBunpok(const msBunpok & clon)
-{
-	cocos2d::log("@@@ cloning BUNPOK CLASS @@@");
-	initMagic();
-}
-
-msBunpok::~msBunpok()
-{
-}
-
-magicStone * msBunpok::clone()
-{
-	return  new msBunpok(*this);
-}
-
-void msBunpok::initMagic()
-{
-	magic = gameMetaData::msType::bunpok;
-}
-
-/*----------------------------------------
-
-
-msNungang
-
-
------------------------------------------*/
-msNungang::msNungang()
-{
-	cocos2d::log("@@@ create NUNGANG CLASS @@@");
-	initMagic();
-}
-
-msNungang::msNungang(const msNungang & clon)
-{
-	cocos2d::log("@@@ cloning NUNGANG CLASS @@@");
-	initMagic();
-}
-
-msNungang::~msNungang()
-{
-}
-
-magicStone * msNungang::clone()
-{
-	return  new msNungang(*this);
-}
-
-void msNungang::initMagic()
-{
-	magic = gameMetaData::msType::nungang;
-}
-
-/*----------------------------------------
-
-
-msBuljak
-
-
------------------------------------------*/
-msBuljak::msBuljak()
-{
-	cocos2d::log("@@@ create BULJAK CLASS @@@");
-	initMagic();
-}
-
-msBuljak::msBuljak(const msBuljak & clon)
-{
-	cocos2d::log("@@@ cloning BULJAK CLASS @@@");
-	initMagic();
-}
-
-msBuljak::~msBuljak()
-{
-}
-
-magicStone * msBuljak::clone()
-{
-	return  new msBuljak(*this);
-}
-
-void msBuljak::initMagic()
-{
-	magic = gameMetaData::msType::buljak;
-}
-
-/*----------------------------------------
-
-
-msPotion
-
-
------------------------------------------*/
-msPotion::msPotion()
-{
-	cocos2d::log("@@@ create potion CLASS @@@");
-	initMagic();
-}
-
-msPotion::msPotion(const msPotion & clon)
-{
-	cocos2d::log("@@@ cloning potion CLASS @@@");
-	initMagic();
-}
-
-msPotion::~msPotion()
-{
-}
-
-magicStone * msPotion::clone()
-{
-	return  new msPotion(*this);
-}
-
-void msPotion::initMagic()
-{
-	magic = gameMetaData::msType::potion;
+	return new magicStone(magic);
 }

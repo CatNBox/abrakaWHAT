@@ -2,7 +2,8 @@
 #include "gameObject\magicStone.h"
 #include "gameObject\player.h"
 #include "managers\spriteManager.h"
-#include <iostream>
+#include "managers\actionManager.h"
+//#include <iostream>
 
 using namespace cocos2d;
 
@@ -14,6 +15,7 @@ bool gameRoomObjLayer::init()
 	}
 
 	sprManager = new spriteManager;
+	actManager = actionManager::getInstance();
 
 	//eventListener setting
 	settingEventListener();
@@ -407,7 +409,6 @@ void gameRoomObjLayer::setStartOrder()
 
 void gameRoomObjLayer::callNpcProcess()
 {
-	gameFlowManager::getInstance().getSoundManager()->playNpcSound();
 	for (int msNum = gameMetaData::msType::yongyong; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
 		int discardCnt = 0;
@@ -427,9 +428,9 @@ void gameRoomObjLayer::callNpcProcess()
 //----checkEvent owned magicStone
 void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 {
-	std::cout << "check Event in" << std::endl;
+	//std::cout << "check Event in" << std::endl;
 	const int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
-	std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
+	//std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
 	//----current player pointer
 	auto curPlayer = arrPlayers[curPlayerNum];
@@ -438,14 +439,14 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	//when choose pass
 	if (magicEnum == gameMetaData::msType::pass)
 	{
-		std::cout << "passTurn : " << magicEnum << std::endl;
+		//std::cout << "passTurn : " << magicEnum << std::endl;
 		passTurn();
 		return;
 	}
 	//check and activate selected magicStone
 	else if (curPlayer->checkOutMagic(magicEnum))
 	{
-		std::cout << "magic activate : " << magicEnum << std::endl;
+		//std::cout << "magic activate : " << magicEnum << std::endl;
 		isCorrectChoice = true;
 
 		//----activateMagic
@@ -460,7 +461,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	//not exist selected magicStone
 	else
 	{
-		std::cout << "not exist : " << magicEnum << std::endl;
+		//std::cout << "not exist : " << magicEnum << std::endl;
 		isCorrectChoice = false;
 
 		//----action checkFail
@@ -529,7 +530,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		addChild(redScreenSpr, gameMetaData::layerZOrder::effectZ);
 		auto blinking = cocos2d::Blink::create(2.0f, 8);
 		auto callred = cocos2d::CallFunc::create([=]() {redScreenSpr->setVisible(false);});
-		auto seqRed = gameFlowManager::getInstance().wrapActions(blinking, callred, NULL);
+		auto seqRed = actManager->wrapActions4Cnt(blinking, callred, NULL);
 		redScreenSpr->runAction(seqRed);
 
 		auto shaking01 = cocos2d::MoveBy::create(0.1f, Vec2(10, 10));	//15,15
@@ -545,7 +546,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 			shaking04, shaking05, shaking06, shaking07, shaking08, shaking09, NULL);
 		auto reverseAction = seq01->reverse();
 		//auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
-		auto seqEarthQuake = gameFlowManager::getInstance().wrapActions(seq01, reverseAction, NULL);
+		auto seqEarthQuake = actManager->wrapActions4Cnt(seq01, reverseAction, NULL);
 		this->runAction(seqEarthQuake);
 
 		damage = inlineFunc::getRandomInt(1, 3);
@@ -699,7 +700,7 @@ void gameRoomObjLayer::calcScore()
 
 void gameRoomObjLayer::callEndRoundEvent()
 {
-	int checkActionCnt = gameFlowManager::getInstance().getRunningActionCnt();
+	int checkActionCnt = actManager->getRunningActionCnt();
 	if (checkActionCnt > 0)
 	{
 		loopError++;
@@ -784,7 +785,7 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 	if ((stateEnum == gameMetaData::msStatus::notUse) && isAllUsed())
 	{
 		checkArrStones();
-		std::cout << "All MagicStone is used" << std::endl;
+		//std::cout << "All MagicStone is used" << std::endl;
 		//뽑을 카드가 없을 경우 예외설정
 		//1. 모두 사용됬을 경우
 		//2. 초기화가 안되어서 분배에 실패했을 경우
@@ -827,19 +828,19 @@ int gameRoomObjLayer::getMsPosRevision(int msListSize, int msOrder)
 
 void gameRoomObjLayer::checkArrStones()
 {
-	std::cout << "---Check arrStones---" << std::endl;
+	//std::cout << "---Check arrStones---" << std::endl;
 	for (auto const &i : arrStones)
 	{
 		std::cout << i->getMagic() << " : " << i->getStatus() << std::endl;
 	}
-	std::cout << "---------------------" << std::endl;
+	//std::cout << "---------------------" << std::endl;
 }
 
 void gameRoomObjLayer::checkArrPlayers()
 {
 	for (auto const &i : arrPlayers)
 	{
-		std::cout << "StoneList size : " << i->getStoneListSize() << std::endl;
-		std::cout << "BooungList size : " << i->getBooungListSize() << std::endl;
+		//std::cout << "StoneList size : " << i->getStoneListSize() << std::endl;
+		//std::cout << "BooungList size : " << i->getBooungListSize() << std::endl;
 	}
 }

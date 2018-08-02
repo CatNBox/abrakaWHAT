@@ -1,6 +1,7 @@
 #include "gameRoomUILayer.h"
 #include "gameObject\gameMetaData.h"
-#include "managers\gameFlowManager.h"
+#include "managers\spriteManager.h"
+#include "managers\actionManager.h"
 #include <iostream>
 
 using namespace cocos2d;
@@ -15,6 +16,9 @@ bool gameRoomUILayer::init()
 	//arrBtnSelectStone.resize(8);
 	settingEventListener();
 
+	sprManager = new spriteManager;
+	actManager = actionManager::getInstance();
+
 	this->initUI();
 
 	return true;
@@ -22,7 +26,6 @@ bool gameRoomUILayer::init()
 
 void gameRoomUILayer::settingEventListener()
 {
-
 	//키보드 인벤트 등록
 	keyListener = EventListenerKeyboard::create();
 	if (keyListener != nullptr)
@@ -183,11 +186,11 @@ void gameRoomUILayer::setRound()
 	std::cout << "라운드 업" << std::endl;
 
 	//라운드 50 710
-	roundSpr->setTextureRect(gameFlowManager::getInstance().getNumSprRect(roundNum));
+	roundSpr->setTextureRect(sprManager->getNumSprRect(roundNum));
 }
 bool gameRoomUILayer::checkRunningAction()
 {
-	int actionCnt = gameFlowManager::getInstance().getRunningActionCnt();
+	int actionCnt = actManager->getRunningActionCnt();
 	std::cout << "actionCnt : " << actionCnt << std::endl;
 	if (actionCnt != 0)
 	{
@@ -232,7 +235,7 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
-		gameFlowManager::getInstance().endGame();
+		this->returnMainMenu();
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{
