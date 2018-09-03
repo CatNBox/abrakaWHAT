@@ -2,7 +2,6 @@
 #include "gameObject\gameMetaData.h"
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
-#include <iostream>
 
 using namespace cocos2d;
 
@@ -26,7 +25,7 @@ bool gameRoomUILayer::init()
 
 void gameRoomUILayer::settingEventListener()
 {
-	//키보드 인벤트 등록
+	//set keyboardEvent
 	keyListener = EventListenerKeyboard::create();
 	if (keyListener != nullptr)
 	{
@@ -38,42 +37,31 @@ void gameRoomUILayer::settingEventListener()
 	else
 	{
 		log("### err ### gameRoomLayer::keyListener is nullptr ");
-		std::abort();
 	}
 
-	//각종 이벤트 디스패치
-	//패스버튼 및 선택ui 활성화
+	//event dispatch
+	//enable passBtn, selectUI
 	callBackListener = EventListenerCustom::create("choicerUIEnabled",
 		[=](EventCustom* event) {
+		magicChoicer->setEnabled(true);
 		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
 		btnPass->setEnabled(true);
-		magicChoicer->setEnabled(true);
-		//this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+		//other btns is diabled until last choice btn
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
-	//턴이 넘어갈땐 패스버튼 및 선택ui 비활성화
+	//disable passBtn, selectUI WHEN passing turn to next user
 	callBackListener = EventListenerCustom::create("passTurn2NextUser",
 		[=](EventCustom* event) {
-		std::cout << " 패스 턴 " << std::endl;
-		auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
-		btnPass->setEnabled(false);
-		magicChoicer->setEnabled(false);
+		setEnabledInputUI(false, false);
 		lastChooseMs = 0;
-		//this->setKeyboardEnabled(false);//키보드 이벤트 비활성화로 바꿀것
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
-	//내턴이 돌아오면 magicStone선택ui 활성화
+	//enable selectUI without passBtn WHEN turn back to me
 	callBackListener = EventListenerCustom::create("myTurn",
 		[=](EventCustom* event) {
-		std::cout << "my Turn back" << std::endl;
-		magicChoicer->setEnabled(true);
-		for (int i = 0; i < 8; i++)
-		{
-			arrBtnSelectStone[i]->setEnabled(true);
-		}
-		//this->setKeyboardEnabled(true);//키보드 이벤트 비활성화로 바꿀것
+		setEnabledInputUI(true, false);
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
@@ -81,25 +69,24 @@ void gameRoomUILayer::settingEventListener()
 	callBackListener = EventListenerCustom::create("roundUp",
 		[=](EventCustom* event) {
 		roundNum++;
-		std::cout << " 라운드 업 : " << roundNum << std::endl;
-		magicChoicer->setEnabled(true);
-		for (int i = 0; i < 8; i++)
-		{
-			arrBtnSelectStone[i]->setEnabled(true);
-		}
 		setRound();
+		setEnabledInputUI(false, false);
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
-	//disable all inupt method
-	callBackListener = EventListenerCustom::create("disableInput",
-		[=](EventCustom* event) {
-		for (int i = 0; i < 8; i++)
-		{
-			arrBtnSelectStone[i]->setEnabled(false);
-		}
-	});
-	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
+}
+
+void gameRoomUILayer::setEnabledInputUI(const bool flag4KeyboardNselectUI, const bool flag4PassBtn)
+{
+	magicChoicer->setEnabled(flag4KeyboardNselectUI);
+	for (auto i : arrBtnSelectStone)
+	{
+		i->setEnabled(flag4KeyboardNselectUI);
+	}
+	auto btnPass = (MenuItemImage*)magicChoicer->getChildByName("btnPass");
+	btnPass->setEnabled(flag4PassBtn);
+
+	keyListener->setEnabled(flag4KeyboardNselectUI);
 }
 
 
@@ -183,23 +170,20 @@ void gameRoomUILayer::initUI()
 
 void gameRoomUILayer::setRound()
 {
-	std::cout << "라운드 업" << std::endl;
-
 	//라운드 50 710
 	roundSpr->setTextureRect(sprManager->getNumSprRect(roundNum));
 }
+
 bool gameRoomUILayer::checkRunningAction()
 {
 	int actionCnt = actManager->getRunningActionCnt();
-	std::cout << "actionCnt : " << actionCnt << std::endl;
 	if (actionCnt != 0)
 	{
-		if (actionCnt < 0)
-			std::cout << "ERROR actionCnt : " << actionCnt << std::endl;
 		return true;
 	}
 	return false;
 }
+
 void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 {
 	if (checkRunningAction())

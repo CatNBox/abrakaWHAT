@@ -292,10 +292,10 @@ void popupLayer::setWarning(cocos2d::EventCustom* warningEvent)
 	setPopupBoard(gameMetaData::popupBoardSize::popup400245);
 
 	//get data
-	auto warningFlag = (enum class gameMetaData::warningCode*)warningEvent->getUserData();
+	gameMetaData::warningCode warningFlag = *(gameMetaData::warningCode*)warningEvent->getUserData();
 
 	//setTextLabel
-	setWarningLabel(*warningFlag);
+	setWarningLabel(warningFlag);
 
 	//setBtn	
 	auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");

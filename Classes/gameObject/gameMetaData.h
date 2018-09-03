@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include <string>
 #include <vector>
 #include <random>
@@ -173,15 +174,10 @@ namespace gameMetaData
 		buljak00,
 		activateMagic00
 	};
-
-	enum class errCode
-	{
-		infinityLoop,
-		unknown
-	};
-
+	
 	enum class warningCode
 	{
+		infinityLoopWarning,
 		exitBtnWarning
 	};
 

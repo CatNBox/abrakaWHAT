@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "cocos2d.h"
 #include "managers\soundManager.h"
 
@@ -79,4 +79,4 @@ private:
 
 	soundManager* objSoundManager;
 	//networkManager* objNetworkManager;
-};
+};*/

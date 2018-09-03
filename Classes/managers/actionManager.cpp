@@ -1,10 +1,5 @@
 #include "actionManager.h"
 
-actionManager::actionManager()
-{
-	cocos2d::log("create actionManager instance");
-}
-
 void actionManager::incRunningActionCnt()
 {
 	runningActionCnt++;
@@ -13,15 +8,6 @@ void actionManager::incRunningActionCnt()
 void actionManager::decRunningActionCnt()
 {
 	runningActionCnt--;
-}
-
-actionManager * actionManager::getInstance()
-{
-	if (instance == nullptr)
-	{
-		instance.reset(new actionManager);
-	}
-	return instance.get();
 }
 
 const int actionManager::getRunningActionCnt() const
@@ -51,14 +37,4 @@ cocos2d::Sequence * actionManager::wrapActions4Cnt(cocos2d::FiniteTimeAction * a
 	va_end(ap);
 
 	return cocos2d::Sequence::create(vecAction);
-}
-
-void actionManager::releaseInstance()
-{
-	instance.release();
-}
-
-actionManager::~actionManager()
-{
-	cocos2d::log("delete actionManager instance");
 }

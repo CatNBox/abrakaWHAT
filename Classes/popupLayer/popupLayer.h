@@ -45,7 +45,7 @@ private:
 	std::vector<std::pair<cocos2d::Sprite*, cocos2d::Sprite*>> playerSpr;
 	int playerCnt = 4;
 	int roundWinnerIdx = 4;
-
+	
 	float playerSprStdYaxis;
 	float popupNumStdScale;
 	//cocos2d::MenuItemImage btnOk;

@@ -12,6 +12,7 @@ public:
 	CREATE_FUNC(gameRoomUILayer);
 private:
 	void settingEventListener();
+	void setEnabledInputUI(const bool flag4KeyboardNselectUI, const bool flag4PassBtn);
 	void checkMagic(const int magicStoneNumber);
 	void returnMainMenu();
 	void initUI();

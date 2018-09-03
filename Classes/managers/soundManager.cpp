@@ -1,5 +1,4 @@
 #include "managers\soundManager.h"
-#include "managers\gameFlowManager.h"
 #include "gameObject\gameMetaData.h"
 #include <SimpleAudioEngine.h>
 
@@ -54,7 +53,7 @@ void soundManager::playNpcSound()
 		CocosDenshion::SimpleAudioEngine::getInstance()
 			->stopEffect(prevNpcSoundID);
 	}
-	int rInt = gameFlowManager::getInstance().getRandomInt(0, 15);
+	int rInt = inlineFunc::getRandomInt(0, 15);
 	prevNpcSoundID = CocosDenshion::SimpleAudioEngine::getInstance()
 		->playEffect(gameMetaData::arrNpcSound.at(rInt));
 }

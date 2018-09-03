@@ -172,32 +172,32 @@ void gameRoomObjLayer::createPlayers()
 void gameRoomObjLayer::createMagicStones()
 {
 
-	arrStones[0] = new msYongyong;
+	arrStones[0] = new magicStone(gameMetaData::msType::yongyong);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong]] 
-		= new msBangrang;
+		= new magicStone(gameMetaData::msType::bangrang);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang]] 
-		= new msWind;
+		= new magicStone(gameMetaData::msType::wind);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang] 
 		+ arrMsCnt[gameMetaData::msType::wind]] 
-		= new msBooung;
+		= new magicStone(gameMetaData::msType::booung);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang] 
 		+ arrMsCnt[gameMetaData::msType::wind] 
 		+ arrMsCnt[gameMetaData::msType::booung]] 
-		= new msBunpok;
+		= new magicStone(gameMetaData::msType::bunpok);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang]
 		+ arrMsCnt[gameMetaData::msType::wind]
 		+ arrMsCnt[gameMetaData::msType::booung]
 		+ arrMsCnt[gameMetaData::msType::bunpok]] 
-		= new msNungang;
+		= new magicStone(gameMetaData::msType::nungang);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang]
@@ -205,7 +205,7 @@ void gameRoomObjLayer::createMagicStones()
 		+ arrMsCnt[gameMetaData::msType::booung]
 		+ arrMsCnt[gameMetaData::msType::bunpok]
 		+ arrMsCnt[gameMetaData::msType::nungang]] 
-		= new msBuljak;
+		= new magicStone(gameMetaData::msType::buljak);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong] 
 		+ arrMsCnt[gameMetaData::msType::bangrang]
@@ -214,7 +214,7 @@ void gameRoomObjLayer::createMagicStones()
 		+ arrMsCnt[gameMetaData::msType::bunpok]
 		+ arrMsCnt[gameMetaData::msType::nungang]
 		+ arrMsCnt[gameMetaData::msType::buljak]] 
-		= new msPotion;
+		= new magicStone(gameMetaData::msType::potion);
 
 	int prototypeIndex = 0;
 	for (int i = 0; i < (int)arrStones.size(); i++)
@@ -225,7 +225,7 @@ void gameRoomObjLayer::createMagicStones()
 		}
 		else
 		{
-			arrStones[i] = arrStones[prototypeIndex]->clone();	//prototype pattern
+			arrStones[i] = arrStones[prototypeIndex]->clone();
 		}
 		this->addChild(arrStones[i], gameMetaData::layerZOrder::objZ2);
 	}
@@ -325,9 +325,9 @@ void gameRoomObjLayer::initRound()
 	shareStone2Player();
 
 	//3. setting firstTurn Player
+	//setNextRoundStater();
 	starterNum = 0;
 	curPlayerNum = 0;
-	//setStartOrder(); //starterNum setting
 
 	if (arrPlayers[starterNum]->isNPC())
 	{
@@ -336,6 +336,11 @@ void gameRoomObjLayer::initRound()
 			((npc*)arrPlayers[starterNum])->npcTurnOn();
 			callNpcProcess();
 		}, 5.0f, "starterIsNpc");
+	}
+	else if(starterNum == myPlayerNum)
+	{
+		EventCustom myTurnEvent("myTurn");
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&myTurnEvent);
 	}
 }
 
@@ -707,7 +712,7 @@ void gameRoomObjLayer::callEndRoundEvent()
 		if (loopError > 50)
 		{
 			cocos2d::EventCustom errorWarning("popupWarning");
-			errorWarning.setUserData((void*)gameMetaData::errCode::infinityLoop);
+			errorWarning.setUserData((void*)gameMetaData::warningCode::infinityLoopWarning);
 			Director::getInstance()->getEventDispatcher()->dispatchEvent(&errorWarning);
 			return;
 		}
@@ -784,7 +789,7 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 {
 	if ((stateEnum == gameMetaData::msStatus::notUse) && isAllUsed())
 	{
-		checkArrStones();
+		//checkArrStones();
 		//std::cout << "All MagicStone is used" << std::endl;
 		//뽑을 카드가 없을 경우 예외설정
 		//1. 모두 사용됬을 경우
@@ -831,7 +836,7 @@ void gameRoomObjLayer::checkArrStones()
 	//std::cout << "---Check arrStones---" << std::endl;
 	for (auto const &i : arrStones)
 	{
-		std::cout << i->getMagic() << " : " << i->getStatus() << std::endl;
+		//std::cout << i->getMagic() << " : " << i->getStatus() << std::endl;
 	}
 	//std::cout << "---------------------" << std::endl;
 }

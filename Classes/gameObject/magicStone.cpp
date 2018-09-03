@@ -61,14 +61,14 @@ void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPo
 	auto moving = cocos2d::MoveTo::create(0.8f, targetPos);
 	auto callPlaySFX = cocos2d::CallFunc::create([=]() 
 	{
-		gameFlowManager::getInstance().getSoundManager()->playSfx(gameMetaData::sfxName::msMoving00);
+		sndManager->playSfx(gameMetaData::sfxName::msMoving00);
 	});
 
 	cocos2d::Sequence* seq;
 	if(movementEnum != gameMetaData::msMovement::reordering)
-		seq = gameFlowManager::getInstance().wrapActions(preDelay, showThis, callPlaySFX, moving, NULL);
+		seq = actManager->wrapActions4Cnt(preDelay, showThis, callPlaySFX, moving, NULL);
 	else
-		seq = gameFlowManager::getInstance().wrapActions(preDelay, showThis, moving, NULL);
+		seq = actManager->wrapActions4Cnt(preDelay, showThis, moving, NULL);
 
 	this->runAction(seq);
 }
@@ -84,24 +84,24 @@ void magicStone::actionActivated()
 	auto spawning = cocos2d::Spawn::create(scaling, fadeOut, NULL);
 	auto callPlaySFX = cocos2d::CallFunc::create([=]()
 	{
-		gameFlowManager::getInstance().getSoundManager()->playSfx(gameMetaData::sfxName::activateMagic00);
+		sndManager->playSfx(gameMetaData::sfxName::activateMagic00);
 	});
 
-	auto seq = gameFlowManager::getInstance().wrapActions(moving, callPlaySFX, spawning, NULL);
+	auto seq = actManager->wrapActions4Cnt(moving, callPlaySFX, spawning, NULL);
 
 	this->runAction(seq);
 }
 
 void magicStone::actionRevealedSecret()
 {
-	//----like flip magicStone
+	//----looks like flip magicStone
 	auto zOrderUp = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ2); });
 	auto shrinking = cocos2d::ScaleTo::create(0.3f, 0.01f, 1.5f);
 	auto changeTexture = cocos2d::CallFunc::create([=]() {this->initMsSprite(); });
 	auto growing = cocos2d::ScaleTo::create(0.3f, SECRETSTONE_BASESCALE, SECRETSTONE_BASESCALE);
 	auto zOrderDown = cocos2d::CallFunc::create([=]() {this->setLocalZOrder(gameMetaData::layerZOrder::objZ0); });
 	
-	auto seq = gameFlowManager::getInstance().wrapActions(zOrderUp, shrinking, changeTexture, growing, zOrderDown, NULL);
+	auto seq = actManager->wrapActions4Cnt(zOrderUp, shrinking, changeTexture, growing, zOrderDown, NULL);
 
 	this->runAction(seq);
 }
@@ -109,6 +109,7 @@ void magicStone::actionRevealedSecret()
 magicStone::magicStone()
 {
 	actManager = actionManager::getInstance();
+	sndManager = new soundManager;
 
 	magic = gameMetaData::msType::base;
 	initObjData();
@@ -117,6 +118,7 @@ magicStone::magicStone()
 magicStone::magicStone(const gameMetaData::msType msType)
 {
 	actManager = actionManager::getInstance();
+	sndManager = new soundManager;
 
 	magic = msType;
 	initObjData();
