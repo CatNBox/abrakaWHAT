@@ -93,6 +93,15 @@
     <ClCompile Include="..\Classes\managers\spriteManager.cpp">
       <Filter>src\01_managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.cpp">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomScene.cpp">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomUILayer.cpp">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -146,9 +155,6 @@
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h">
       <Filter>src\05_waitingRoomScene</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomObjLayer.h">
-      <Filter>src\05_waitingRoomScene</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h">
       <Filter>src\05_waitingRoomScene</Filter>
     </ClInclude>
@@ -166,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\managers\spriteManager.h">
       <Filter>src\01_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomUILayer.h">
+      <Filter>src\05_waitingRoomScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

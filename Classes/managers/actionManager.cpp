@@ -15,6 +15,11 @@ const int actionManager::getRunningActionCnt() const
 	return runningActionCnt;
 }
 
+void actionManager::initCnt()
+{
+	runningActionCnt = 0;
+}
+
 cocos2d::Sequence * actionManager::wrapActions4Cnt(cocos2d::FiniteTimeAction * action01, ...)
 {
 	va_list ap;

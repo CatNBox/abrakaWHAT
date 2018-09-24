@@ -52,7 +52,7 @@ bool magicStone::setBaseSprite()
 	return this->initWithSpriteFrameName(gameMetaData::arrMsSpriteName[gameMetaData::msType::base]);
 }
 
-void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum)
+void magicStone::actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const gameMetaData::msMovement movementEnum)
 {
 	this->stopAllActions();
 	auto preDelay = cocos2d::DelayTime::create(priorDelay);

@@ -12,13 +12,12 @@ bool gameRoomUILayer::init()
 		return false;
 	}
 	
-	//arrBtnSelectStone.resize(8);
 	settingEventListener();
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
 
-	this->initUI();
+	initUI();
 
 	return true;
 }
@@ -128,7 +127,7 @@ void gameRoomUILayer::initUI()
 		"UISprite/btnExitPress.png",
 		"UISprite/btnExitPress.png",
 		CC_CALLBACK_0(
-			gameRoomUILayer::returnMainMenu,
+			gameRoomUILayer::returnMainmenu,
 			this
 		)
 	);
@@ -136,7 +135,7 @@ void gameRoomUILayer::initUI()
 	btnExit->setPosition(Vec2(330, 670));
 
 	magicChoicer = cocos2d::Menu::create();
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < gameMetaData::variableMaxCnt::msTypeCnt - 1; i++)
 	{
 		magicChoicer->addChild(arrBtnSelectStone[i]);
 	}
@@ -204,7 +203,7 @@ void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
 }
 
-void gameRoomUILayer::returnMainMenu()
+void gameRoomUILayer::returnMainmenu()
 {
 	EventCustom popupEvent("popupWarning");
 	auto warningFlag = gameMetaData::warningCode::exitBtnWarning;
@@ -219,7 +218,7 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
-		this->returnMainMenu();
+		this->returnMainmenu();
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{

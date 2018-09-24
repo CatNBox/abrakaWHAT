@@ -4,12 +4,12 @@
 #include "gameRoomScene\gameRoomUILayer.h"
 #include "popupLayer\popupLayer.h"
 
-cocos2d::Scene * gameRoomScene::createScene()
+cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int playerOrder[])
 {
 	auto scene = gameRoomScene::create();
 
 	auto layerBG = gameRoomBGLayer::create();
-	auto layerObj = gameRoomObjLayer::create();
+	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerOrder);
 	auto layerUI = gameRoomUILayer::create();
 	auto layerPopup = popupLayer::create();
 

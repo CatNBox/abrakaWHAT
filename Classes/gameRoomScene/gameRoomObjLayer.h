@@ -11,19 +11,24 @@ class actionManager;
 class gameRoomObjLayer : public cocos2d::Layer
 {
 public:
-	virtual bool init();
+	virtual bool init(gameMetaData::gameMode modeFlag, int playerOrder[]);
+	//CREATE_FUNC(gameRoomObjLayer);
+
+	static gameRoomObjLayer* createWithParam(gameMetaData::gameMode modeFlag, int playerOrder[]);
+
 	void initRound();
 
-	CREATE_FUNC(gameRoomObjLayer);
 private:
 	void delay01secCallWrapper(void (gameRoomObjLayer::*targetFunc)(void));
 	void settingEventListener();
 	void settingCntValues();
-	void createPlayers();
+	void createPlayers(int playerOrder[]);
 	void createMagicStones();
 	void createSeenChecker();
 	void createPlayerLpObj();
 	void createScoreSpr();
+
+	void startGameByNpc();
 
 	void selSecretStone();
 	void shareStone2Player();
@@ -46,6 +51,8 @@ private:
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
+
+	gameMetaData::gameMode curMode = gameMetaData::gameMode::unknown;
 
 	int playerCnt = 0;
 	int secretCnt = 0;

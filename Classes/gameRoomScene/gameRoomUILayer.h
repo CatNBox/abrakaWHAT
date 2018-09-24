@@ -14,7 +14,7 @@ private:
 	void settingEventListener();
 	void setEnabledInputUI(const bool flag4KeyboardNselectUI, const bool flag4PassBtn);
 	void checkMagic(const int magicStoneNumber);
-	void returnMainMenu();
+	void returnMainmenu();
 	void initUI();
 	void setRound();
 	bool checkRunningAction();
@@ -25,7 +25,6 @@ private:
 	cocos2d::EventListenerKeyboard* keyListener;
 	cocos2d::EventListenerCustom* callBackListener;
 	cocos2d::Menu* magicChoicer; //eash stone's front sprite and pass sprite
-	//cocos2d::Menu* etcUI; //exit
 	
 	spriteManager* sprManager;
 	actionManager* actManager;

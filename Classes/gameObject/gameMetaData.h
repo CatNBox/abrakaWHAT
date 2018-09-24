@@ -16,6 +16,9 @@
 //-------------------
 //header for manage
 //enum and const, inline function
+//
+//	 ONLY CONST VALUE
+//
 //-------------------
 
 namespace inlineFunc 
@@ -140,7 +143,8 @@ namespace gameMetaData
 	enum class popupBoardSize
 	{
 		popup400245,
-		popup400500
+		popup400500,
+		unknown
 	};
 
 	const std::unordered_map<popupBoardSize, const char*> mapPopupBoardSpr =
@@ -149,18 +153,20 @@ namespace gameMetaData
 		{ popupBoardSize::popup400500, "popup400500.png" }
 	};
 
-	enum npcCharacter
+	enum class npcCharacter
 	{
 		vampyJp,
 		anduinKor,
 		anduinEng,
-		arisaEng
+		arisaEng,
+		unknown
 	};
 
-	enum npcEmotion
+	enum class npcEmotion
 	{
 		greeting,
-		threaten
+		threaten,
+		unknown
 	};
 
 	enum variableMaxCnt
@@ -172,13 +178,15 @@ namespace gameMetaData
 	{
 		msMoving00,
 		buljak00,
-		activateMagic00
+		activateMagic00,
+		unknownSfx
 	};
 	
 	enum class warningCode
 	{
 		infinityLoopWarning,
-		exitBtnWarning
+		exitBtnWarning,
+		unknown
 	};
 
 	enum msType
@@ -201,7 +209,7 @@ namespace gameMetaData
 		objZ0,			//----secretStone Zorder
 		objZ1,			//----LP Zorder
 		objZ2,
-		effectZ			//----Effect Zorder
+		effectZ		//----Effect Zorder
 	};
 
 	enum msStatus
@@ -209,34 +217,47 @@ namespace gameMetaData
 		notUse,
 		owned,
 		secret,
-		discard
+		discard,
+		unknownStatus
 	};
 
-	enum msMovement
+	enum class msMovement
 	{
 		sharing,
 		selected,
-		reordering
+		reordering,
+		unknownMovement
 	};
 
-	enum msActionState
+	enum class msActionState
 	{
 		msWait,
 		msMove,
 		msDiscard,
-		msActive
+		msActive,
+		unknown
 	};
 
-	enum curScene
+	enum class curScene
 	{
 		setupScene = 0,
 		mainMenuScene = 1,
-		gameRoom
+		gameRoom,
+		unknown
 	};
 
-	enum npcState
+	enum class gameMode
+	{
+		single,
+		host,
+		guest,
+		unknown
+	};
+
+	enum class npcState
 	{
 		npcWait,
-		npcTurnOn
+		npcTurnOn,
+		unknown
 	};
 }

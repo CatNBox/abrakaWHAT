@@ -23,7 +23,7 @@ void soundManager::preLoadSound()
 	CocosDenshion::SimpleAudioEngine::getInstance()->preloadEffect("soundResource/tempSound/anduinEng/theLightShallBurnYou.wav");
 }
 
-void soundManager::playSfx(const int sfxEnum)
+void soundManager::playSfx(const gameMetaData::sfxName sfxEnum)
 {
 	switch (sfxEnum)
 	{

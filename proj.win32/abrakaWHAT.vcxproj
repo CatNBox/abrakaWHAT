@@ -167,6 +167,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\popupLayer\popupLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupScene.cpp" />
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.cpp" />
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomUILayer.cpp" />
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -191,7 +194,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupScene.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h" />
-    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomObjLayer.h" />
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomUILayer.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

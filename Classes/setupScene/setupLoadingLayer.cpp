@@ -86,25 +86,25 @@ void setupLodingLayer::setINI()
 	wchar_t buf2ini[32];
 
 	_itow_s(gameMetaData::defaultPlayerCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"playerCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"playerCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultSecretCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"secretCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"secretCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultYongCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"yongCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"yongCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultBangrangCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"bangrangCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"bangrangCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultWindCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"windCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"windCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultBooungCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"booungCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"booungCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultBunpokCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"bunpokCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"bunpokCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultNungangCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"nungangCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"nungangCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultBuljakCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"buljakCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"buljakCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultPotionCnt, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"potionCnt", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"potionCnt", buf2ini, L".\\option.ini");
 	_itow_s(gameMetaData::defaultMaxLifePoint, buf2ini, 10);
-	WritePrivateProfileString(L"RoundOption", L"maxLifePoint", buf2ini, L"option.ini");
+	WritePrivateProfileString(L"RoundOption", L"maxLifePoint", buf2ini, L".\\option.ini");
 }

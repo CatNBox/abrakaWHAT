@@ -7,6 +7,7 @@ namespace gameMetaData
 {
 	enum msStatus;
 	enum msType;
+	enum class msMovement;
 }
 
 /*----------------------------------------
@@ -27,7 +28,7 @@ public:
 	bool initMsSprite();	//magic에 맞는 스프라이트로 갱신
 	bool setBaseSprite();	//뒷모습 스프라이트로 갱신
 
-	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const int movementEnum);
+	void actionMove(const float priorDelay, const cocos2d::Vec2 targetPos, const gameMetaData::msMovement movementEnum);
 	void actionActivated();
 	void actionRevealedSecret();
 

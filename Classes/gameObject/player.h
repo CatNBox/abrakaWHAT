@@ -92,5 +92,5 @@ private:
 	std::array<int, gameMetaData::variableMaxCnt::msTypeCnt> arrDiscardCnt;
 	std::vector<int> arrPrevFailList;
 	float thinkRowhenTime = 1.5f;
-	int state; // gameMetaData::npcState
+	gameMetaData::npcState state; // gameMetaData::npcState
 };

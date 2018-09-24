@@ -1,6 +1,6 @@
 #include "mainMenuScene\mainMenuObjLayer.h"
 #include "gameObject\gameMetaData.h"
-#include "gameRoomScene\gameRoomScene.h"
+#include "waitingRoomScene\waitingRoomScene.h"
 
 
 using namespace cocos2d;
@@ -80,15 +80,19 @@ void mainMenuObjLayer::exitBtnCallback()
 
 void mainMenuObjLayer::hostGameBtnCallback()
 {
+	auto hostModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(gameMetaData::gameMode::host));
+	Director::getInstance()->replaceScene(hostModeScene);
 }
 
 void mainMenuObjLayer::joinGameBtnCallback()
 {
+	auto joinModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(gameMetaData::gameMode::guest));
+	Director::getInstance()->replaceScene(joinModeScene);
 }
 
 void mainMenuObjLayer::singleGameBtnCallback()
 {
-	auto singleModeScene = TransitionSlideInT::create(0.6f, gameRoomScene::createScene());
+	auto singleModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(gameMetaData::gameMode::single));
 	Director::getInstance()->replaceScene(singleModeScene);
 }
 

@@ -1,5 +1,10 @@
 #pragma once
 
+namespace gameMetaData
+{
+	enum sfxName;
+}
+
 class soundManager
 {
 public:
@@ -7,7 +12,7 @@ public:
 	~soundManager();
 
 	void preLoadSound();
-	void playSfx(const int sfxEnum);
+	void playSfx(const gameMetaData::sfxName sfxEnum);
 	void playNpcSound();
 private:
 	unsigned int prevNpcSoundID = 0;

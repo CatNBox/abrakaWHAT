@@ -7,15 +7,19 @@
 
 using namespace cocos2d;
 
-bool gameRoomObjLayer::init()
+bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerOrder[])
 {
 	if (!Layer::init())
 	{
 		return false;
 	}
 
+	curMode = modeFlag;
+	myPlayerNum = playerOrder[0] - 1;
+
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
+	actManager->initCnt();
 
 	//eventListener setting
 	settingEventListener();
@@ -27,7 +31,7 @@ bool gameRoomObjLayer::init()
 	createScoreSpr();
 
 	//create players
-	createPlayers();
+	createPlayers(playerOrder);
 
 	//create magicStones
 	createMagicStones();
@@ -67,18 +71,18 @@ void gameRoomObjLayer::settingEventListener()
 
 void gameRoomObjLayer::settingCntValues()
 {
-	playerCnt = GetPrivateProfileInt(L"RoundOption", L"playerCnt", gameMetaData::defaultPlayerCnt, L"option.ini");
-	secretCnt = GetPrivateProfileInt(L"RoundOption", L"secretCnt", gameMetaData::defaultSecretCnt, L"option.ini");
-	maxLifePoint = GetPrivateProfileInt(L"RoundOption", L"maxLifePoint", gameMetaData::defaultMaxLifePoint, L"option.ini");
+	playerCnt = GetPrivateProfileInt(L"RoundOption", L"playerCnt", gameMetaData::defaultPlayerCnt, L".\\option.ini");
+	secretCnt = GetPrivateProfileInt(L"RoundOption", L"secretCnt", gameMetaData::defaultSecretCnt, L".\\option.ini");
+	maxLifePoint = GetPrivateProfileInt(L"RoundOption", L"maxLifePoint", gameMetaData::defaultMaxLifePoint, L".\\option.ini");
 
-	arrMsCnt[gameMetaData::msType::yongyong] =	GetPrivateProfileInt(L"RoundOption", L"yongCnt", gameMetaData::defaultYongCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::bangrang] =	GetPrivateProfileInt(L"RoundOption", L"bangrangCnt", gameMetaData::defaultBangrangCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::wind]=		GetPrivateProfileInt(L"RoundOption", L"windCnt", gameMetaData::defaultWindCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::booung] =	GetPrivateProfileInt(L"RoundOption", L"booungCnt", gameMetaData::defaultBooungCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::bunpok] =	GetPrivateProfileInt(L"RoundOption", L"bunpokCnt", gameMetaData::defaultBunpokCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::nungang] =	GetPrivateProfileInt(L"RoundOption", L"nungangCnt", gameMetaData::defaultNungangCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::buljak] =	GetPrivateProfileInt(L"RoundOption", L"buljakCnt", gameMetaData::defaultBuljakCnt, L"option.ini");
-	arrMsCnt[gameMetaData::msType::potion] =	GetPrivateProfileInt(L"RoundOption", L"potionCnt", gameMetaData::defaultPotionCnt, L"option.ini");
+	arrMsCnt[gameMetaData::msType::yongyong] =	GetPrivateProfileInt(L"RoundOption", L"yongCnt", gameMetaData::defaultYongCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::bangrang] =	GetPrivateProfileInt(L"RoundOption", L"bangrangCnt", gameMetaData::defaultBangrangCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::wind]=		GetPrivateProfileInt(L"RoundOption", L"windCnt", gameMetaData::defaultWindCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::booung] =	GetPrivateProfileInt(L"RoundOption", L"booungCnt", gameMetaData::defaultBooungCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::bunpok] =	GetPrivateProfileInt(L"RoundOption", L"bunpokCnt", gameMetaData::defaultBunpokCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::nungang] =	GetPrivateProfileInt(L"RoundOption", L"nungangCnt", gameMetaData::defaultNungangCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::buljak] =	GetPrivateProfileInt(L"RoundOption", L"buljakCnt", gameMetaData::defaultBuljakCnt, L".\\option.ini");
+	arrMsCnt[gameMetaData::msType::potion] =	GetPrivateProfileInt(L"RoundOption", L"potionCnt", gameMetaData::defaultPotionCnt, L".\\option.ini");
 
 	stoneMaxCnt = 
 		arrMsCnt[gameMetaData::msType::yongyong]	//yongyong 
@@ -95,7 +99,7 @@ void gameRoomObjLayer::settingCntValues()
 	arrStones.resize(stoneMaxCnt);
 }
 
-void gameRoomObjLayer::createPlayers()
+void gameRoomObjLayer::createPlayers(int playerOrder[])
 {
 	//현재 내 플레이어 번호를 기준으로 할 것 - 차후 멀티모드 수정
 	bool bPlayer = true;
@@ -103,7 +107,7 @@ void gameRoomObjLayer::createPlayers()
 	for (auto &i : arrPlayers)
 	{
 		player* tempPlayer;
-		if (bPlayer == true)
+		if (idx == myPlayerNum)
 		{
 			tempPlayer = new player(idx);
 			bPlayer = false;
@@ -286,6 +290,39 @@ void gameRoomObjLayer::createScoreSpr()
 	}
 }
 
+void gameRoomObjLayer::startGameByNpc()
+{
+	auto actCnt = actManager->getRunningActionCnt();
+	if (actCnt == 0)
+	{
+		((npc*)arrPlayers[starterNum])->npcTurnOn();
+		callNpcProcess();
+	}
+	else
+	{
+		this->scheduleOnce([=](float d)
+		{
+			startGameByNpc();
+		}, 0.5f, "starterIsNpc");
+	}
+}
+
+gameRoomObjLayer * gameRoomObjLayer::createWithParam(gameMetaData::gameMode modeFlag, int playerOrder[])
+{
+	gameRoomObjLayer *pRet = new(std::nothrow) gameRoomObjLayer();
+	if (pRet && pRet->init(modeFlag, playerOrder))
+	{
+		pRet->autorelease();
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = nullptr;
+		return nullptr;
+	}
+}
+
 void gameRoomObjLayer::initRound()
 {
 	//0.init each Object
@@ -333,9 +370,8 @@ void gameRoomObjLayer::initRound()
 	{
 		this->scheduleOnce([=](float d)
 		{
-			((npc*)arrPlayers[starterNum])->npcTurnOn();
-			callNpcProcess();
-		}, 5.0f, "starterIsNpc");
+			startGameByNpc();
+		}, 8.0f, "starterIsNpc");
 	}
 	else if(starterNum == myPlayerNum)
 	{
@@ -395,13 +431,14 @@ void gameRoomObjLayer::shareStone2Player()
 		int defaultY = arrPlayers[tempCurPlayerIdx]->getDefaultY();
 		int revisionValue = getMsPosRevision(5, i / 4);
 		float rotValue = arrPlayers[tempCurPlayerIdx]->getRotationValue();
-		auto tempVec = Vec2(defaultX + revisionValue, defaultY);
-		if (tempCurPlayerIdx % 2 == 1)
+		auto tempTargetVec = Vec2(defaultX + revisionValue, defaultY);
+		auto tempStandardValue = (myPlayerNum + 1) % 2;
+		if (i % 2 == tempStandardValue)
 		{
-			tempVec.setPoint(defaultX, defaultY + revisionValue);
+			tempTargetVec.setPoint(defaultX, defaultY + revisionValue);
 		}
 		tempSelStone->setRotation(rotValue);
-		tempSelStone->actionMove(0.2f * (secretCnt + preDelayCnt), tempVec, gameMetaData::msMovement::sharing);
+		tempSelStone->actionMove(0.2f * (secretCnt + preDelayCnt), tempTargetVec, gameMetaData::msMovement::sharing);
 		preDelayCnt++;
 	}
 }
