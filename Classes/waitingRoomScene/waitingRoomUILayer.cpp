@@ -140,6 +140,10 @@ void waitingRoomUILayer::startGameCallback()
 	3. 숫자가 날아와서 플레이어 옆에 붙음
 	4. waitingRoomScene 천천히 페이드아웃 후 gameRoomScene으로 변경
 	*/
+
+	/*
+	on multiMode, popup ask adding CPU when not enough player 
+	*/
 	setBtnDisabled();
 	orderingCallback();
 
