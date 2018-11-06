@@ -11,7 +11,7 @@
 #define SECRETSTONE_BASESCALE 0.5f
 #define SCORE_BASESCALE 0.5f
 
-#define CURRENT_BUILD_MODE SINGLE_MODE_BUILD
+#define CURRENT_BUILD_MODE NETWORK_MODE_BUILD
 
 //-------------------
 //header for manage

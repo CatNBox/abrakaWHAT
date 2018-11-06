@@ -14,7 +14,6 @@ private:
 	void settingEventListener();
 	void setEnabledInputUI(const bool flag4KeyboardNselectUI, const bool flag4PassBtn);
 	void checkMagic(const int magicStoneNumber);
-	void returnMainmenu();
 	void initUI();
 	void setRound();
 	bool checkRunningAction();

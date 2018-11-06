@@ -5,12 +5,13 @@
 
 using namespace cocos2d;
 
-bool waitingRoomUILayer::init()
+bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
 {
 	if (!Layer::init())
 	{
 		return false;
 	}
+	curMode = modeFlag;
 
 	settingEventListener();
 	initUI();
@@ -21,35 +22,31 @@ bool waitingRoomUILayer::init()
 	return true;
 }
 
-void waitingRoomUILayer::setGameMode(gameMetaData::gameMode modeFlag)
+waitingRoomUILayer * waitingRoomUILayer::createWithParam(gameMetaData::gameMode modeFlag)
 {
-	curMode = modeFlag;
+	waitingRoomUILayer *pRet = new(std::nothrow) waitingRoomUILayer();
+	if (pRet && pRet->init(modeFlag))
+	{
+		pRet->autorelease();
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = nullptr;
+		return nullptr;
+	}
 }
 
 void waitingRoomUILayer::settingEventListener()
 {
 	//eventDispatch
-	//exitBtn
 	//gameStartBtn
 	//settingPlayerOrder orderingBtn
 }
 
 void waitingRoomUILayer::initUI()
 {
-	//setting menu and menuItem
-	//exitBtn, orderingBtn, startBtn
-	auto btnExit = MenuItemImage::create(
-		"UISprite/btnExitNormal.png",
-		"UISprite/btnExitPress.png",
-		"UISprite/btnExitPress.png",
-		CC_CALLBACK_0(
-			waitingRoomUILayer::returnMainmenuCallback,
-			this
-		)
-	);
-	btnExit->setScale(0.5f);
-	btnExit->setPosition(Vec2(330, 670+56-384));
-
 	auto btnStart = MenuItemImage::create(
 		"UISprite/btnStartNormal.png",
 		"UISprite/btnStartPress.png",
@@ -76,7 +73,6 @@ void waitingRoomUILayer::initUI()
 
 	btnMenu = Menu::create();
 
-	btnMenu->addChild(btnExit);
 	btnMenu->addChild(btnStart);
 	//btnMenu->addChild(btnOrdering);
 
@@ -121,14 +117,6 @@ void waitingRoomUILayer::addPlayerLabel()
 	playerSpr02->setPosition(Vec2(180, 500));
 
 	this->addChild(playerSpr02, gameMetaData::layerZOrder::objZ0);
-}
-
-void waitingRoomUILayer::returnMainmenuCallback()
-{
-	EventCustom popupEvent("popupWarning");
-	auto warningFlag = gameMetaData::warningCode::exitBtnWarning;
-	popupEvent.setUserData(&warningFlag);
-	Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEvent);
 }
 
 void waitingRoomUILayer::startGameCallback()

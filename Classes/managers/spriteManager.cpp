@@ -89,4 +89,12 @@ void spriteManager::preLoadingSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprWin.png");
 	tempSpr->initWithFile("UISprite/sprBooung.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprBooung.png");
+	tempSpr->initWithFile("UISprite/sprDot.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprDot.png");
+	tempSpr->initWithFile("UISprite/sprUpArrow.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprUpArrow.png");
+	tempSpr->initWithFile("UISprite/btnCopyFromClip.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnCopyFromClip.png");
+	tempSpr->initWithFile("UISprite/btnCopyToClip.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnCopyToClip.png");
 }

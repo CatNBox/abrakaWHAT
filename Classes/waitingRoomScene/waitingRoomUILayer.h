@@ -8,10 +8,9 @@ class actionManager;
 class waitingRoomUILayer : public cocos2d::Layer
 {
 public:
-	virtual bool init();
-	CREATE_FUNC(waitingRoomUILayer);
-
-	void setGameMode(gameMetaData::gameMode modeFlag);
+	virtual bool init(gameMetaData::gameMode modeFlag);
+	//CREATE_FUNC(waitingRoomUILayer);
+	static waitingRoomUILayer* createWithParam(gameMetaData::gameMode modeFlag);
 
 private:
 	void settingEventListener();
@@ -20,7 +19,6 @@ private:
 	void initPlayerLabel();
 	void addPlayerLabel();
 
-	void returnMainmenuCallback();
 	void startGameCallback();
 	void orderingCallback();
 

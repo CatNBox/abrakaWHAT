@@ -3,6 +3,8 @@
 #include "gameRoomScene\gameRoomObjLayer.h"
 #include "gameRoomScene\gameRoomUILayer.h"
 #include "popupLayer\popupLayer.h"
+#include "commonUILayer\commonUILayer.h"
+#include "gameObject\gameMetaData.h"
 
 cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int playerOrder[])
 {
@@ -12,11 +14,13 @@ cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int
 	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerOrder);
 	auto layerUI = gameRoomUILayer::create();
 	auto layerPopup = popupLayer::create();
+	auto layerCommonUI = commonUILayer::create();
 
-	scene->addChild(layerBG, 0);
-	scene->addChild(layerObj, 2);
-	scene->addChild(layerUI, 1);
-	scene->addChild(layerPopup, 3);
+	scene->addChild(layerBG, gameMetaData::layerZOrder::backGroundZ);
+	scene->addChild(layerUI, gameMetaData::layerZOrder::objZ0);
+	scene->addChild(layerObj, gameMetaData::layerZOrder::objZ1);
+	scene->addChild(layerCommonUI, gameMetaData::layerZOrder::objZ1);
+	scene->addChild(layerPopup, gameMetaData::layerZOrder::objZ2);
 
 	return scene;
 }

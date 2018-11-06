@@ -150,6 +150,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
+    <ClCompile Include="..\Classes\commonUILayer\commonUILayer.cpp" />
     <ClCompile Include="..\Classes\gameObject\magicStone.cpp" />
     <ClCompile Include="..\Classes\gameObject\player.cpp" />
     <ClCompile Include="..\Classes\gameRoomScene\gameRoomBGLayer.cpp" />
@@ -161,6 +162,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\mainMenuScene\mainMenuScene.cpp" />
     <ClCompile Include="..\Classes\managers\actionManager.cpp" />
     <ClCompile Include="..\Classes\managers\gameFlowManager.cpp" />
+    <ClCompile Include="..\Classes\managers\networkClass\stream.cpp" />
     <ClCompile Include="..\Classes\managers\networkManager.cpp" />
     <ClCompile Include="..\Classes\managers\soundManager.cpp" />
     <ClCompile Include="..\Classes\managers\spriteManager.cpp" />
@@ -168,12 +170,14 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\setupScene\setupLoadingLayer.cpp" />
     <ClCompile Include="..\Classes\setupScene\setupScene.cpp" />
     <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.cpp" />
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomJoinLayer.cpp" />
     <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomUILayer.cpp" />
     <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomScene.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\AppDelegate.h" />
+    <ClInclude Include="..\Classes\commonUILayer\commonUILayer.h" />
     <ClInclude Include="..\Classes\deletedCode.h" />
     <ClInclude Include="..\Classes\gameObject\gameMetaData.h" />
     <ClInclude Include="..\Classes\gameObject\magicStone.h" />
@@ -187,13 +191,17 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\mainMenuScene\mainMenuScene.h" />
     <ClInclude Include="..\Classes\managers\actionManager.h" />
     <ClInclude Include="..\Classes\managers\gameFlowManager.h" />
+    <ClInclude Include="..\Classes\managers\networkClass\protocol.h" />
+    <ClInclude Include="..\Classes\managers\networkClass\stream.h" />
     <ClInclude Include="..\Classes\managers\networkManager.h" />
+    <ClInclude Include="..\Classes\managers\singleton.h" />
     <ClInclude Include="..\Classes\managers\soundManager.h" />
     <ClInclude Include="..\Classes\managers\spriteManager.h" />
     <ClInclude Include="..\Classes\popupLayer\popupLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupLoadingLayer.h" />
     <ClInclude Include="..\Classes\setupScene\setupScene.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomBGLayer.h" />
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomJoinLayer.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomUILayer.h" />
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomScene.h" />
     <ClInclude Include="main.h" />

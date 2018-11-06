@@ -122,18 +122,6 @@ void gameRoomUILayer::initUI()
 		)
 	);
 
-	auto btnExit = MenuItemImage::create(
-		"UISprite/btnExitNormal.png",
-		"UISprite/btnExitPress.png",
-		"UISprite/btnExitPress.png",
-		CC_CALLBACK_0(
-			gameRoomUILayer::returnMainmenu,
-			this
-		)
-	);
-	btnExit->setScale(0.5f);
-	btnExit->setPosition(Vec2(330, 670));
-
 	magicChoicer = cocos2d::Menu::create();
 	for (int i = 0; i < gameMetaData::variableMaxCnt::msTypeCnt - 1; i++)
 	{
@@ -144,7 +132,6 @@ void gameRoomUILayer::initUI()
 	magicChoicer->addChild(btnPass, 0, "btnPass");
 	magicChoicer->alignItemsHorizontallyWithPadding(10.0f);
 	magicChoicer->setPosition(Vec2(384, 56));
-	magicChoicer->addChild(btnExit);
 	this->addChild(magicChoicer);
 
 	auto seenCheckerBoard = Sprite::createWithSpriteFrameName("ms_seenBG.png");
@@ -203,14 +190,6 @@ void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
 }
 
-void gameRoomUILayer::returnMainmenu()
-{
-	EventCustom popupEvent("popupWarning");
-	auto warningFlag = gameMetaData::warningCode::exitBtnWarning;
-	popupEvent.setUserData(&warningFlag);
-	Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEvent);
-}
-
 void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)
 {
 	if (checkRunningAction() || !(magicChoicer->isEnabled()))
@@ -218,7 +197,6 @@ void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, coco
 
 	if (keyCode == EventKeyboard::KeyCode::KEY_ESCAPE)
 	{
-		this->returnMainmenu();
 	}
 	else if (keyCode == EventKeyboard::KeyCode::KEY_1)
 	{

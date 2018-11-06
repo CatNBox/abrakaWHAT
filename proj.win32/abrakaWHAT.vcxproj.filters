@@ -34,6 +34,12 @@
     <Filter Include="src\06_popupLayer">
       <UniqueIdentifier>{c6971501-7ad8-4d52-87f1-407bd4c9f55f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\01_managers\networkClass">
+      <UniqueIdentifier>{f0011ac9-825d-4b57-bb4e-99c3d4792acc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\07_commonUILayer">
+      <UniqueIdentifier>{3b123f7a-918f-4c64-b139-5b8d03aa1a4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,6 +107,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomUILayer.cpp">
       <Filter>src\05_waitingRoomScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\managers\networkClass\stream.cpp">
+      <Filter>src\01_managers\networkClass</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\waitingRoomScene\waitingRoomJoinLayer.cpp">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\commonUILayer\commonUILayer.cpp">
+      <Filter>src\07_commonUILayer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +190,21 @@
     </ClInclude>
     <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomUILayer.h">
       <Filter>src\05_waitingRoomScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\singleton.h">
+      <Filter>src\01_managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\networkClass\stream.h">
+      <Filter>src\01_managers\networkClass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\networkClass\protocol.h">
+      <Filter>src\01_managers\networkClass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\waitingRoomScene\waitingRoomJoinLayer.h">
+      <Filter>src\05_waitingRoomScene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\commonUILayer\commonUILayer.h">
+      <Filter>src\07_commonUILayer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

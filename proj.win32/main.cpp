@@ -2,6 +2,7 @@
 #include "AppDelegate.h"
 #include "cocos2d.h"
 #include "managers\actionManager.h"
+#include "managers\networkManager.h"
 
 USING_NS_CC;
 
