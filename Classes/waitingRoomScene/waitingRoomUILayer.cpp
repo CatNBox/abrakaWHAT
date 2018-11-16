@@ -1,8 +1,9 @@
 #include "waitingRoomScene\waitingRoomUILayer.h"
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
+#include "managers\networkManager.h"
 #include "gameRoomScene\gameRoomScene.h"
-
+#include <iostream>
 using namespace cocos2d;
 
 bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
@@ -12,12 +13,19 @@ bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
 		return false;
 	}
 	curMode = modeFlag;
+	hostAddr = "000.000.000.000";
 
 	settingEventListener();
 	initUI();
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
+	netManager = networkManager::getInstance();
+	netManager->init(modeFlag);
+	
+	hostAddr = netManager->getMyAddr();
+	setIpAddrSpr();
+	std::cout << "ip : " << hostAddr << std::endl;;
 	
 	return true;
 }
@@ -47,6 +55,11 @@ void waitingRoomUILayer::settingEventListener()
 
 void waitingRoomUILayer::initUI()
 {
+	//menu create
+	btnMenu = Menu::create();
+	this->addChild(btnMenu);
+
+	// gameStart btn
 	auto btnStart = MenuItemImage::create(
 		"UISprite/btnStartNormal.png",
 		"UISprite/btnStartPress.png",
@@ -59,27 +72,34 @@ void waitingRoomUILayer::initUI()
 	btnStart->setScale(0.8f);
 	btnStart->setPosition(Vec2(0, -230));
 
-	/*
-	auto btnOrdering = MenuItemImage::create(
-		"UISprite/btnOrderingNormal.png",
-		"UISprite/btnOrderingPress.png",
-		"UISprite/btnOrderingPress.png",
+	btnMenu->addChild(btnStart);
+
+	// copy to clipboard btn
+	auto tempNormalC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+	tempNormalC2CSpr->setColor(Color3B(225, 225, 225));
+	auto tempClickedC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+	tempClickedC2CSpr->setColor(Color3B(125, 125, 125));
+	auto tempDisabledC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+	tempDisabledC2CSpr->setColor(Color3B(95, 95, 95));
+	auto btnCopyToClipboard = MenuItemImage::create();
+	btnCopyToClipboard->initWithNormalSprite(
+		tempNormalC2CSpr,
+		tempClickedC2CSpr,
+		tempDisabledC2CSpr,
 		CC_CALLBACK_0(
-			waitingRoomUILayer::orderingCallback,
+			waitingRoomUILayer::copy2Clipboard,
 			this
 		)
 	);
-	*/
+	btnCopyToClipboard->setScale(0.4f);
+	btnCopyToClipboard->setAnchorPoint(Vec2::ZERO);
+	btnCopyToClipboard->setPosition(Vec2(80, 200));
 
-	btnMenu = Menu::create();
-
-	btnMenu->addChild(btnStart);
-	//btnMenu->addChild(btnOrdering);
-
-	this->addChild(btnMenu);
+	btnMenu->addChild(btnCopyToClipboard);
 
 	initPlayerLabel();
 	//addPlayerLabel();
+	initIpAddrSpr();
 }
 
 void waitingRoomUILayer::initPlayerLabel()
@@ -101,7 +121,7 @@ void waitingRoomUILayer::initPlayerLabel()
 
 		i->setScale(0.7f);
 		i->setAnchorPoint(Vec2::ZERO);
-		i->setPosition(Vec2(180, labelY -= 70));
+		i->setPosition(Vec2(100, labelY -= 70));
 
 		this->addChild(i, gameMetaData::layerZOrder::objZ0);
 	}
@@ -114,7 +134,7 @@ void waitingRoomUILayer::addPlayerLabel()
 
 	playerSpr02->setScale(0.7f);
 	playerSpr02->setAnchorPoint(Vec2::ZERO);
-	playerSpr02->setPosition(Vec2(180, 500));
+	playerSpr02->setPosition(Vec2(140, 500));
 
 	this->addChild(playerSpr02, gameMetaData::layerZOrder::objZ0);
 }
@@ -164,17 +184,148 @@ void waitingRoomUILayer::orderingCallback()
 		}
 		playerOrder[i] = pickNum;
 
+		//setting order number
 		auto orderNum = Sprite::createWithSpriteFrameName("spr_number.png");
 		orderNum->setTextureRect(sprManager->getNumSprRect(pickNum));
 		orderNum->setScale(0.6f);
 		orderNum->setAnchorPoint(Vec2::ZERO);
 		auto posX = playerList.at(i)->getPositionX();
 		auto posY = playerList.at(i)->getPositionY();
-		orderNum->setPosition(Vec2(posX + 200, posY + 10));
+		orderNum->setPosition(Vec2(posX + 220, posY + 10));
 		//orderNum->setVisible(false);
 		this->addChild(orderNum);
 
 		//액션추가
+	}
+}
+
+void waitingRoomUILayer::initIpAddrSpr()
+{
+	int addWeightValue = 0;
+	for (int i = 0; i < 12; i++)
+	{
+		if (i % 3 == 0)
+		{
+			addWeightValue += 12;
+		}
+		//sprite IPAddr
+		ipAddrSpr[i] = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+		ipAddrSpr[i]->setTextureRect(sprManager->getNumSprRect(0));
+		ipAddrSpr[i]->setScale(0.7f);
+		ipAddrSpr[i]->setAnchorPoint(Vec2::ZERO);
+		ipAddrSpr[i]->setPosition(Vec2(400 + 25 * i + addWeightValue, 630));
+		this->addChild(ipAddrSpr[i], gameMetaData::layerZOrder::objZ1);
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		//dot spr
+		auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName("sprDot.png");
+		tempSpr->setScale(0.3f);
+		tempSpr->setAnchorPoint(Vec2::ZERO);
+		tempSpr->setPosition(Vec2(485 + 90 * i, 622));
+		this->addChild(tempSpr, gameMetaData::layerZOrder::objZ0);
+	}
+}
+
+void waitingRoomUILayer::errorWrongIpFormat()
+{
+	for (auto &ipSpr : ipAddrSpr)
+	{
+		ipSpr->setVisible(false);
+	}
+	btnMenu->setVisible(false);
+
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName("sprError.png");
+	tempSpr->setScale(0.7f);
+	tempSpr->setAnchorPoint(Vec2::ZERO);
+	tempSpr->setPosition(Vec2(400, 600));
+	this->addChild(tempSpr, gameMetaData::layerZOrder::objZ0);
+}
+
+void waitingRoomUILayer::setIpAddrSpr()
+{
+	//0.0.0.0 = 000.000.000.000
+	bool wrongFormat = false;
+	std::string bufStr = "000.000.000.000";
+	for (int i = hostAddr.size() - 1, bi = bufStr.size()-1, tempCnt = 0; 
+		i >= 0; 
+		i--, bi--)
+	{
+		char bufData = hostAddr.at(i);
+		if (bufData != '.')
+		{
+			if (bufData >= '0' && bufData <= '9')
+			{
+				bufStr.at(bi) = bufData;
+			}
+			else
+			{
+				wrongFormat = true;
+				break;
+			}
+
+		}
+		else
+		{
+			//3711
+			tempCnt++;
+			bi = bufStr.size() - (tempCnt*4);
+			if (bi < 0)
+			{
+				wrongFormat = true;
+				break;
+			}
+		}
+	}
+
+	if (wrongFormat)
+	{
+		errorWrongIpFormat();
+		return;
+	}
+
+	hostAddr = bufStr;
+
+	for (int i = 0; i < hostAddr.size(); i++)
+	{
+		if (i % 4 == 3)
+		{
+			continue;
+		}
+		char buf4atoi[2] = { '\0','\0' };
+		buf4atoi[0] = hostAddr[i];
+		int tempNum = atoi(buf4atoi);
+		int sprIndex = i - (i / 4);
+		ipAddrSpr[sprIndex]->setTextureRect(sprManager->getNumSprRect(tempNum));
+	}
+}
+
+void waitingRoomUILayer::copy2Clipboard()
+{
+	int targetStrLen = hostAddr.size() + 1; //include '\0'
+	const char* bufStr = hostAddr.c_str();
+
+	//alloc memory
+	HANDLE hData = ::GlobalAlloc(GMEM_DDESHARE | GMEM_MOVEABLE, targetStrLen);
+
+	char* pData = (char*)::GlobalLock(hData);
+	if (pData != nullptr)
+	{
+		memcpy(pData, bufStr, targetStrLen);
+
+		//unlock to cpy to clipboard
+		::GlobalUnlock(hData);
+
+		//open
+		if (::OpenClipboard(NULL))
+		{
+			//empties clipboard
+			::EmptyClipboard();
+			//cpy
+			::SetClipboardData(CF_TEXT, hData);
+			//close
+			::CloseClipboard();
+		}
 	}
 }
 

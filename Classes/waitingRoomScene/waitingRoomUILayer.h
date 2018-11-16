@@ -4,6 +4,7 @@
 
 class spriteManager;
 class actionManager;
+class networkManager;
 
 class waitingRoomUILayer : public cocos2d::Layer
 {
@@ -22,6 +23,11 @@ private:
 	void startGameCallback();
 	void orderingCallback();
 
+	void initIpAddrSpr();
+	void errorWrongIpFormat();
+	void setIpAddrSpr();
+	void copy2Clipboard();
+
 	void setBtnDisabled();
 	void setCpuSpr();
 	void runGameScene();
@@ -29,6 +35,10 @@ private:
 	gameMetaData::gameMode curMode;
 	spriteManager* sprManager;
 	actionManager* actManager;
+	networkManager* netManager;
+
+	std::string hostAddr;
+	cocos2d::Sprite* ipAddrSpr[12];
 
 	int playerCnt;
 	cocos2d::Menu* btnMenu;

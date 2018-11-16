@@ -16,10 +16,15 @@ private:
 	void ipAddrDigitUp(const int sprIndex);
 	void ipAddrDigitDown(const int sprIndex);
 	void displayIpAddrFromClip();
+	void updateIpAddrDisplay();
+	void join2IPAddr();
+
+	void callWrongIpPopup();
 
 	//IP
 	std::string ipAddr;
 	cocos2d::Sprite* ipAddrSpr[12];
+	cocos2d::Menu* btnMenu;
 
 	gameMetaData::gameMode curMode;
 

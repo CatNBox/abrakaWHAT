@@ -31,6 +31,7 @@ private:
 	void setWarning(cocos2d::EventCustom* warningEvent);
 
 	void setWarningLabel(enum class gameMetaData::warningCode warningCodeEnum);
+	void setWarningBtn(enum class gameMetaData::warningCode warningCodeEnum);
 
 	spriteManager* sprManager;
 

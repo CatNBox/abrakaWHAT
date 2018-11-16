@@ -298,28 +298,7 @@ void popupLayer::setWarning(cocos2d::EventCustom* warningEvent)
 	setWarningLabel(warningFlag);
 
 	//setBtn	
-	auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
-	auto tempOkSprPress = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
-	auto tempOkSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
-	tempOkSprPress->setColor(cocos2d::Color3B::GRAY);
-	tempOkSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
-	btnOk = cocos2d::MenuItemImage::create();
-	btnOk->initWithNormalSprite(tempOkSprNormal, tempOkSprPress, tempOkSprDisable, CC_CALLBACK_0(popupLayer::callbackGameExit, this));
-	btnOk->setScale(0.6f);
-
-	auto tempCancelSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprCancel.png");
-	auto tempCancelSprPress = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
-	auto tempCancelSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
-	tempCancelSprPress->setColor(cocos2d::Color3B::GRAY);
-	tempCancelSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
-	btnCancle = cocos2d::MenuItemImage::create();
-	btnCancle->initWithNormalSprite(tempCancelSprNormal, tempCancelSprPress, tempCancelSprDisable, CC_CALLBACK_0(popupLayer::callbackPopupClose, this));
-	btnCancle->setScale(0.6f);
-
-	btnMenu = cocos2d::Menu::create(btnOk, btnCancle, NULL);
-	btnMenu->alignItemsHorizontallyWithPadding(3.0f);
-	btnMenu->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS - 30.0f));
-	this->addChild(btnMenu, gameMetaData::layerZOrder::objZ1);
+	setWarningBtn(warningFlag);
 
 	this->setVisible(true);
 }
@@ -332,5 +311,60 @@ void popupLayer::setWarningLabel(gameMetaData::warningCode warningCodeEnum)
 		//tempLabel->setBMFontSize(14.0f);
 		tempLabel->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS + 50.0f));
 		this->addChild(tempLabel, gameMetaData::layerZOrder::objZ1);
+	}
+	else if (warningCodeEnum == gameMetaData::warningCode::wrongIpFormat)
+	{
+		auto tempLabel1 = cocos2d::Label::createWithTTF("Not match IP Format. plz check Text.", "fonts/Marker Felt.ttf", 26.0f, cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
+		auto tempLabel2 = cocos2d::Label::createWithTTF("Right format e.g : 012.012.255.255", "fonts/Marker Felt.ttf", 26.0f, cocos2d::Size::ZERO, cocos2d::TextHAlignment::CENTER);
+		//tempLabel->setBMFontSize(14.0f);
+		tempLabel1->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS + 65.0f));
+		tempLabel2->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS + 30.0f));
+		this->addChild(tempLabel1, gameMetaData::layerZOrder::objZ1);
+		this->addChild(tempLabel2, gameMetaData::layerZOrder::objZ1);
+	}
+}
+
+void popupLayer::setWarningBtn(gameMetaData::warningCode warningCodeEnum)
+{
+	if (warningCodeEnum == gameMetaData::warningCode::exitBtnWarning)
+	{
+		auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
+		auto tempOkSprPress = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+		auto tempOkSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+		tempOkSprPress->setColor(cocos2d::Color3B::GRAY);
+		tempOkSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+		btnOk = cocos2d::MenuItemImage::create();
+		btnOk->initWithNormalSprite(tempOkSprNormal, tempOkSprPress, tempOkSprDisable, CC_CALLBACK_0(popupLayer::callbackGameExit, this));
+		btnOk->setScale(0.6f);
+
+		auto tempCancelSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprCancel.png");
+		auto tempCancelSprPress = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
+		auto tempCancelSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempCancelSprNormal->getSpriteFrame());
+		tempCancelSprPress->setColor(cocos2d::Color3B::GRAY);
+		tempCancelSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+		btnCancle = cocos2d::MenuItemImage::create();
+		btnCancle->initWithNormalSprite(tempCancelSprNormal, tempCancelSprPress, tempCancelSprDisable, CC_CALLBACK_0(popupLayer::callbackPopupClose, this));
+		btnCancle->setScale(0.6f);
+
+		btnMenu = cocos2d::Menu::create(btnOk, btnCancle, NULL);
+		btnMenu->alignItemsHorizontallyWithPadding(3.0f);
+		btnMenu->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS - 30.0f));
+		this->addChild(btnMenu, gameMetaData::layerZOrder::objZ1);
+	}
+	else if (warningCodeEnum == gameMetaData::warningCode::wrongIpFormat)
+	{
+		auto tempOkSprNormal = cocos2d::Sprite::createWithSpriteFrameName("sprOk.png");
+		auto tempOkSprPress = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+		auto tempOkSprDisable = cocos2d::Sprite::createWithSpriteFrame(tempOkSprNormal->getSpriteFrame());
+		tempOkSprPress->setColor(cocos2d::Color3B::GRAY);
+		tempOkSprDisable->setColor(cocos2d::Color3B(50, 50, 50));
+		btnOk = cocos2d::MenuItemImage::create();
+		btnOk->initWithNormalSprite(tempOkSprNormal, tempOkSprPress, tempOkSprDisable, CC_CALLBACK_0(popupLayer::callbackPopupClose, this));
+		btnOk->setScale(0.6f);
+
+		btnMenu = cocos2d::Menu::create(btnOk, NULL);
+		btnMenu->alignItemsHorizontallyWithPadding(3.0f);
+		btnMenu->setPosition(cocos2d::Vec2(STDAXIS, STDAXIS - 40.0f));
+		this->addChild(btnMenu, gameMetaData::layerZOrder::objZ1);
 	}
 }

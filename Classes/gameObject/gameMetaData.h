@@ -186,6 +186,7 @@ namespace gameMetaData
 	{
 		infinityLoopWarning,
 		exitBtnWarning,
+		wrongIpFormat,
 		unknown
 	};
 

@@ -7,10 +7,10 @@ cocos2d::Rect spriteManager::getNumSprRect(const int num)
 	switch (num)
 	{
 	case 1:
-		tempRect = cocos2d::Rect(11, 5, 34, 75);
+		tempRect = cocos2d::Rect(5, 8, 35, 75);
 		return tempRect;
 	case 2:
-		tempRect = cocos2d::Rect(51, 5, 47, 81);
+		tempRect = cocos2d::Rect(52, 5, 47, 81);
 		return tempRect;
 	case 3:
 		tempRect = cocos2d::Rect(100, 5, 45, 81);
@@ -34,7 +34,7 @@ cocos2d::Rect spriteManager::getNumSprRect(const int num)
 		tempRect = cocos2d::Rect(381, 5, 47, 81);
 		return tempRect;
 	default:
-		tempRect = cocos2d::Rect(430, 5, 46, 81);
+		tempRect = cocos2d::Rect(428, 5, 46, 81);
 		return tempRect;
 	}
 	return tempRect;
@@ -97,4 +97,12 @@ void spriteManager::preLoadingSprites()
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnCopyFromClip.png");
 	tempSpr->initWithFile("UISprite/btnCopyToClip.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnCopyToClip.png");
+
+	tempSpr->initWithFile("UISprite/btnHostNormal.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnHostNormal.png");
+	tempSpr->initWithFile("UISprite/btnJoinNormal.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "btnJoinNormal.png");
+	
+	tempSpr->initWithFile("UISprite/sprError.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprError.png");
 }
