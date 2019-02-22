@@ -12,12 +12,15 @@ public:
 	virtual bool init(gameMetaData::gameMode modeFlag);
 	//CREATE_FUNC(waitingRoomUILayer);
 	static waitingRoomUILayer* createWithParam(gameMetaData::gameMode modeFlag);
+	void update(float dTime);
 
 private:
 	void settingEventListener();
-	void initUI();
+	void initUI(gameMetaData::gameMode modeFlag);
 
-	void initPlayerLabel();
+	void updateIpAddr();
+	//void updatePlayerLabel(cocos2d::EventCustom* playerCntEvent);
+	void updatePlayerLabel();
 	void addPlayerLabel();
 
 	void startGameCallback();
@@ -32,7 +35,7 @@ private:
 	void setCpuSpr();
 	void runGameScene();
 
-	gameMetaData::gameMode curMode;
+	gameMetaData::gameMode curGameMode;
 	spriteManager* sprManager;
 	actionManager* actManager;
 	networkManager* netManager;
@@ -45,5 +48,5 @@ private:
 	std::vector<cocos2d::Sprite*> playerList;
 	int playerOrder[gameMetaData::defaultPlayerCnt];
 
-	cocos2d::EventListenerCustom callBackListener;
+	cocos2d::EventListenerCustom* eventListener;
 };

@@ -2,7 +2,7 @@
 #include "mainMenuScene\mainMenuScene.h"
 #include "managers\spriteManager.h"
 #include "gameObject\gameMetaData.h"
-#include <iostream>
+#include "managers/networkManager.h"
 
 popupLayer::popupLayer()
 {
@@ -53,6 +53,9 @@ void popupLayer::callbackPopupClose()
 void popupLayer::callbackGameExit()
 {
 	callbackPopupClose();
+
+	//if gameMode::host/guest, must call networkManager->close()
+	networkManager::getInstance()->close();
 
 	this->scheduleOnce([=](float d) 
 	{
@@ -147,7 +150,6 @@ void popupLayer::setEndGame(cocos2d::EventCustom* endGameEvent)
 	//get Data
 	std::array<int, 4>* arrEndScore;
 	arrEndScore = (std::array<int,4>*)endGameEvent->getUserData();
-	std::for_each(arrEndScore->begin(), arrEndScore->end(), [](int i) {std::cout << i << std::endl; });
 
 	//display player
 	setDisplayPlayer();

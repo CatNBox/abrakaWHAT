@@ -1,7 +1,7 @@
 #include "waitingRoomJoinLayer.h"
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
-#include <iostream>
+#include "managers/networkManager.h"
 
 using namespace cocos2d;
 
@@ -11,12 +11,15 @@ bool waitingRoomJoinLayer::init(gameMetaData::gameMode modeFlag)
 	{
 		return false;
 	}
-	curMode = modeFlag;
-	ipAddr = "000.000.000.000";
-
+	curGameMode = modeFlag;
+	ipAddrSprFormat = "000.000.000.000";
+	ipAddrNetFormat = "0.0.0.0";
+	
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
+	netManager = networkManager::getInstance();
 
+	initTimeout(gameMetaData::defaultTimeoutCnt);
 	initUI();
 
 	return true;
@@ -35,6 +38,22 @@ waitingRoomJoinLayer * waitingRoomJoinLayer::createWithParam(gameMetaData::gameM
 		delete pRet;
 		pRet = nullptr;
 		return nullptr;
+	}
+}
+
+void waitingRoomJoinLayer::update(float dTime)
+{
+	//check timeOut default 10.0f
+	this->_timeout -= dTime;
+	if (this->_timeout <= 0)
+	{
+		this->unscheduleUpdate();
+	}
+
+	//check flags in networkManager
+	if (netManager->getClientConnectionState() == true)
+	{
+		callbackJoinSuccess();
 	}
 }
 
@@ -161,35 +180,35 @@ void waitingRoomJoinLayer::initUI()
 
 void waitingRoomJoinLayer::ipAddrDigitUp(const int sprIndex)
 {
-	//ipAddr[index] value + 1
+	//ipAddrSprFormat[index] value + 1
 	//if curValue is 9, change value to 0
 	char tempBuf[2] = { '\0','\0' };
-	//not match ipAddr idx and ipAddrSpr idx
+	//not match ipAddrSprFormat idx and ipAddrSpr idx
 	int strIdx = sprIndex + (sprIndex / 3);
-	tempBuf[0] = ipAddr.at(strIdx);
+	tempBuf[0] = ipAddrSprFormat.at(strIdx);
 	int tempVal = atoi(tempBuf);
 	tempVal = (tempVal + 1) > 9 ? 0 : tempVal + 1;
 	_itoa_s(tempVal, tempBuf, 10);
-	ipAddr.at(strIdx) = tempBuf[0];
+	ipAddrSprFormat.at(strIdx) = tempBuf[0];
 
-	//call getNumRect(ipAddr[index])
+	//call getNumRect(ipAddrSprFormat[index])
 	ipAddrSpr[sprIndex]->setTextureRect(sprManager->getNumSprRect(tempVal));
 }
 
 void waitingRoomJoinLayer::ipAddrDigitDown(const int sprIndex)
 {
-	//ipAddr[index] value - 1
+	//ipAddrSprFormat[index] value - 1
 	//if curValue is 0, change value to 9
 	char tempBuf[2] = { '\0','\0' };
-	//not match ipAddr idx and ipAddrSpr idx
+	//not match ipAddrSprFormat idx and ipAddrSpr idx
 	int strIdx = sprIndex + (sprIndex / 3);
-	tempBuf[0] = ipAddr.at(strIdx);
+	tempBuf[0] = ipAddrSprFormat.at(strIdx);
 	int tempVal = atoi(tempBuf);
 	tempVal = (tempVal - 1) < 0 ? 9 : tempVal - 1;
 	_itoa_s(tempVal, tempBuf, 10);
-	ipAddr.at(strIdx) = tempBuf[0];
+	ipAddrSprFormat.at(strIdx) = tempBuf[0];
 
-	//call getNumRect(ipAddr[index])
+	//call getNumRect(ipAddrSprFormat[index])
 	ipAddrSpr[sprIndex]->setTextureRect(sprManager->getNumSprRect(tempVal));
 }
 
@@ -233,7 +252,6 @@ void waitingRoomJoinLayer::displayIpAddrFromClip()
 				}
 				else
 				{
-					//3711
 					tempCnt++;
 					bi = strFormat.size() - (tempCnt * 4);
 					if (bi < 0)
@@ -246,8 +264,8 @@ void waitingRoomJoinLayer::displayIpAddrFromClip()
 
 			if (chkFormat)
 			{
-				ipAddr = strFormat;
-				//update ipAddr display
+				ipAddrSprFormat = strFormat;
+				//update ipAddrSprFormat display
 				updateIpAddrDisplay();
 			}
 			else
@@ -265,23 +283,76 @@ void waitingRoomJoinLayer::displayIpAddrFromClip()
 
 void waitingRoomJoinLayer::updateIpAddrDisplay()
 {
-	for (int i = 0; i < ipAddr.size(); i++)
+	for (int i = 0; i < ipAddrSprFormat.size(); i++)
 	{
 		if (i % 4 == 3)
 		{
 			continue;
 		}
 		char tempBuf[2] = { '\0','\0' };
-		tempBuf[0] = ipAddr[i];
+		tempBuf[0] = ipAddrSprFormat[i];
 		int tempNum = atoi(tempBuf);
 		int sprIndex = i - (i / 4);
 		ipAddrSpr[sprIndex]->setTextureRect(sprManager->getNumSprRect(tempNum));
 	}
 }
 
+void waitingRoomJoinLayer::convertIpAddrFormat()
+{
+	int readCharCnt = 0;
+	int readPartCnt = 1;
+	std::string tempBuffer = "";
+
+	ipAddrNetFormat = "";
+
+	for (auto i : ipAddrSprFormat)
+	{
+		readCharCnt++;
+
+		if (i == '.')
+		{
+			readCharCnt = 0;
+			tempBuffer += i;
+			ipAddrNetFormat += tempBuffer;
+			tempBuffer = "";
+			continue;
+		}
+
+		if (i >= '0' && i <= '9')
+		{
+			if (tempBuffer.size() == 1 && tempBuffer.at(0) == '0')
+			{
+				tempBuffer = i;
+			}
+			else
+			{
+				tempBuffer += i;
+			}
+		}
+	}
+	ipAddrNetFormat += tempBuffer;
+
+}
+
 void waitingRoomJoinLayer::join2IPAddr()
 {
 	//connect host
+	convertIpAddrFormat();
+	networkManager::getInstance()->runClient(ipAddrNetFormat);
+
+	//check connection state until timeout
+	this->updateNetworkInfo();
+}
+
+void waitingRoomJoinLayer::updateNetworkInfo()
+{
+	//call update scheduling
+	this->scheduleUpdate();
+}
+
+void waitingRoomJoinLayer::initTimeout(float time)
+{
+	this->_timeout = time;
 }
 
 void waitingRoomJoinLayer::callWrongIpPopup()
@@ -290,4 +361,14 @@ void waitingRoomJoinLayer::callWrongIpPopup()
 	auto warningFlag = gameMetaData::warningCode::wrongIpFormat;
 	popupEvent.setUserData(&warningFlag);
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEvent);
+}
+
+void waitingRoomJoinLayer::callbackJoinSuccess()
+{
+	this->unscheduleUpdate();
+
+	this->setVisible(false);
+
+	//call waitingRoomUiLayer wakeup
+	Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("guestModeUILayerWakeup");
 }

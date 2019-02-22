@@ -11,7 +11,7 @@
 #define SECRETSTONE_BASESCALE 0.5f
 #define SCORE_BASESCALE 0.5f
 
-#define CURRENT_BUILD_MODE NETWORK_MODE_BUILD
+#define CURRENT_BUILD_MODE RELEASE_MODE_BUILD
 
 //-------------------
 //header for manage
@@ -48,6 +48,7 @@ namespace gameMetaData
 	const int defaultBuljakCnt = 7;
 	const int defaultPotionCnt = 8;
 	const int defaultMaxLifePoint = 6;
+	const float defaultTimeoutCnt = 10.0f;
 
 	//0 = ms_bg, 1~8 = ms1~8
 	const std::string arrMsSpriteName[] = {
@@ -260,5 +261,11 @@ namespace gameMetaData
 		npcWait,
 		npcTurnOn,
 		unknown
+	};
+
+	enum class serverState
+	{
+		serverOn,
+		serverFail
 	};
 }

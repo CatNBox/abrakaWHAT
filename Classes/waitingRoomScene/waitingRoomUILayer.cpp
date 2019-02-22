@@ -4,6 +4,7 @@
 #include "managers\networkManager.h"
 #include "gameRoomScene\gameRoomScene.h"
 #include <iostream>
+
 using namespace cocos2d;
 
 bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
@@ -12,21 +13,20 @@ bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
 	{
 		return false;
 	}
-	curMode = modeFlag;
+	curGameMode = modeFlag;
 	hostAddr = "000.000.000.000";
 
 	settingEventListener();
-	initUI();
+	initUI(modeFlag);
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
 	netManager = networkManager::getInstance();
-	netManager->init(modeFlag);
-	
-	hostAddr = netManager->getMyAddr();
-	setIpAddrSpr();
-	std::cout << "ip : " << hostAddr << std::endl;;
-	
+
+	netManager->start(curGameMode);
+
+	this->scheduleUpdate();
+
 	return true;
 }
 
@@ -46,33 +46,60 @@ waitingRoomUILayer * waitingRoomUILayer::createWithParam(gameMetaData::gameMode 
 	}
 }
 
+void waitingRoomUILayer::update(float dTime)
+{
+	//check server state
+	//get connected playerCnt
+	int tempPlayerCnt = netManager->getPlayerCnt();
+	if (tempPlayerCnt != playerCnt)
+	{
+		playerCnt = tempPlayerCnt;
+		updatePlayerLabel();
+	}
+}
+
 void waitingRoomUILayer::settingEventListener()
 {
 	//eventDispatch
 	//gameStartBtn
 	//settingPlayerOrder orderingBtn
+
+	//initIpAddr
+	eventListener = EventListenerCustom::create("UILayerInitIpAddr",
+		CC_CALLBACK_0(waitingRoomUILayer::updateIpAddr, this));
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
+
+	//guestMode visible true
+	eventListener = EventListenerCustom::create("guestModeUILayerWakeup",
+		[=](EventCustom* event) {
+		this->setVisible(true);
+	});
+	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 }
 
-void waitingRoomUILayer::initUI()
+void waitingRoomUILayer::initUI(gameMetaData::gameMode modeFlag)
 {
 	//menu create
 	btnMenu = Menu::create();
 	this->addChild(btnMenu);
 
 	// gameStart btn
-	auto btnStart = MenuItemImage::create(
-		"UISprite/btnStartNormal.png",
-		"UISprite/btnStartPress.png",
-		"UISprite/btnStartPress.png",
-		CC_CALLBACK_0(
-			waitingRoomUILayer::startGameCallback,
-			this
-		)
-	);
-	btnStart->setScale(0.8f);
-	btnStart->setPosition(Vec2(0, -230));
+	if (modeFlag == gameMetaData::gameMode::host)
+	{
+		auto btnStart = MenuItemImage::create(
+			"UISprite/btnStartNormal.png",
+			"UISprite/btnStartPress.png",
+			"UISprite/btnStartPress.png",
+			CC_CALLBACK_0(
+				waitingRoomUILayer::startGameCallback,
+				this
+			)
+		);
+		btnStart->setScale(0.8f);
+		btnStart->setPosition(Vec2(0, -230));
 
-	btnMenu->addChild(btnStart);
+		btnMenu->addChild(btnStart);
+	}
 
 	// copy to clipboard btn
 	auto tempNormalC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
@@ -97,14 +124,22 @@ void waitingRoomUILayer::initUI()
 
 	btnMenu->addChild(btnCopyToClipboard);
 
-	initPlayerLabel();
-	//addPlayerLabel();
+	updatePlayerLabel();
+	addPlayerLabel();
 	initIpAddrSpr();
 }
 
-void waitingRoomUILayer::initPlayerLabel()
+void waitingRoomUILayer::updateIpAddr()
 {
-	playerCnt = gameMetaData::defaultPlayerCnt;
+	hostAddr = netManager->getMyAddr();
+	setIpAddrSpr();
+}
+
+//void waitingRoomUILayer::updatePlayerLabel(cocos2d::EventCustom* playerCntEvent)
+void waitingRoomUILayer::updatePlayerLabel()
+{
+	if (playerCnt < 1) return;
+
 	playerList.resize(playerCnt);
 
 	auto tempPlayerLabel = Sprite::createWithSpriteFrameName("sprPlayer.png");
@@ -154,7 +189,6 @@ void waitingRoomUILayer::startGameCallback()
 	*/
 	setBtnDisabled();
 	orderingCallback();
-
 	
 	this->schedule([=](float d) {
 		this->runGameScene();
@@ -183,6 +217,7 @@ void waitingRoomUILayer::orderingCallback()
 			else breakInf++;
 		}
 		playerOrder[i] = pickNum;
+		std::cout << "pickNum : " << pickNum << std::endl;
 
 		//setting order number
 		auto orderNum = Sprite::createWithSpriteFrameName("spr_number.png");
@@ -302,6 +337,9 @@ void waitingRoomUILayer::setIpAddrSpr()
 
 void waitingRoomUILayer::copy2Clipboard()
 {
+
+	cocos2d::Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("UILayerInitIpAddr");
+
 	int targetStrLen = hostAddr.size() + 1; //include '\0'
 	const char* bufStr = hostAddr.c_str();
 
@@ -340,7 +378,7 @@ void waitingRoomUILayer::setCpuSpr()
 
 void waitingRoomUILayer::runGameScene()
 {
-	auto startGameScene = TransitionCrossFade::create(0.3f, gameRoomScene::createScene(curMode, playerOrder));
+	auto startGameScene = TransitionCrossFade::create(0.3f, gameRoomScene::createScene(curGameMode, playerOrder));
 	Director::getInstance()->replaceScene(startGameScene);
 }
 

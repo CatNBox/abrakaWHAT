@@ -52,7 +52,7 @@ private:
 
 	int getMsPosRevision(int msListSize, int msOrder);
 
-	gameMetaData::gameMode curMode = gameMetaData::gameMode::unknown;
+	gameMetaData::gameMode curGameMode = gameMetaData::gameMode::unknown;
 
 	int playerCnt = 0;
 	int secretCnt = 0;

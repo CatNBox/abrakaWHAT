@@ -14,7 +14,7 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerOrder[])
 		return false;
 	}
 
-	curMode = modeFlag;
+	curGameMode = modeFlag;
 	myPlayerNum = playerOrder[0] - 1;
 
 	sprManager = new spriteManager;

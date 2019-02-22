@@ -5,6 +5,7 @@
 #include "popupLayer\popupLayer.h"
 #include "gameObject\gameMetaData.h"
 #include "commonUILayer\commonUILayer.h"
+#include "managers/networkManager.h"
 
 cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 {
@@ -16,6 +17,8 @@ cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 	auto layerPopup = popupLayer::create();
 	auto layerCommonUI = commonUILayer::create();
 
+	//init networkManager
+	networkManager::getInstance()->init();
 
 	scene->addChild(layerBG, gameMetaData::layerZOrder::backGroundZ);
 	scene->addChild(layerObj, gameMetaData::layerZOrder::objZ0);
@@ -26,7 +29,7 @@ cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 	}
 	scene->addChild(layerCommonUI, gameMetaData::layerZOrder::objZ1);
 	scene->addChild(layerPopup,gameMetaData::layerZOrder::objZ2);
-	
+
 	return scene;
 }
 
