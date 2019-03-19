@@ -65,12 +65,13 @@ void guestClient::startSend(const bool isImmediately, const int dataSize, char &
 
 void guestClient::handleConnect(const boost::system::error_code & errCode)
 {
-	std::cout << "Error Code : " << errCode.value() << " Error Message : " << errCode.message() << std::endl;
-
 	if (errCode)
 	{
-		std::cout << "Connect fail " << std::endl;
-		std::cout << "Error Code : " << errCode.value() << " Error Message : " << errCode.message() << std::endl;
+		std::cout
+			<< "---------------------" << std::endl 
+			<< "Connect fail " << std::endl;
+		std::cout << "Error Code : " << errCode.value() << " Error Message : " << errCode.message() << std::endl
+			<< "---------------------" << std::endl;
 
 		//popup connect error
 
@@ -78,15 +79,10 @@ void guestClient::handleConnect(const boost::system::error_code & errCode)
 	}
 	else
 	{
-		std::cout << "Server connect success" << std::endl;
-		std::cout << "" << std::endl;
-
-		networkManager::getInstance()->clientConnectSuccess(); 
-		
-		netProtocol::PKT_REQ_CNT sendPkt;
-		sendPkt.init();
-
-		this->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+		std::cout
+			<< "---------------------" << std::endl 
+			<< "Server connect success" << std::endl
+			<< "---------------------" << std::endl;
 
 		startReceive();
 	}
@@ -113,11 +109,17 @@ void guestClient::handleReceive(const boost::system::error_code & errCode, const
 	{
 		if (errCode == boost::asio::error::eof)
 		{
-			//std::cout << "connect fail" << std::endl;
+			std::cout
+				<< "---------------------" << std::endl 
+				<< "error No : " << errCode.value() << " error Message : " << errCode.message() << std::endl
+				<< "---------------------" << std::endl;
 		}
 		else
 		{
-			//std::cout << "error No : " << errCode.value() << " error Message : " << errCode.message() << std::endl;
+			std::cout
+				<< "---------------------" << std::endl 
+				<< "error No : " << errCode.value() << " error Message : " << errCode.message() << std::endl
+				<< "---------------------" << std::endl;
 		}
 
 		this->close();
@@ -170,15 +172,124 @@ void guestClient::processPacket(const char & pData)
 
 	switch (pHeader->pktId)
 	{
-	case netProtocol::pktIdentt::RES_CNT:
+	case netProtocol::pktIdentt::RES_IN:
 		{
-			netProtocol::PKT_RES_CNT* pPacket = (netProtocol::PKT_RES_CNT*)&pData;
+			netProtocol::PKT_RES_IN* pPacket = (netProtocol::PKT_RES_IN*)&pData;
 
-			int tempPlayerCnt = pPacket->playerCnt;
-			std::cout << "tempPlayerCnt : " << tempPlayerCnt << std::endl;
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : RES_IN" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet mySessionID : " << pPacket->mySessionID << std::endl;
+			for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+			{
+				std::cout << "packet userState[" << i << "] : " << pPacket->userStateList[i] << std::endl;
+			}
+			std::cout << "---------------------" << std::endl;
 
-			//updatePlayerCnt call waitingUILayer::updatePlayerLabel
-			networkManager::getInstance()->updatePlayerCnt(tempPlayerCnt);
+			bool curUserLoginState[netProtocol::maxSessionCnt];
+			memcpy(curUserLoginState, pPacket->userStateList, sizeof(bool)*netProtocol::maxSessionCnt);
+			networkManager::getInstance()->setCurPlayersLoginState(curUserLoginState);
+
+			int myClientID = pPacket->mySessionID;
+			networkManager::getInstance()->setMyClientID(myClientID);
+
+			networkManager::getInstance()->clientConnectSuccess();
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_IN:
+		{
+			netProtocol::PKT_NOTICE_IN* pPacket = (netProtocol::PKT_NOTICE_IN*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_IN" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet joinedUserId : " << pPacket->joinedUserId << std::endl
+				<< "---------------------" << std::endl;
+
+			int joinedPlayerId = pPacket->joinedUserId;
+
+			networkManager::getInstance()->setJoinedNewPlayer(joinedPlayerId);
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_OUT:
+		{
+			netProtocol::PKT_NOTICE_OUT* pPacket = (netProtocol::PKT_NOTICE_OUT*)&pData;
+			
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_OUT" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet joinedUserId : " << pPacket->disconnectUserId << std::endl
+				<< "---------------------" << std::endl;
+
+			int disconnectPlayerId = pPacket->disconnectUserId;
+
+			networkManager::getInstance()->setDisconnectPlayer(disconnectPlayerId);
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_NPC:
+		{
+			netProtocol::PKT_NOTICE_NPC* pPacket = (netProtocol::PKT_NOTICE_NPC*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_NPC" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet npcID : " << pPacket->npcId << std::endl
+				<< "---------------------" << std::endl;
+
+			int npcId = pPacket->npcId;
+
+			networkManager::getInstance()->setNpc(npcId);
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_ORDER:
+		{
+			netProtocol::PKT_NOTICE_ORDER* pPacket = (netProtocol::PKT_NOTICE_ORDER*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_ORDER" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl;
+			for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+			{
+				std::cout << "packet turnOrder[" << i << "] : " << pPacket->turnOrderList[i] << std::endl;
+			}
+			std::cout
+				<< "---------------------" << std::endl;
+
+			int receiveTurnOrder[netProtocol::maxSessionCnt];
+			memcpy(receiveTurnOrder, pPacket->turnOrderList, sizeof(int)*netProtocol::maxSessionCnt);
+			networkManager::getInstance()->setTurnOrder(receiveTurnOrder);
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_START:
+		{
+			netProtocol::PKT_NOTICE_START* pPacket = (netProtocol::PKT_NOTICE_START*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_START" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "---------------------" << std::endl;
+
+			networkManager::getInstance()->setFlagReadyLoadingGameRoom();
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_READY:
+		{
+			netProtocol::PKT_NOTICE_READY* pPacket = (netProtocol::PKT_NOTICE_READY*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_READY" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet readyID : " << pPacket->readyId << std::endl
+				<< "---------------------" << std::endl;
+
+			networkManager::getInstance()->setGameRoomSceneReady(pPacket->readyId);
 		}
 		break;
 	default:

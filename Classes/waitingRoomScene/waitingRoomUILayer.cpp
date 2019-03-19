@@ -13,17 +13,17 @@ bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
 	{
 		return false;
 	}
-	curGameMode = modeFlag;
 	hostAddr = "000.000.000.000";
-
-	settingEventListener();
-	initUI(modeFlag);
-
+	curGameMode = modeFlag;
+	playerTurnOrder[0] = 0;
+	playerCnt = 0;
+	NPCCnt = 0;
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
 	netManager = networkManager::getInstance();
-
-	netManager->start(curGameMode);
+		
+	settingEventListener();
+	initUI(modeFlag);
 
 	this->scheduleUpdate();
 
@@ -50,11 +50,68 @@ void waitingRoomUILayer::update(float dTime)
 {
 	//check server state
 	//get connected playerCnt
-	int tempPlayerCnt = netManager->getPlayerCnt();
-	if (tempPlayerCnt != playerCnt)
+	auto netPlayerCnt = netManager->getPlayerCnt();
+	auto netNPCCnt = netManager->getNPCCnt();
+	if (playerCnt != netPlayerCnt
+		|| NPCCnt != netNPCCnt)
 	{
-		playerCnt = tempPlayerCnt;
+		playerCnt = netPlayerCnt;
+		NPCCnt = netNPCCnt;
 		updatePlayerLabel();
+	}
+
+	//setting turnOrder
+	if (playerTurnOrder[0] == 0)
+	{
+		if (netManager->getTurnOrderSettingState())
+		{
+			setPlayerTurnOrder();
+			showSpriteTurnOrder();
+
+			if (curGameMode == gameMetaData::gameMode::host)
+			{
+				netManager->requestGameRoomStart();
+			}
+		}
+	}
+
+	if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::readyLoadingGameRoomScene)
+	{
+		//change scene and count down
+		netManager->setFlagLoadingGameRooom();
+
+		auto sprCntdwnNum = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+		auto tempSprRect = sprManager->getNumSprRect(4);
+		sprCntdwnNum->setTextureRect(tempSprRect);
+		sprCntdwnNum->setPosition(STDAXIS, 75.0f);
+		this->addChild(sprCntdwnNum, gameMetaData::layerZOrder::objZ1);
+
+		cocos2d::Vector<cocos2d::FiniteTimeAction*> vecAction;
+
+		//startNum ~ 1
+		for (int i = 4; i > 0; i--)
+		{
+			auto tempFuncChangeCntNum = cocos2d::CallFunc::create([=]() {
+				sprCntdwnNum->setTextureRect(sprManager->getNumSprRect(i));
+			});
+			vecAction.pushBack(tempFuncChangeCntNum);
+
+			auto tempDelay = cocos2d::DelayTime::create(1.0f);
+			vecAction.pushBack(tempDelay);
+		}
+		//zero
+		auto tempFuncChangeCntNum = cocos2d::CallFunc::create([=]() {
+			sprCntdwnNum->setTextureRect(sprManager->getNumSprRect(0));
+		});
+		vecAction.pushBack(tempFuncChangeCntNum);
+
+		auto seq = cocos2d::Sequence::create(vecAction);
+		sprCntdwnNum->runAction(seq);
+
+		this->schedule([=](float d) {
+			this->unscheduleUpdate();
+			this->runGameScene();
+		}, 0.0f, 0, 4.0f, "startGameScene");
 	}
 }
 
@@ -73,6 +130,7 @@ void waitingRoomUILayer::settingEventListener()
 	eventListener = EventListenerCustom::create("guestModeUILayerWakeup",
 		[=](EventCustom* event) {
 		this->setVisible(true);
+		this->updateIpAddr();
 	});
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 }
@@ -124,23 +182,8 @@ void waitingRoomUILayer::initUI(gameMetaData::gameMode modeFlag)
 
 	btnMenu->addChild(btnCopyToClipboard);
 
-	updatePlayerLabel();
-	addPlayerLabel();
-	initIpAddrSpr();
-}
-
-void waitingRoomUILayer::updateIpAddr()
-{
-	hostAddr = netManager->getMyAddr();
-	setIpAddrSpr();
-}
-
-//void waitingRoomUILayer::updatePlayerLabel(cocos2d::EventCustom* playerCntEvent)
-void waitingRoomUILayer::updatePlayerLabel()
-{
-	if (playerCnt < 1) return;
-
-	playerList.resize(playerCnt);
+	//init playerLabel visible false
+	playerList.resize(gameMetaData::defaultPlayerCnt);
 
 	auto tempPlayerLabel = Sprite::createWithSpriteFrameName("sprPlayer.png");
 	playerList.at(0) = tempPlayerLabel;
@@ -157,8 +200,51 @@ void waitingRoomUILayer::updatePlayerLabel()
 		i->setScale(0.7f);
 		i->setAnchorPoint(Vec2::ZERO);
 		i->setPosition(Vec2(100, labelY -= 70));
+		i->setVisible(false);
 
 		this->addChild(i, gameMetaData::layerZOrder::objZ0);
+	}
+
+	updatePlayerLabel();
+	initIpAddrSpr();
+	updateIpAddr();
+}
+
+void waitingRoomUILayer::updateIpAddr()
+{
+	hostAddr = netManager->getServerAddr();
+	setIpAddrSpr();
+}
+
+void waitingRoomUILayer::updatePlayerLabel()
+{
+	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
+	{
+		auto tempPlayersState = netManager->getPlayerConnectionState(i);
+		if (tempPlayersState == gameMetaData::netPlayerState::disconnected)
+		{
+			playerList[i]->setVisible(false);
+		}
+		else if (tempPlayersState == gameMetaData::netPlayerState::connected)
+		{
+			/*
+				add code setting player texture
+			*/
+			playerList[i]->initWithSpriteFrameName("sprPlayer.png");
+			playerList[i]->setScale(0.7f);
+			playerList[i]->setAnchorPoint(Vec2::ZERO);
+			playerList[i]->setVisible(true);
+		}
+		else
+		{
+			/*
+				add code setting NPC texture
+			*/
+			playerList[i]->initWithSpriteFrameName("sprNPC.png");
+			playerList[i]->setScale(0.7f);
+			playerList[i]->setAnchorPoint(Vec2::ZERO);
+			playerList[i]->setVisible(true);
+		}
 	}
 }
 
@@ -187,41 +273,79 @@ void waitingRoomUILayer::startGameCallback()
 	/*
 	on multiMode, popup ask adding CPU when not enough player 
 	*/
+	//not joined player slot check
+	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
+	{
+		auto curPlayerState = netManager->getPlayerConnectionState(i);
+		if (curPlayerState == gameMetaData::netPlayerState::disconnected)
+		{
+			netManager->requestSettingNPC(i);
+		}
+	}
+
 	setBtnDisabled();
-	orderingCallback();
-	
-	this->schedule([=](float d) {
-		this->runGameScene();
-	}, 0.0f, 0, 2.0f, "startGameScene");
-	
+	if (setBufTurnOrder())
+	{
+		netManager->requestSettingOrder(bufTurnOrder);
+
+		/*
+		this->schedule([=](float d) {
+			this->runGameScene();
+		}, 0.0f, 0, 2.0f, "startGameScene");
+		*/
+	}
+	else
+	{
+		//0~3의 랜덤값 중 한번도 선택되지않은 숫자가 있는 오류
+	}
 }
 
-void waitingRoomUILayer::orderingCallback()
+bool waitingRoomUILayer::setBufTurnOrder()
 {
-	auto tempCheckSet = std::vector<bool>(playerList.size()); //init by false
+	auto pickedNumCheckList = std::vector<bool>(playerList.size()); //init by false
 	for (auto i = 0; i < playerList.size(); i++)
 	{
-		int pickNum = 0;
+		int pickOrderNum = 0;
 		int breakInf = 0;
 		for(;;)
 		{
-			auto tempCursor = inlineFunc::getRandomInt(0, tempCheckSet.size() - 1);
-			if (!tempCheckSet.at(tempCursor))
+			auto tempCursor = inlineFunc::getRandomInt(0, pickedNumCheckList.size() - 1);
+			if (pickedNumCheckList.at(tempCursor) == false)
 			{
-				tempCheckSet.at(tempCursor) = true;
-				pickNum = tempCursor + 1;
+				pickedNumCheckList.at(tempCursor) = true;
+				pickOrderNum = tempCursor + 1;
 				break;
 			}
 
 			if (breakInf > 1000) break; //오류추가
 			else breakInf++;
 		}
-		playerOrder[i] = pickNum;
-		std::cout << "pickNum : " << pickNum << std::endl;
+		std::cout << "waitingRoomUILayer::setBufTurnOrder() pickOrderNum : " << pickOrderNum << std::endl;
+		if (pickOrderNum == 0)
+		{
+			return false;
+		}
+		bufTurnOrder[i] = pickOrderNum;
+	}
 
+	return true;
+}
+
+void waitingRoomUILayer::setPlayerTurnOrder()
+{
+	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
+	{
+		playerTurnOrder[i] = netManager->getTurnOrder(i);
+	}
+}
+
+void waitingRoomUILayer::showSpriteTurnOrder()
+{
+	for (auto i = 0; i < playerList.size(); i++)
+	{
 		//setting order number
 		auto orderNum = Sprite::createWithSpriteFrameName("spr_number.png");
-		orderNum->setTextureRect(sprManager->getNumSprRect(pickNum));
+		orderNum->setTextureRect(sprManager->getNumSprRect(playerTurnOrder[i]));
 		orderNum->setScale(0.6f);
 		orderNum->setAnchorPoint(Vec2::ZERO);
 		auto posX = playerList.at(i)->getPositionX();
@@ -337,9 +461,6 @@ void waitingRoomUILayer::setIpAddrSpr()
 
 void waitingRoomUILayer::copy2Clipboard()
 {
-
-	cocos2d::Director::getInstance()->getEventDispatcher()->dispatchCustomEvent("UILayerInitIpAddr");
-
 	int targetStrLen = hostAddr.size() + 1; //include '\0'
 	const char* bufStr = hostAddr.c_str();
 
@@ -378,7 +499,7 @@ void waitingRoomUILayer::setCpuSpr()
 
 void waitingRoomUILayer::runGameScene()
 {
-	auto startGameScene = TransitionCrossFade::create(0.3f, gameRoomScene::createScene(curGameMode, playerOrder));
+	auto startGameScene = TransitionCrossFade::create(0.3f, gameRoomScene::createScene(curGameMode, playerTurnOrder));
 	Director::getInstance()->replaceScene(startGameScene);
 }
 

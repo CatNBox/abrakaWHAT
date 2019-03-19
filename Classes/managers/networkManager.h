@@ -4,21 +4,18 @@
 #include "managers\singleton.h"
 #include "managers\networkClass\protocol.h"
 #include "managers\networkClass\stream.h"
+#include "managers/networkClass/netPlayer.h"
+#include <array>
 #include "cocos2d.h"
 
 class guestClient;
 class hostServer;
 
-namespace gameMetaData
-{
-	enum class gameMode;
-}
-
 class networkManager final : public singleton<networkManager>
 {
 public:
-	void init();
-	void start(gameMetaData::gameMode modeFlag);
+	void init(gameMetaData::gameMode modeFlag);
+	void start();
 	void close();
 	bool checkTurnOn();
 
@@ -27,22 +24,45 @@ public:
 	void clientConnectSuccess();
 	void runServer();
 
-	std::string getMyAddr();
+	std::string getServerAddr();
 
 	void updatePlayerCnt(const int playerCnt);
-	int getPlayerCnt();
 
-	bool getClientConnectionState();
+	//cocos2d node request function
+	int getPlayerCnt();
+	int getNPCCnt();
+	gameMetaData::netPlayerState getMyClientConnectionState();
+	gameMetaData::netPlayerState getPlayerConnectionState(const int id);
+	bool getTurnOrderSettingState();
+	int getTurnOrder(const int id);
+	gameMetaData::gameProgressStage getNetworkProgressStage();
+	bool getPlayerGameRoomReadyState(const int playerId);
 
 	//client request function
-	void requestCurPlayerCnt();
+	void requestSettingNPC(int id);
+	void requestSettingOrder(int* playerTurnOrder);
+	void requestGameRoomStart();
+	void requestGameRoomSceneReady();
+
+	//set network data
+	void setMyClientID(int id);
+	void setCurPlayersLoginState(bool* loginStateList);
+	void setJoinedNewPlayer(int joinedPlayerId);
+	void setDisconnectPlayer(int disconnectPlayerId);
+	void setNpc(int NpcId);
+	void setTurnOrder(int* turnOrderList);
+	void setFlagReadyLoadingGameRoom();
+	void setFlagLoadingGameRooom();
+	void setGameRoomSceneReady(int readyId);
 	
 private:
 
 	void setMyServerAddr();
+	void updateCurPlayerCnt();
 
-	gameMetaData::gameMode curGameMode;
+	int myClientID;
 	int curPlayerCnt;
+	int curNPCCnt;
 
 	std::string serverAddr;
 
@@ -54,6 +74,12 @@ private:
 	boost::thread* serverThread;
 	hostServer* server;
 
+	//playerList
+	std::array<netPlayer, 4> playerList;
+	std::array<int, 4> playerTurnOrder;
+
 	//flags
-	bool clientConnectionState;
+	gameMetaData::gameMode curGameMode;
+	gameMetaData::gameProgressStage curProgressStage;
+	bool turnOrderSettingState;
 };

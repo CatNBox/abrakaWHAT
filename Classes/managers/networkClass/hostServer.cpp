@@ -10,6 +10,7 @@ hostServer::hostServer(boost::asio::io_service& ioServ)
 	initSessionPool(netProtocol::maxSessionCnt);
 	serverIo = &ioServ;
 	serverAcceptingState = true;
+	gameStartedState = false;
 }
 
 hostServer::~hostServer()
@@ -44,14 +45,34 @@ void hostServer::start()
 void hostServer::closeSession(const int sessionID)
 {
 	vecSessionPool.at(sessionID)->getSocket().close();
-	queSessionId.push(sessionID);
-
-	if (serverAcceptingState == false)
+	
+	if (gameStartedState == false)
 	{
-		acceptor.open(boost::asio::ip::tcp::v4());
-		acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
-		acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), netProtocol::port));
-		startAccept();
+		queSessionId.push(sessionID);
+		noticePlayerOut(sessionID);
+
+		if (serverAcceptingState == false)
+		{
+			acceptor.open(boost::asio::ip::tcp::v4());
+			acceptor.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
+			acceptor.bind(boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), netProtocol::port));
+			acceptor.listen();
+			startAccept();
+		}
+	}
+	else
+	{
+		netProtocol::PKT_NOTICE_NPC sendPkt;
+		sendPkt.init();
+		sendPkt.npcId = sessionID;
+
+		for (auto i : vecSessionPool)
+		{
+			if (i->getSocket().is_open())
+			{
+				i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+			}
+		}
 	}
 }
 
@@ -62,21 +83,52 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 
 	switch (pHeader->pktId)
 	{
-	case netProtocol::pktIdentt::REQ_CNT : //login packet
+	case netProtocol::pktIdentt::REQ_NPC: //set npc session
 		{
-			netProtocol::PKT_REQ_CNT* pPacket = (netProtocol::PKT_REQ_CNT*)&pData;
-			//set user info
-			std::cout << "$$ LOG IN session : " << sessionId << std::endl;
+			netProtocol::PKT_REQ_NPC* pPacket = (netProtocol::PKT_REQ_NPC*)&pData;
 
-			//response playerCnt message
-			netProtocol::PKT_RES_CNT sendPkt;
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_NPC" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet npcSessionID : " << pPacket->npcSessionID << std::endl
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "---------------------" << std::endl;
+
+			auto npcSessionID = pPacket->npcSessionID;
+
+			for (int i = 0; i < queSessionId.size(); i++)
+			{
+				auto frontSessionID = queSessionId.front();
+				if (frontSessionID == npcSessionID)
+				{
+					
+					if (vecSessionPool.at(frontSessionID)->getSocket().is_open())
+					{
+						vecSessionPool.at(frontSessionID)->getSocket().close();
+					}
+					
+					queSessionId.pop();
+					if (queSessionId.empty())
+					{
+						acceptor.cancel();
+						acceptor.close();
+						serverAcceptingState = false;
+					}
+					break;
+				}
+				else
+				{
+					queSessionId.pop();
+					queSessionId.push(frontSessionID);
+				}
+			}
+			//add error handleing when not exist sessionID in queue equal to npcSessionID
+
+			//notify all session about setting npc
+			netProtocol::PKT_NOTICE_NPC sendPkt;
 			sendPkt.init();
-			int tempCnt = gameMetaData::defaultPlayerCnt - queSessionId.size();
-			if (tempCnt < 0) tempCnt = 0;
-			sendPkt.playerCnt = tempCnt;
-			std::cout << "$$ playerCnt : " << sendPkt.playerCnt << std::endl;
-			std::cout << "$$ defaultPlayerCnt : " << gameMetaData::defaultPlayerCnt << std::endl;
-			std::cout << "$$ queSessionId : " << queSessionId.size() << std::endl;
+			sendPkt.npcId = npcSessionID;
 
 			for (auto i : vecSessionPool)
 			{
@@ -85,6 +137,81 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 				}
 			}
+		}
+		break;
+	case netProtocol::pktIdentt::REQ_ORDER: //start gameRoom packet
+		{
+			//notify turnOrder to all session 
+			netProtocol::PKT_REQ_ORDER* pPacket = (netProtocol::PKT_REQ_ORDER*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_ORDER" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl;
+			for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+			{
+				std::cout << "packet turnOrder[" << i << "] : " << pPacket->turnOrderList[i] << std::endl;
+			}
+			std::cout
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "---------------------" << std::endl;
+
+			gameStartedState = true;
+
+			netProtocol::PKT_NOTICE_ORDER sendPkt;
+			sendPkt.init();
+			memcpy(sendPkt.turnOrderList, pPacket->turnOrderList, sizeof(int)*netProtocol::maxSessionCnt);
+
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
+		}
+		break;
+	case netProtocol::pktIdentt::REQ_START: //start gameRoom packet
+		{
+			//notify all session game is start
+			netProtocol::PKT_REQ_START* pPacket = (netProtocol::PKT_REQ_START*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_START" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "---------------------" << std::endl;
+
+			netProtocol::PKT_NOTICE_START sendPkt;
+			sendPkt.init();
+			
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
+		}
+		break;
+	case netProtocol::pktIdentt::REQ_READY: //start gameRoom packet
+		{
+			//notify all session game is start
+			netProtocol::PKT_REQ_READY* pPacket = (netProtocol::PKT_REQ_READY*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_READY" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "---------------------" << std::endl;
+
+			netProtocol::PKT_NOTICE_READY sendPkt;
+			sendPkt.init();
+			sendPkt.readyId = sessionId;
+
+			vecSessionPool[0]->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 		}
 		break;
 	default:
@@ -118,6 +245,35 @@ void hostServer::handleAccept(session* pSession, const boost::system::error_code
 		pSession->init();
 		pSession->startReceive();
 
+		//----------
+		netProtocol::PKT_RES_IN resPkt;
+		resPkt.init();
+		resPkt.mySessionID = pSession->getSessionId();
+
+		netProtocol::PKT_NOTICE_IN noticePkt;
+		noticePkt.init();
+		noticePkt.joinedUserId = pSession->getSessionId();
+
+		for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+		{
+			auto tempSession = vecSessionPool[i];
+			if (tempSession->getSocket().is_open())
+			{
+				resPkt.userStateList[i] = true;
+				if (tempSession != pSession)
+				{
+					tempSession->startSend(false, noticePkt.pktSize, (char&)noticePkt);
+				}
+			}
+			else
+			{
+				resPkt.userStateList[i] = false;
+			}
+		}
+
+		pSession->startSend(false, resPkt.pktSize, (char&)resPkt);
+		//----------
+
 		postAcceptSuccess();
 	}
 	else
@@ -143,3 +299,37 @@ bool hostServer::postAcceptSuccess()
 
 	return true;
 }
+
+void hostServer::noticePlayerOut(const int sessionID)
+{
+	netProtocol::PKT_NOTICE_OUT sendPkt;
+	sendPkt.init();
+	sendPkt.disconnectUserId = sessionID;
+
+	for (auto i : vecSessionPool)
+	{
+		if (i->getSocket().is_open())
+		{
+			i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+		}
+	}
+}
+
+/*
+void hostServer::noticePlayerCnt()
+{
+	netProtocol::PKT_RES_CNT sendPkt;
+	sendPkt.init();
+	int tempCnt = gameMetaData::defaultPlayerCnt - queSessionId.size();
+	if (tempCnt < 0) tempCnt = 0;
+	sendPkt.playerCnt = tempCnt;
+
+	for (auto i : vecSessionPool)
+	{
+		if (i->getSocket().is_open())
+		{
+			i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+		}
+	}
+}
+*/

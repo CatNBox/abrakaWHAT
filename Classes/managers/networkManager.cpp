@@ -7,21 +7,28 @@
 #include "managers/networkClass/guestClient.h"
 #include "managers/networkClass/hostServer.h"
 
-void networkManager::init()
+void networkManager::init(gameMetaData::gameMode modeFlag)
 {
+	curGameMode = modeFlag;
+	curProgressStage = gameMetaData::gameProgressStage::waiting;
+	curPlayerCnt = 0;
+	curNPCCnt = 0;
+	turnOrderSettingState = false;
 	this->clientIo = nullptr;
 	this->clientThread = nullptr;
 	this->myClient = nullptr;
 	this->serverIo = nullptr;
 	this->serverThread = nullptr;
 	this->server = nullptr;
-	this->clientConnectionState = false;
+	this->myClientID = -1;
+	for (auto i : playerList)
+	{
+		i.init();
+	}
 }
 
-void networkManager::start(gameMetaData::gameMode modeFlag)
+void networkManager::start()
 {
-	curGameMode = modeFlag;
-	curPlayerCnt = 0;
 
 	if (curGameMode == gameMetaData::gameMode::single)
 	{
@@ -119,7 +126,8 @@ void networkManager::runClient(const std::string hostAddr)
 
 	serverAddr = hostAddr;
 	
-	clientIo = new boost::asio::io_service;
+	auto tempIo = new boost::asio::io_service;
+	clientIo = tempIo;
 	myClient = new guestClient(*clientIo);
 	myClient->connect(endPoint);
 
@@ -141,17 +149,7 @@ void networkManager::clientConnectFail()
 
 void networkManager::clientConnectSuccess()
 {
-	//호스트면 바로 playerCnt를 요청
-	//게스트면 layer변경이벤트를 먼저 호출한 후 playerCnt를 요청
-	if (curGameMode == gameMetaData::gameMode::host)
-	{
-		//requestCurPlayerCnt();
-	}
-	else if (curGameMode == gameMetaData::gameMode::guest)
-	{
-		clientConnectionState = true;
-		//requestCurPlayerCnt();
-	}
+	playerList[myClientID].connectSuccess();
 }
 
 void networkManager::runServer()
@@ -164,7 +162,7 @@ void networkManager::runServer()
 	serverThread = new boost::thread(boost::bind(&boost::asio::io_service::run, serverIo));
 }
 
-std::string networkManager::getMyAddr()
+std::string networkManager::getServerAddr()
 {
 	return serverAddr;
 }
@@ -179,17 +177,144 @@ int networkManager::getPlayerCnt()
 	return curPlayerCnt;
 }
 
-bool networkManager::getClientConnectionState()
+int networkManager::getNPCCnt()
 {
-	return clientConnectionState;
+	return curNPCCnt;
 }
 
-void networkManager::requestCurPlayerCnt()
+gameMetaData::netPlayerState networkManager::getMyClientConnectionState()
 {
-	netProtocol::PKT_REQ_CNT sendPkt;
+	if (myClientID >= 0 && myClientID < playerList.size())
+	{
+		return playerList[myClientID].getConnectionState();
+	}
+
+	return gameMetaData::netPlayerState::unknown;
+}
+
+gameMetaData::netPlayerState networkManager::getPlayerConnectionState(const int id)
+{
+	return playerList[id].getConnectionState();
+}
+
+bool networkManager::getTurnOrderSettingState()
+{
+	return turnOrderSettingState;
+}
+
+int networkManager::getTurnOrder(const int id)
+{
+	return playerTurnOrder[id];
+}
+
+gameMetaData::gameProgressStage networkManager::getNetworkProgressStage()
+{
+	return curProgressStage;
+}
+
+bool networkManager::getPlayerGameRoomReadyState(const int playerId)
+{
+	return playerList[playerId].getGameRoomReadyState();
+}
+
+void networkManager::requestSettingNPC(int id)
+{
+	//send req_npc to all players
+	netProtocol::PKT_REQ_NPC sendPkt;
+	sendPkt.init();
+	sendPkt.npcSessionID = id;
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::requestSettingOrder(int * playerTurnOrder)
+{
+	//send req_order to server for echo all players
+	netProtocol::PKT_REQ_ORDER sendPkt;
+	sendPkt.init();
+	memcpy(sendPkt.turnOrderList, playerTurnOrder, sizeof(int)*netProtocol::maxSessionCnt);
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::requestGameRoomStart()
+{
+	netProtocol::PKT_REQ_START sendPkt;
 	sendPkt.init();
 
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::requestGameRoomSceneReady()
+{
+	netProtocol::PKT_REQ_READY sendPkt;
+	sendPkt.init();
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::setMyClientID(int id)
+{
+	this->myClientID = id;
+}
+
+void networkManager::setCurPlayersLoginState(bool* loginStateList)
+{
+	for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+	{
+		if (loginStateList[i])
+		{
+			playerList[i].connectSuccess();
+		}
+		else
+		{
+			playerList[i].disconnect();
+		}
+	}
+	updateCurPlayerCnt();
+}
+
+void networkManager::setJoinedNewPlayer(int joinedPlayerId)
+{
+	playerList[joinedPlayerId].connectSuccess();
+	updateCurPlayerCnt();
+}
+
+void networkManager::setDisconnectPlayer(int disconnectPlayerId)
+{
+	playerList[disconnectPlayerId].disconnect();
+	updateCurPlayerCnt();
+}
+
+void networkManager::setNpc(int NpcId)
+{
+	playerList[NpcId].setNpcState(this->curGameMode);
+	updateCurPlayerCnt();
+}
+
+void networkManager::setTurnOrder(int * turnOrderList)
+{
+	for (int i = 0; i < netProtocol::maxSessionCnt; i++)
+	{
+		playerTurnOrder[i] = turnOrderList[i];
+	}
+
+	turnOrderSettingState = true;
+}
+
+void networkManager::setFlagReadyLoadingGameRoom()
+{
+	curProgressStage = gameMetaData::gameProgressStage::readyLoadingGameRoomScene;
+}
+
+void networkManager::setFlagLoadingGameRooom()
+{
+	curProgressStage = gameMetaData::gameProgressStage::loadingGameRoomScene;
+}
+
+void networkManager::setGameRoomSceneReady(int readyId)
+{
+	playerList[readyId].setGameRoomReady();
 }
 
 void networkManager::setMyServerAddr()
@@ -206,6 +331,25 @@ void networkManager::setMyServerAddr()
 			std::cout << addr.to_string() << std::endl;
 			serverAddr = addr.to_string();
 			break;
+		}
+	}
+}
+
+void networkManager::updateCurPlayerCnt()
+{
+	curPlayerCnt = 0;
+	curNPCCnt = 0;
+	for (auto i : playerList)
+	{
+		auto tempState = i.getConnectionState();
+		if (tempState == gameMetaData::netPlayerState::connected)
+		{
+			curPlayerCnt++;
+		}
+		else if (tempState == gameMetaData::netPlayerState::guestNPC
+			|| tempState == gameMetaData::netPlayerState::hostNPC)
+		{
+			curNPCCnt++;
 		}
 	}
 }

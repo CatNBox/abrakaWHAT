@@ -21,6 +21,7 @@ private:
 	void displayIpAddrFromClip();
 	void updateIpAddrDisplay();
 	void convertIpAddrFormat();
+	bool checkIpAddrSuitability();
 	void join2IPAddr();
 
 	void callWrongIpPopup();

@@ -22,6 +22,11 @@ private:
 	bool postAcceptSuccess();
 
 	bool serverAcceptingState;
+	bool gameStartedState;
+
+	//notice send
+	//void noticePlayerCnt();
+	void noticePlayerOut(const int sessionID);
 
 	//used "new" in initSessionPool. must release memory when close server.
 	std::vector<session*> vecSessionPool;

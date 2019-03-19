@@ -1,7 +1,7 @@
 #include "mainMenuScene\mainMenuObjLayer.h"
 #include "gameObject\gameMetaData.h"
 #include "waitingRoomScene\waitingRoomScene.h"
-
+#include "managers/networkManager.h"
 
 using namespace cocos2d;
 
@@ -80,13 +80,22 @@ void mainMenuObjLayer::exitBtnCallback()
 
 void mainMenuObjLayer::hostGameBtnCallback()
 {
-	auto hostModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(gameMetaData::gameMode::host));
+	//init networkManager
+	auto curGameMode = gameMetaData::gameMode::host;
+	networkManager::getInstance()->init(curGameMode);
+	networkManager::getInstance()->start();
+
+	auto hostModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(curGameMode));
 	Director::getInstance()->replaceScene(hostModeScene);
 }
 
 void mainMenuObjLayer::joinGameBtnCallback()
 {
-	auto joinModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(gameMetaData::gameMode::guest));
+	//init networkManager
+	auto curGameMode = gameMetaData::gameMode::guest;
+	networkManager::getInstance()->init(curGameMode);
+
+	auto joinModeScene = TransitionCrossFade::create(0.3f, waitingRoomScene::createScene(curGameMode));
 	Director::getInstance()->replaceScene(joinModeScene);
 }
 

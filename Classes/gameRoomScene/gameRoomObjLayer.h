@@ -11,10 +11,10 @@ class actionManager;
 class gameRoomObjLayer : public cocos2d::Layer
 {
 public:
-	virtual bool init(gameMetaData::gameMode modeFlag, int playerOrder[]);
+	virtual bool init(gameMetaData::gameMode modeFlag, int playerTurnOrder[]);
 	//CREATE_FUNC(gameRoomObjLayer);
 
-	static gameRoomObjLayer* createWithParam(gameMetaData::gameMode modeFlag, int playerOrder[]);
+	static gameRoomObjLayer* createWithParam(gameMetaData::gameMode modeFlag, int playerTurnOrder[]);
 
 	void initRound();
 
@@ -22,7 +22,7 @@ private:
 	void delay01secCallWrapper(void (gameRoomObjLayer::*targetFunc)(void));
 	void settingEventListener();
 	void settingCntValues();
-	void createPlayers(int playerOrder[]);
+	void createPlayers(int playerTurnOrder[]);
 	void createMagicStones();
 	void createSeenChecker();
 	void createPlayerLpObj();

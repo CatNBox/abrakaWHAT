@@ -126,6 +126,9 @@
     <ClCompile Include="..\Classes\managers\networkClass\session.cpp">
       <Filter>src\01_managers\networkClass</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\managers\networkClass\netPlayer.cpp">
+      <Filter>src\01_managers\networkClass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -222,6 +225,9 @@
       <Filter>src\01_managers\networkClass</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\managers\networkClass\session.h">
+      <Filter>src\01_managers\networkClass</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\managers\networkClass\netPlayer.h">
       <Filter>src\01_managers\networkClass</Filter>
     </ClInclude>
   </ItemGroup>

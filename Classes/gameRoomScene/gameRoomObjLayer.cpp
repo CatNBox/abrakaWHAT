@@ -7,7 +7,7 @@
 
 using namespace cocos2d;
 
-bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerOrder[])
+bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder[])
 {
 	if (!Layer::init())
 	{
@@ -15,7 +15,7 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerOrder[])
 	}
 
 	curGameMode = modeFlag;
-	myPlayerNum = playerOrder[0] - 1;
+	myPlayerNum = playerTurnOrder[0] - 1;
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
@@ -31,7 +31,7 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerOrder[])
 	createScoreSpr();
 
 	//create players
-	createPlayers(playerOrder);
+	createPlayers(playerTurnOrder);
 
 	//create magicStones
 	createMagicStones();
@@ -99,7 +99,7 @@ void gameRoomObjLayer::settingCntValues()
 	arrStones.resize(stoneMaxCnt);
 }
 
-void gameRoomObjLayer::createPlayers(int playerOrder[])
+void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
 {
 	//현재 내 플레이어 번호를 기준으로 할 것 - 차후 멀티모드 수정
 	bool bPlayer = true;
@@ -307,10 +307,10 @@ void gameRoomObjLayer::startGameByNpc()
 	}
 }
 
-gameRoomObjLayer * gameRoomObjLayer::createWithParam(gameMetaData::gameMode modeFlag, int playerOrder[])
+gameRoomObjLayer * gameRoomObjLayer::createWithParam(gameMetaData::gameMode modeFlag, int playerTurnOrder[])
 {
 	gameRoomObjLayer *pRet = new(std::nothrow) gameRoomObjLayer();
-	if (pRet && pRet->init(modeFlag, playerOrder))
+	if (pRet && pRet->init(modeFlag, playerTurnOrder))
 	{
 		pRet->autorelease();
 		return pRet;

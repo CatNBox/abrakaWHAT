@@ -86,12 +86,15 @@ void session::handleReceive(const boost::system::error_code & errCode, size_t by
 		if (errCode.value() == boost::asio::error::eof)
 		{
 			//disconnect
-			std::cout << "Disconnect client id : " << sessionId << std::endl; //log will be write txtfile
+			std::cout << "Disconnect eof client id : " << sessionId << std::endl; //log will be write txtfile
+
+			//call session return
+			pServer->closeSession(sessionId);
 		}
 		else if (errCode.value() == boost::asio::error::connection_reset)
 		{
 			//disconnect
-			std::cout << "Disconnect client id : " << sessionId << std::endl; //log will be write txtfile
+			std::cout << "Disconnect 10054 client id : " << sessionId << std::endl; //log will be write txtfile
 
 			//call session return
 			pServer->closeSession(sessionId);

@@ -6,12 +6,12 @@
 #include "commonUILayer\commonUILayer.h"
 #include "gameObject\gameMetaData.h"
 
-cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int playerOrder[])
+cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int playerTurnOrder[])
 {
 	auto scene = gameRoomScene::create();
 
 	auto layerBG = gameRoomBGLayer::create();
-	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerOrder);
+	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerTurnOrder);
 	auto layerUI = gameRoomUILayer::create();
 	auto layerPopup = popupLayer::create();
 	auto layerCommonUI = commonUILayer::create();

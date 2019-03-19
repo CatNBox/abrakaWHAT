@@ -6,6 +6,7 @@
 #include "gameObject\gameMetaData.h"
 #include "commonUILayer\commonUILayer.h"
 #include "managers/networkManager.h"
+#include <iostream>
 
 cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 {
@@ -13,17 +14,14 @@ cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 	
 	auto layerBG = waitingRoomBGLayer::create();
 	auto layerObj = waitingRoomUILayer::createWithParam(modeFlag);
-	auto layerJoin = waitingRoomJoinLayer::createWithParam(modeFlag);
 	auto layerPopup = popupLayer::create();
 	auto layerCommonUI = commonUILayer::create();
-
-	//init networkManager
-	networkManager::getInstance()->init();
 
 	scene->addChild(layerBG, gameMetaData::layerZOrder::backGroundZ);
 	scene->addChild(layerObj, gameMetaData::layerZOrder::objZ0);
 	if (modeFlag == gameMetaData::gameMode::guest)
 	{
+		auto layerJoin = waitingRoomJoinLayer::createWithParam(modeFlag);
 		layerObj->setVisible(false);
 		scene->addChild(layerJoin, gameMetaData::layerZOrder::objZ1);
 	}

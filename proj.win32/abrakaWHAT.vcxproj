@@ -165,6 +165,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\managers\gameFlowManager.cpp" />
     <ClCompile Include="..\Classes\managers\networkClass\guestClient.cpp" />
     <ClCompile Include="..\Classes\managers\networkClass\hostServer.cpp" />
+    <ClCompile Include="..\Classes\managers\networkClass\netPlayer.cpp" />
     <ClCompile Include="..\Classes\managers\networkClass\session.cpp" />
     <ClCompile Include="..\Classes\managers\networkClass\stream.cpp" />
     <ClCompile Include="..\Classes\managers\networkManager.cpp" />
@@ -197,6 +198,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\managers\gameFlowManager.h" />
     <ClInclude Include="..\Classes\managers\networkClass\guestClient.h" />
     <ClInclude Include="..\Classes\managers\networkClass\hostServer.h" />
+    <ClInclude Include="..\Classes\managers\networkClass\netPlayer.h" />
     <ClInclude Include="..\Classes\managers\networkClass\protocol.h" />
     <ClInclude Include="..\Classes\managers\networkClass\session.h" />
     <ClInclude Include="..\Classes\managers\networkClass\stream.h" />

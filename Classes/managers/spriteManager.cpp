@@ -105,4 +105,7 @@ void spriteManager::preLoadingSprites()
 	
 	tempSpr->initWithFile("UISprite/sprError.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprError.png");
+
+	tempSpr->initWithFile("UISprite/sprNPC.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprNPC.png");
 }

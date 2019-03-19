@@ -24,7 +24,9 @@ private:
 	void addPlayerLabel();
 
 	void startGameCallback();
-	void orderingCallback();
+	bool setBufTurnOrder();
+	void setPlayerTurnOrder();
+	void showSpriteTurnOrder();
 
 	void initIpAddrSpr();
 	void errorWrongIpFormat();
@@ -44,9 +46,11 @@ private:
 	cocos2d::Sprite* ipAddrSpr[12];
 
 	int playerCnt;
+	int NPCCnt;
 	cocos2d::Menu* btnMenu;
 	std::vector<cocos2d::Sprite*> playerList;
-	int playerOrder[gameMetaData::defaultPlayerCnt];
+	int playerTurnOrder[gameMetaData::defaultPlayerCnt];
+	int bufTurnOrder[gameMetaData::defaultPlayerCnt];
 
 	cocos2d::EventListenerCustom* eventListener;
 };

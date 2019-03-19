@@ -256,6 +256,14 @@ namespace gameMetaData
 		unknown
 	};
 
+	enum class gameProgressStage
+	{
+		waiting,
+		readyLoadingGameRoomScene,
+		loadingGameRoomScene,
+		gameRoomReady
+	};
+
 	enum class npcState
 	{
 		npcWait,
@@ -267,5 +275,14 @@ namespace gameMetaData
 	{
 		serverOn,
 		serverFail
+	};
+
+	enum class netPlayerState
+	{
+		unknown,
+		connected,
+		disconnected,
+		guestNPC,
+		hostNPC
 	};
 }
