@@ -13,17 +13,26 @@ bool waitingRoomUILayer::init(gameMetaData::gameMode modeFlag)
 	{
 		return false;
 	}
-	hostAddr = "000.000.000.000";
 	curGameMode = modeFlag;
+	hostAddr = "000.000.000.000";
 	playerTurnOrder[0] = 0;
 	playerCnt = 0;
 	NPCCnt = 0;
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
 	netManager = networkManager::getInstance();
+
+	if (curGameMode == gameMetaData::gameMode::single)
+	{
+		curProgressStage = gameMetaData::gameProgressStage::waiting;
+	}
+	else
+	{
+		curProgressStage = netManager->getNetworkProgressStage();
+	}
 		
 	settingEventListener();
-	initUI(modeFlag);
+	initUI();
 
 	this->scheduleUpdate();
 
@@ -48,37 +57,54 @@ waitingRoomUILayer * waitingRoomUILayer::createWithParam(gameMetaData::gameMode 
 
 void waitingRoomUILayer::update(float dTime)
 {
-	//check server state
-	//get connected playerCnt
-	auto netPlayerCnt = netManager->getPlayerCnt();
-	auto netNPCCnt = netManager->getNPCCnt();
-	if (playerCnt != netPlayerCnt
-		|| NPCCnt != netNPCCnt)
+	if (curGameMode == gameMetaData::gameMode::single)
 	{
-		playerCnt = netPlayerCnt;
-		NPCCnt = netNPCCnt;
-		updatePlayerLabel();
+
 	}
-
-	//setting turnOrder
-	if (playerTurnOrder[0] == 0)
+	else
 	{
-		if (netManager->getTurnOrderSettingState())
+		//check server state
+		//get connected playerCnt
+		auto netPlayerCnt = netManager->getPlayerCnt();
+		auto netNPCCnt = netManager->getNPCCnt();
+		if (playerCnt != netPlayerCnt
+			|| NPCCnt != netNPCCnt)
 		{
-			setPlayerTurnOrder();
-			showSpriteTurnOrder();
+			playerCnt = netPlayerCnt;
+			NPCCnt = netNPCCnt;
+			updatePlayerLabel();
+		}
 
-			if (curGameMode == gameMetaData::gameMode::host)
+		//setting turnOrder
+		if (playerTurnOrder[0] == 0)
+		{
+			if (netManager->getTurnOrderSettingState())
 			{
-				netManager->requestGameRoomStart();
+				setPlayerTurnOrder();
+				showSpriteTurnOrder();
+
+				if (curGameMode == gameMetaData::gameMode::host)
+				{
+					netManager->requestGameRoomStart();
+				}
 			}
 		}
+
+		curProgressStage = netManager->getNetworkProgressStage();
 	}
 
-	if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::readyLoadingGameRoomScene)
+	//gameRoomScene loading if ready for loading gameRoom
+	if (curProgressStage == gameMetaData::gameProgressStage::readyLoadingGameRoomScene)
 	{
-		//change scene and count down
-		netManager->setFlagLoadingGameRooom();
+		if (curGameMode == gameMetaData::gameMode::single)
+		{
+			curProgressStage = gameMetaData::gameProgressStage::loadingGameRoomScene;
+			showSpriteTurnOrder();
+		}
+		else
+		{
+			netManager->setFlagLoadingGameRooom();
+		}
 
 		auto sprCntdwnNum = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
 		auto tempSprRect = sprManager->getNumSprRect(4);
@@ -135,14 +161,14 @@ void waitingRoomUILayer::settingEventListener()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(eventListener, this);
 }
 
-void waitingRoomUILayer::initUI(gameMetaData::gameMode modeFlag)
+void waitingRoomUILayer::initUI()
 {
 	//menu create
 	btnMenu = Menu::create();
 	this->addChild(btnMenu);
 
 	// gameStart btn
-	if (modeFlag == gameMetaData::gameMode::host)
+	if (curGameMode != gameMetaData::gameMode::guest)
 	{
 		auto btnStart = MenuItemImage::create(
 			"UISprite/btnStartNormal.png",
@@ -158,29 +184,6 @@ void waitingRoomUILayer::initUI(gameMetaData::gameMode modeFlag)
 
 		btnMenu->addChild(btnStart);
 	}
-
-	// copy to clipboard btn
-	auto tempNormalC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
-	tempNormalC2CSpr->setColor(Color3B(225, 225, 225));
-	auto tempClickedC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
-	tempClickedC2CSpr->setColor(Color3B(125, 125, 125));
-	auto tempDisabledC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
-	tempDisabledC2CSpr->setColor(Color3B(95, 95, 95));
-	auto btnCopyToClipboard = MenuItemImage::create();
-	btnCopyToClipboard->initWithNormalSprite(
-		tempNormalC2CSpr,
-		tempClickedC2CSpr,
-		tempDisabledC2CSpr,
-		CC_CALLBACK_0(
-			waitingRoomUILayer::copy2Clipboard,
-			this
-		)
-	);
-	btnCopyToClipboard->setScale(0.4f);
-	btnCopyToClipboard->setAnchorPoint(Vec2::ZERO);
-	btnCopyToClipboard->setPosition(Vec2(80, 200));
-
-	btnMenu->addChild(btnCopyToClipboard);
 
 	//init playerLabel visible false
 	playerList.resize(gameMetaData::defaultPlayerCnt);
@@ -205,9 +208,36 @@ void waitingRoomUILayer::initUI(gameMetaData::gameMode modeFlag)
 		this->addChild(i, gameMetaData::layerZOrder::objZ0);
 	}
 
+	if (curGameMode != gameMetaData::gameMode::single)
+	{
+		// copy to clipboard btn
+		auto tempNormalC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+		tempNormalC2CSpr->setColor(Color3B(225, 225, 225));
+		auto tempClickedC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+		tempClickedC2CSpr->setColor(Color3B(125, 125, 125));
+		auto tempDisabledC2CSpr = Sprite::createWithSpriteFrameName("btnCopyToClip.png");
+		tempDisabledC2CSpr->setColor(Color3B(95, 95, 95));
+		auto btnCopyToClipboard = MenuItemImage::create();
+		btnCopyToClipboard->initWithNormalSprite(
+			tempNormalC2CSpr,
+			tempClickedC2CSpr,
+			tempDisabledC2CSpr,
+			CC_CALLBACK_0(
+				waitingRoomUILayer::copy2Clipboard,
+				this
+			)
+		);
+		btnCopyToClipboard->setScale(0.4f);
+		btnCopyToClipboard->setAnchorPoint(Vec2::ZERO);
+		btnCopyToClipboard->setPosition(Vec2(80, 200));
+
+		btnMenu->addChild(btnCopyToClipboard);
+
+		initIpAddrSpr();
+		updateIpAddr();
+	}
+
 	updatePlayerLabel();
-	initIpAddrSpr();
-	updateIpAddr();
 }
 
 void waitingRoomUILayer::updateIpAddr()
@@ -220,30 +250,50 @@ void waitingRoomUILayer::updatePlayerLabel()
 {
 	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
 	{
-		auto tempPlayersState = netManager->getPlayerConnectionState(i);
-		if (tempPlayersState == gameMetaData::netPlayerState::disconnected)
+		if (curGameMode == gameMetaData::gameMode::single)
 		{
-			playerList[i]->setVisible(false);
-		}
-		else if (tempPlayersState == gameMetaData::netPlayerState::connected)
-		{
-			/*
-				add code setting player texture
-			*/
-			playerList[i]->initWithSpriteFrameName("sprPlayer.png");
-			playerList[i]->setScale(0.7f);
-			playerList[i]->setAnchorPoint(Vec2::ZERO);
-			playerList[i]->setVisible(true);
+			if (i == 0)
+			{
+				playerList[i]->initWithSpriteFrameName("sprPlayer.png");
+				playerList[i]->setScale(0.7f);
+				playerList[i]->setAnchorPoint(Vec2::ZERO);
+				playerList[i]->setVisible(true);
+			}
+			else
+			{
+				playerList[i]->initWithSpriteFrameName("sprNPC.png");
+				playerList[i]->setScale(0.7f);
+				playerList[i]->setAnchorPoint(Vec2::ZERO);
+				playerList[i]->setVisible(true);
+			}
 		}
 		else
 		{
-			/*
-				add code setting NPC texture
-			*/
-			playerList[i]->initWithSpriteFrameName("sprNPC.png");
-			playerList[i]->setScale(0.7f);
-			playerList[i]->setAnchorPoint(Vec2::ZERO);
-			playerList[i]->setVisible(true);
+			auto tempPlayersState = netManager->getPlayerConnectionState(i);
+			if (tempPlayersState == gameMetaData::netPlayerState::disconnected)
+			{
+				playerList[i]->setVisible(false);
+			}
+			else if (tempPlayersState == gameMetaData::netPlayerState::connected)
+			{
+				/*
+					add code setting player texture
+				*/
+				playerList[i]->initWithSpriteFrameName("sprPlayer.png");
+				playerList[i]->setScale(0.7f);
+				playerList[i]->setAnchorPoint(Vec2::ZERO);
+				playerList[i]->setVisible(true);
+			}
+			else
+			{
+				/*
+					add code setting NPC texture
+				*/
+				playerList[i]->initWithSpriteFrameName("sprNPC.png");
+				playerList[i]->setScale(0.7f);
+				playerList[i]->setAnchorPoint(Vec2::ZERO);
+				playerList[i]->setVisible(true);
+			}
 		}
 	}
 }
@@ -270,33 +320,42 @@ void waitingRoomUILayer::startGameCallback()
 	4. waitingRoomScene 천천히 페이드아웃 후 gameRoomScene으로 변경
 	*/
 
-	/*
-	on multiMode, popup ask adding CPU when not enough player 
-	*/
-	//not joined player slot check
-	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
+	if (curGameMode == gameMetaData::gameMode::single)
 	{
-		auto curPlayerState = netManager->getPlayerConnectionState(i);
-		if (curPlayerState == gameMetaData::netPlayerState::disconnected)
+
+	}
+	else
+	{
+		/*
+		on multiMode, popup ask adding CPU when not enough player
+		*/
+		//not joined player slot check
+		for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
 		{
-			netManager->requestSettingNPC(i);
+			auto curPlayerState = netManager->getPlayerConnectionState(i);
+			if (curPlayerState == gameMetaData::netPlayerState::disconnected)
+			{
+				netManager->requestSettingNPC(i);
+			}
 		}
 	}
 
 	setBtnDisabled();
 	if (setBufTurnOrder())
 	{
-		netManager->requestSettingOrder(bufTurnOrder);
-
-		/*
-		this->schedule([=](float d) {
-			this->runGameScene();
-		}, 0.0f, 0, 2.0f, "startGameScene");
-		*/
+		if (curGameMode == gameMetaData::gameMode::single)
+		{
+			curProgressStage = gameMetaData::gameProgressStage::readyLoadingGameRoomScene;
+		}
+		else
+		{
+			netManager->requestSettingOrder(bufTurnOrder);
+		}
 	}
 	else
 	{
 		//0~3의 랜덤값 중 한번도 선택되지않은 숫자가 있는 오류
+		assert(true && !"startGameCallback()에서 turnOrder가 제대로 설정되지않음");
 	}
 }
 
@@ -326,6 +385,10 @@ bool waitingRoomUILayer::setBufTurnOrder()
 			return false;
 		}
 		bufTurnOrder[i] = pickOrderNum;
+		if (curGameMode == gameMetaData::gameMode::single)
+		{
+			playerTurnOrder[i] = pickOrderNum;
+		}
 	}
 
 	return true;

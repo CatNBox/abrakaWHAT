@@ -7,6 +7,7 @@ class magicStone;
 class player;
 class spriteManager;
 class actionManager;
+class networkManager;
 
 class gameRoomObjLayer : public cocos2d::Layer
 {
@@ -27,6 +28,8 @@ private:
 	void createSeenChecker();
 	void createPlayerLpObj();
 	void createScoreSpr();
+
+	void update(float dTime);
 
 	void startGameByNpc();
 
@@ -52,7 +55,8 @@ private:
 
 	int getMsPosRevision(int msListSize, int msOrder);
 
-	gameMetaData::gameMode curGameMode = gameMetaData::gameMode::unknown;
+	gameMetaData::gameMode curGameMode;
+	gameMetaData::gameProgressStage curProgressStage;
 
 	int playerCnt = 0;
 	int secretCnt = 0;
@@ -64,7 +68,7 @@ private:
 
 	int starterNum = 0;
 	int curPlayerNum = 0;
-	int myPlayerNum = 0;
+	int myPlayOrder = 0;
 	int roundWinPlayerNum = -1;
 
 	bool isMyNumPlayer = true;
@@ -77,6 +81,7 @@ private:
 	std::array<int, 4> arrScore{ 0 };
 	spriteManager* sprManager;
 	actionManager* actManager;
+	networkManager* netManager;
 
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index

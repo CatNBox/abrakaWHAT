@@ -8,8 +8,14 @@ player::player()
 {
 }
 
-player::player(int idx)
-	:myIndex(idx)
+player::player(int playOrder)
+	:myPlayOrder(playOrder)
+{
+}
+
+player::player(int playOrder, int netIndex)
+	: myPlayOrder(playOrder),
+	myNetIndex(netIndex)
 {
 }
 
@@ -259,9 +265,14 @@ void player::setPrevPlayer(player * next)
 	prevPlayer = next;
 }
 
-int player::getIndex() const
+const int player::getPlayOrder() const
 {
-	return myIndex;
+	return myPlayOrder;
+}
+
+const int player::getNetIndex() const
+{
+	return myNetIndex;
 }
 
 int player::getDefaultX() const
@@ -304,9 +315,17 @@ npc::npc()
 {
 }
 
-npc::npc(int idx)
-	: player(idx),
+npc::npc(int playOrder)
+	: player(playOrder),
 	 state(gameMetaData::npcState::npcWait)
+{
+	arrPrevFailList.reserve(gameMetaData::variableMaxCnt::msTypeCnt);
+	initNpc();
+}
+
+npc::npc(int playOrder, int netIdx)
+	:player(playOrder, netIdx),
+	state(gameMetaData::npcState::npcWait)
 {
 	arrPrevFailList.reserve(gameMetaData::variableMaxCnt::msTypeCnt);
 	initNpc();
@@ -420,7 +439,7 @@ void npc::calcScoreMsList()
 		if (msIdx > 0)
 		{
 			elemMsScore.second = (msIdx - elemMsScore.first) * 100 / msIdx;
-			std::cout << myIndex << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
+			std::cout << myPlayOrder << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
 		}
 		msIdx++;
 	}

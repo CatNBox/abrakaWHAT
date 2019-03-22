@@ -16,7 +16,7 @@ public:
 
 private:
 	void settingEventListener();
-	void initUI(gameMetaData::gameMode modeFlag);
+	void initUI();
 
 	void updateIpAddr();
 	//void updatePlayerLabel(cocos2d::EventCustom* playerCntEvent);
@@ -51,6 +51,7 @@ private:
 	std::vector<cocos2d::Sprite*> playerList;
 	int playerTurnOrder[gameMetaData::defaultPlayerCnt];
 	int bufTurnOrder[gameMetaData::defaultPlayerCnt];
+	gameMetaData::gameProgressStage curProgressStage;
 
 	cocos2d::EventListenerCustom* eventListener;
 };

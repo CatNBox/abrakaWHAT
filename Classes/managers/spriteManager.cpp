@@ -108,4 +108,10 @@ void spriteManager::preLoadingSprites()
 
 	tempSpr->initWithFile("UISprite/sprNPC.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprNPC.png");
+
+	tempSpr->initWithFile("UISprite/sprRound.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprRound.png");
+
+	tempSpr->initWithFile("UISprite/sprRank.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprRank.png");
 }

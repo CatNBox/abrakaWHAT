@@ -11,7 +11,8 @@ class player
 {
 public:
 	player();
-	player(int idx);
+	player(int playOrder);
+	player(int playOrder, int netIndex);
 	void init();
 
 	void pushStone2List(magicStone* ms);
@@ -37,7 +38,8 @@ public:
 	void setNextPlayer(player* next);
 	player* getPrevPlayer() const;
 	void setPrevPlayer(player* next);
-	int getIndex() const;
+	const int getPlayOrder() const;
+	const int getNetIndex() const;
 
 	int getDefaultX() const;
 	void setDefaultX(int posX);
@@ -50,7 +52,8 @@ protected:
 	int defaultX = 384;
 	int defaultY = 0;
 	float rotationValue = 0;
-	int myIndex = 0;
+	int myPlayOrder = 0;
+	int myNetIndex = 0;
 
 	int roundLP = 5;
 
@@ -69,7 +72,8 @@ class npc : public player
 {
 public:
 	npc();
-	npc(int idx);
+	npc(int playOrder);
+	npc(int playOrder, int netIdx);
 	void initNpc();
 	void npcProcess();
 	void npcTurnOn();

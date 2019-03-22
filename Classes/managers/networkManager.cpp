@@ -20,7 +20,7 @@ void networkManager::init(gameMetaData::gameMode modeFlag)
 	this->serverIo = nullptr;
 	this->serverThread = nullptr;
 	this->server = nullptr;
-	this->myClientID = -1;
+	this->myClientId = -1;
 	for (auto i : playerList)
 	{
 		i.init();
@@ -149,7 +149,7 @@ void networkManager::clientConnectFail()
 
 void networkManager::clientConnectSuccess()
 {
-	playerList[myClientID].connectSuccess();
+	playerList[myClientId].connectSuccess();
 }
 
 void networkManager::runServer()
@@ -184,9 +184,9 @@ int networkManager::getNPCCnt()
 
 gameMetaData::netPlayerState networkManager::getMyClientConnectionState()
 {
-	if (myClientID >= 0 && myClientID < playerList.size())
+	if (myClientId >= 0 && myClientId < playerList.size())
 	{
-		return playerList[myClientID].getConnectionState();
+		return playerList[myClientId].getConnectionState();
 	}
 
 	return gameMetaData::netPlayerState::unknown;
@@ -215,6 +215,26 @@ gameMetaData::gameProgressStage networkManager::getNetworkProgressStage()
 bool networkManager::getPlayerGameRoomReadyState(const int playerId)
 {
 	return playerList[playerId].getGameRoomReadyState();
+}
+
+int networkManager::getMyClientId()
+{
+	return myClientId;
+}
+
+bool networkManager::isAllPlayerReady()
+{
+	bool allReadyState = true;
+	for (auto i : playerList)
+	{
+		if (i.getGameRoomReadyState() == false)
+		{
+			allReadyState = false;
+			break;
+		}
+	}
+
+	return allReadyState;
 }
 
 void networkManager::requestSettingNPC(int id)
@@ -255,7 +275,7 @@ void networkManager::requestGameRoomSceneReady()
 
 void networkManager::setMyClientID(int id)
 {
-	this->myClientID = id;
+	this->myClientId = id;
 }
 
 void networkManager::setCurPlayersLoginState(bool* loginStateList)

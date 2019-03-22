@@ -26,6 +26,7 @@ void netPlayer::setNpcState(gameMetaData::gameMode curGameMode)
 	{
 		connectionState = gameMetaData::netPlayerState::guestNPC;
 	}
+	gameRoomReady = true;
 }
 
 void netPlayer::connectSuccess()

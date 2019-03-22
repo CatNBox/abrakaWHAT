@@ -37,6 +37,8 @@ public:
 	int getTurnOrder(const int id);
 	gameMetaData::gameProgressStage getNetworkProgressStage();
 	bool getPlayerGameRoomReadyState(const int playerId);
+	int getMyClientId();
+	bool isAllPlayerReady();
 
 	//client request function
 	void requestSettingNPC(int id);
@@ -60,7 +62,7 @@ private:
 	void setMyServerAddr();
 	void updateCurPlayerCnt();
 
-	int myClientID;
+	int myClientId;
 	int curPlayerCnt;
 	int curNPCCnt;
 

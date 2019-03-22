@@ -3,7 +3,8 @@
 #include "gameObject\player.h"
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
-//#include <iostream>
+#include "managers/networkManager.h"
+#include <iostream>
 
 using namespace cocos2d;
 
@@ -15,11 +16,21 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	}
 
 	curGameMode = modeFlag;
-	myPlayerNum = playerTurnOrder[0] - 1;
+	curProgressStage = gameMetaData::gameProgressStage::loadingGameRoomScene;
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
 	actManager->initCnt();
+	netManager = networkManager::getInstance();
+	if (curGameMode == gameMetaData::gameMode::single)
+	{
+		myPlayOrder = playerTurnOrder[0] - 1;
+	}
+	else
+	{
+		auto myId = netManager->getMyClientId();
+		myPlayOrder = playerTurnOrder[myId] - 1;
+	}
 
 	//eventListener setting
 	settingEventListener();
@@ -43,9 +54,15 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	createPlayerLpObj();
 
 	//init round setting
-	this->scheduleOnce([=](float d) {initRound();}, 0.7f, "schedulerKey");
-	//this->schedule([=](float d) {initRound(); },10.0f,CC_REPEAT_FOREVER,10.0f,"initRepeat");
-
+	if (curGameMode == gameMetaData::gameMode::single)
+	{
+		this->scheduleOnce([=](float d) {initRound(); }, 0.7f, "schedulerKey");
+	}
+	else
+	{
+		netManager->requestGameRoomSceneReady();
+		this->scheduleUpdate();
+	}
 
 	return true;
 }
@@ -101,25 +118,54 @@ void gameRoomObjLayer::settingCntValues()
 
 void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
 {
-	//현재 내 플레이어 번호를 기준으로 할 것 - 차후 멀티모드 수정
-	bool bPlayer = true;
-	int idx = 0;
+	int playOrder = 0;
 	for (auto &i : arrPlayers)
 	{
 		player* tempPlayer;
-		if (idx == myPlayerNum)
+		if (curGameMode == gameMetaData::gameMode::single)
 		{
-			tempPlayer = new player(idx);
-			bPlayer = false;
+			//single mode
+			if (myPlayOrder == playOrder)
+			{
+				tempPlayer = new player(playOrder);
+			}
+			else
+			{
+				tempPlayer = new npc(playOrder);
+			}
 		}
 		else
 		{
-			tempPlayer = new npc(idx);
+			//host/guest mode
+			int netIdx;
+			for (int idx = 0; idx < 4; idx++)
+			{
+				if (playerTurnOrder[idx] == playOrder)
+				{
+					netIdx = idx;
+					break;
+				}
+			}
+			gameMetaData::netPlayerState netPlayerState = netManager->getPlayerConnectionState(netIdx);
+			if (netPlayerState == gameMetaData::netPlayerState::connected)
+			{
+				tempPlayer = new player(playOrder, netIdx);
+			}
+			else if (netPlayerState == gameMetaData::netPlayerState::guestNPC
+				|| netPlayerState == gameMetaData::netPlayerState::hostNPC)
+			{
+				tempPlayer = new npc(playOrder, netIdx);
+			}
+			else
+			{
+				//error handling
+				assert(true && !"createPlayer()에서 netPlayerState의 값이 disconnect 또는 unknown이었음");
+			}
 		}
 		i = tempPlayer;
-		idx++;
+		playOrder++;
 	}
-	if (arrPlayers[myPlayerNum]->isNPC())
+	if (arrPlayers[myPlayOrder]->isNPC())
 	{
 		isMyNumPlayer = false;
 	}
@@ -137,24 +183,24 @@ void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
 		int defaultX = 384;
 		int defaultY = 0;
 		float rotValue = 0;
-		if (i == myPlayerNum)	//when multiPlay, it's center Position
+		if (i == myPlayOrder)	//when multiPlay, it's center Position
 		{
 			defaultY = 160;
 			arrScoreSpr.at(i)->setPosition(Vec2(660, 130));
 		}
-		else if (i == (myPlayerNum + 1) % playerCnt)
+		else if (i == (myPlayOrder + 1) % playerCnt)
 		{
 			defaultX = 700;
 			defaultY = 454;
 			rotValue = 90.0f;
 			arrScoreSpr.at(i)->setPosition(Vec2(700, 150));
 		}
-		else if (i == (myPlayerNum + 2) % playerCnt)
+		else if (i == (myPlayOrder + 2) % playerCnt)
 		{
 			defaultY = 700;
 			arrScoreSpr.at(i)->setPosition(Vec2(660, 170));
 		}
-		else if (i == (myPlayerNum + 3) % playerCnt)
+		else if (i == (myPlayOrder + 3) % playerCnt)
 		{
 			defaultX = 68;
 			defaultY = 454;
@@ -175,7 +221,6 @@ void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
 
 void gameRoomObjLayer::createMagicStones()
 {
-
 	arrStones[0] = new magicStone(gameMetaData::msType::yongyong);
 
 	arrStones[arrMsCnt[gameMetaData::msType::yongyong]] 
@@ -290,6 +335,20 @@ void gameRoomObjLayer::createScoreSpr()
 	}
 }
 
+void gameRoomObjLayer::update(float dTime)
+{
+	//update function only run on multiplay guestMode/hostMode
+
+	if (curProgressStage == gameMetaData::gameProgressStage::loadingGameRoomScene)
+	{
+		if (netManager->isAllPlayerReady())
+		{
+			curProgressStage = gameMetaData::gameProgressStage::gameRoomReady;
+			initRound();
+		}
+	}
+}
+
 void gameRoomObjLayer::startGameByNpc()
 {
 	auto actCnt = actManager->getRunningActionCnt();
@@ -335,7 +394,7 @@ void gameRoomObjLayer::initRound()
 	for (auto &i : arrPlayers)
 	{
 		i->init();
-		auto playerIdx = i->getIndex();
+		auto playerIdx = i->getPlayOrder();
 		arrScoreSpr.at(playerIdx)->setTextureRect(sprManager->getNumSprRect(arrScore.at(playerIdx)));
 		arrScoreSpr.at(playerIdx)->setVisible(true);
 	}
@@ -371,9 +430,9 @@ void gameRoomObjLayer::initRound()
 		this->scheduleOnce([=](float d)
 		{
 			startGameByNpc();
-		}, 8.0f, "starterIsNpc");
+		}, 5.0f, "starterIsNpc");
 	}
-	else if(starterNum == myPlayerNum)
+	else if(starterNum == myPlayOrder)
 	{
 		EventCustom myTurnEvent("myTurn");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&myTurnEvent);
@@ -422,7 +481,7 @@ void gameRoomObjLayer::shareStone2Player()
 		//Sharing by player order
 		int tempCurPlayerIdx = i%playerCnt;
 		arrPlayers[tempCurPlayerIdx]->pushStone2List(tempSelStone);
-		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayerNum))
+		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayOrder))
 		{
 			tempSelStone->setBaseSprite();
 		}
@@ -432,7 +491,7 @@ void gameRoomObjLayer::shareStone2Player()
 		int revisionValue = getMsPosRevision(5, i / 4);
 		float rotValue = arrPlayers[tempCurPlayerIdx]->getRotationValue();
 		auto tempTargetVec = Vec2(defaultX + revisionValue, defaultY);
-		auto tempStandardValue = (myPlayerNum + 1) % 2;
+		auto tempStandardValue = (myPlayOrder + 1) % 2;
 		if (i % 2 == tempStandardValue)
 		{
 			tempTargetVec.setPoint(defaultX, defaultY + revisionValue);
@@ -634,7 +693,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 			//팝업창 예외처리
 		}
 		currentPlayer->pushbooung2List(tempMs);
-		if (curPlayerNum == myPlayerNum)
+		if (curPlayerNum == myPlayOrder)
 			tempMs->actionRevealedSecret();
 		return;
 	}
@@ -667,7 +726,7 @@ void gameRoomObjLayer::reorderPlayerHand()
 	for (int i = 0; i < playerMsListSize; i++)
 	{
 		auto tempMagicStone = curPlayer->getMagicStone(i);
-		if ((isMyNumPlayer) && (curPlayerNum == myPlayerNum))
+		if ((isMyNumPlayer) && (curPlayerNum == myPlayOrder))
 		{
 			tempMagicStone->setBaseSprite();
 		}
@@ -712,14 +771,14 @@ void gameRoomObjLayer::calcScore()
 	//check lp / check booung / if curPlayer's lp is zero, no point
 	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
 	{
-		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
-		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 2;
+		arrScore.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 2;
+		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 2;
 	}
 
 	if (abrakaWHAT)
 	{
-		arrScore.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
-		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getIndex()) += 1;
+		arrScore.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 1;
+		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 1;
 		abrakaWHAT = false;
 		return;
 	}
@@ -730,12 +789,12 @@ void gameRoomObjLayer::calcScore()
 		if (elemPlayer->getCurLP() > 0)
 		{
 			//at least have 1 Lp, get 1 point
-			arrScore.at(elemPlayer->getIndex()) += 1;
-			buf4RoundEndPopUp.at(elemPlayer->getIndex()) += 1;
+			arrScore.at(elemPlayer->getPlayOrder()) += 1;
+			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += 1;
 
 			//check booung
-			arrScore.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
-			buf4RoundEndPopUp.at(elemPlayer->getIndex()) += elemPlayer->getBooungListSize();
+			arrScore.at(elemPlayer->getPlayOrder()) += elemPlayer->getBooungListSize();
+			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += elemPlayer->getBooungListSize();
 		}
 	}
 }
@@ -799,7 +858,7 @@ void gameRoomObjLayer::passTurn()
 	}
 	curPlayerNum = (curPlayerNum == playerCnt - 1) ? (0) : (curPlayerNum + 1);
 	
-	if ((!isMyNumPlayer) || (curPlayerNum != myPlayerNum))
+	if ((!isMyNumPlayer) || (curPlayerNum != myPlayOrder))
 	{
 		if (arrPlayers[curPlayerNum]->isNPC())
 		{

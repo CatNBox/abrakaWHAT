@@ -191,8 +191,8 @@ void guestClient::processPacket(const char & pData)
 			memcpy(curUserLoginState, pPacket->userStateList, sizeof(bool)*netProtocol::maxSessionCnt);
 			networkManager::getInstance()->setCurPlayersLoginState(curUserLoginState);
 
-			int myClientID = pPacket->mySessionID;
-			networkManager::getInstance()->setMyClientID(myClientID);
+			int myClientId = pPacket->mySessionID;
+			networkManager::getInstance()->setMyClientID(myClientId);
 
 			networkManager::getInstance()->clientConnectSuccess();
 		}
