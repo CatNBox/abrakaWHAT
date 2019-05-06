@@ -23,7 +23,7 @@ private:
 	void delay01secCallWrapper(void (gameRoomObjLayer::*targetFunc)(void));
 	void settingEventListener();
 	void settingCntValues();
-	void createPlayers(int playerTurnOrder[]);
+	void createPlayers();
 	void createMagicStones();
 	void createSeenChecker();
 	void createPlayerLpObj();
@@ -33,8 +33,13 @@ private:
 
 	void startGameByNpc();
 
-	void selSecretStone();
-	void shareStone2Player();
+	void selectSecretStone();
+	short hostSelectSecretStone();
+	short hostSelectStone4Hand();
+	void distributeStone2Player();
+
+	void selectSecretStonebyNetData();
+	void distributeStoneByNetdata();
 
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void activateMagic(const int magicEnum);
@@ -46,11 +51,11 @@ private:
 	void passTurn();
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
-	void setStartOrder();
 
 	void callNpcProcess();
 
 	magicStone* pickAStone(const int stateEnum);
+	magicStone* pickAStone(const int stateEnum, const short magicEnum);
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
@@ -66,19 +71,28 @@ private:
 	int stoneMinCnt = 0;
 	int stoneMaxCnt = 0;
 
-	int starterNum = 0;
+	int starterIdx = 0;
 	int curPlayerNum = 0;
-	int myPlayOrder = 0;
+	int myPlayerIdx = 0;
+	int myTurnOrder = 0;
 	int roundWinPlayerNum = -1;
 
 	bool isMyNumPlayer = true;
 	bool abrakaWHAT = false;
 
 	std::vector<magicStone*> arrStones;
-	std::vector<player*> arrPlayers;
 	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
+
+	//vector[playerIndex] = score
 	std::vector<cocos2d::Sprite*> arrScoreSpr;
-	std::array<int, 4> arrScore{ 0 };
+	std::array<int, gameMetaData::defaultPlayerCnt> arrScore{ 0 };
+
+	//vector[index] = player
+	std::vector<player*> playersList;
+
+	//array[order] = playerIndex #order range 0~playerCnt
+	std::array<int, gameMetaData::defaultPlayerCnt> arrPlayerIdxInOrder{ 0 };
+
 	spriteManager* sprManager;
 	actionManager* actManager;
 	networkManager* netManager;
@@ -94,6 +108,13 @@ private:
 
 	short loopError = 0;
 
+	//for network
+	short bufSecretDeck[4];
+	short bufPlayer1Hand[5];
+	short bufPlayer2Hand[5];
+	short bufPlayer3Hand[5];
+	short bufPlayer4Hand[5];
+	
 	//멀티에서는 서버에서만 세팅 및 드로우 동작
 	//클라에서는 서버에서 출력해야할 정보만 얻어옴
 };

@@ -9,6 +9,8 @@ namespace netProtocol
 
 	const int maxReceiveBufLen = 512;
 	const int maxSessionCnt = 4; // equal gameMetaData::defaultPlayerCnt
+	const int maxSecretCnt = 4;
+	const int maxPlayerHandCnt = 5;
 
 	struct PACKET_HEADER
 	{
@@ -28,7 +30,9 @@ namespace netProtocol
 		NOTICE_NPC = 13,
 		NOTICE_ORDER = 14,
 		NOTICE_START = 15,
-		NOTICE_READY = 16
+		NOTICE_READY = 16,
+		NOTICE_SETROUND = 17,
+		HOST_SETROUND = 30
 	};
 
 	/*
@@ -106,6 +110,32 @@ namespace netProtocol
 		}
 	};
 
+	struct PKT_HOST_SETROUND : public PACKET_HEADER
+	{
+		short secretMsList[maxSecretCnt];
+		short player1MsList[maxPlayerHandCnt];
+		short player2MsList[maxPlayerHandCnt];
+		short player3MsList[maxPlayerHandCnt];
+		short player4MsList[maxPlayerHandCnt];
+
+		void init()
+		{
+			pktId = pktIdentt::HOST_SETROUND;
+			pktSize = sizeof(PKT_HOST_SETROUND);
+			for (int i = 0; i < maxSecretCnt; i++)
+			{
+				secretMsList[i] = -1;
+			}
+			for (int i = 0; i < maxPlayerHandCnt; i++)
+			{
+				player1MsList[i] = -1;
+				player2MsList[i] = -1;
+				player3MsList[i] = -1;
+				player4MsList[i] = -1;
+			}
+		}
+	};
+
 	struct PKT_NOTICE_IN : public PACKET_HEADER
 	{
 		int joinedUserId;
@@ -175,6 +205,32 @@ namespace netProtocol
 			pktId = pktIdentt::NOTICE_READY;
 			pktSize = sizeof(PKT_NOTICE_READY);
 			readyId = -1;
+		}
+	};
+
+	struct PKT_NOTICE_SETROUND : public PACKET_HEADER
+	{
+		short secretMsList[maxSecretCnt];
+		short player1MsList[maxPlayerHandCnt];
+		short player2MsList[maxPlayerHandCnt];
+		short player3MsList[maxPlayerHandCnt];
+		short player4MsList[maxPlayerHandCnt];
+
+		void init()
+		{
+			pktId = pktIdentt::NOTICE_SETROUND;
+			pktSize = sizeof(PKT_NOTICE_SETROUND);
+			for (int i = 0; i < maxSecretCnt; i++)
+			{
+				secretMsList[i] = -1;
+			}
+			for (int i = 0; i < maxPlayerHandCnt; i++)
+			{
+				player1MsList[i] = -1;
+				player2MsList[i] = -1;
+				player3MsList[i] = -1;
+				player4MsList[i] = -1;
+			}
 		}
 	};
 }

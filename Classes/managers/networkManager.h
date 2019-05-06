@@ -39,12 +39,28 @@ public:
 	bool getPlayerGameRoomReadyState(const int playerId);
 	int getMyClientId();
 	bool isAllPlayerReady();
+	void getInitRoundData(
+		short outSecretDeck[],
+		short outPlayer1Hand[],
+		short outPlayer2Hand[],
+		short outPlayer3Hand[],
+		short outPlayer4Hand[]
+	);
 
 	//client request function
 	void requestSettingNPC(int id);
 	void requestSettingOrder(int* playerTurnOrder);
 	void requestGameRoomStart();
 	void requestGameRoomSceneReady();
+
+	//host request function
+	void requestHostSetRound(
+		short secretDeck[],
+		short player1hand[],
+		short player2hand[],
+		short player3hand[],
+		short player4hand[]
+	);
 
 	//set network data
 	void setMyClientID(int id);
@@ -56,6 +72,13 @@ public:
 	void setFlagReadyLoadingGameRoom();
 	void setFlagLoadingGameRooom();
 	void setGameRoomSceneReady(int readyId);
+	void setRoundByHostData(
+		short secretDeck[],
+		short player1Hand[],
+		short player2Hand[],
+		short player3Hand[],
+		short player4Hand[]
+	);
 	
 private:
 
@@ -77,8 +100,9 @@ private:
 	hostServer* server;
 
 	//playerList
-	std::array<netPlayer, 4> playerList;
-	std::array<int, 4> playerTurnOrder;
+	std::array<netPlayer, netProtocol::maxSecretCnt> playerList;
+	std::array<int, netProtocol::maxSecretCnt> playerTurnOrder;
+	std::array<short, netProtocol::maxSecretCnt> secretDeckList;
 
 	//flags
 	gameMetaData::gameMode curGameMode;

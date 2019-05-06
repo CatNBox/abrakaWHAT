@@ -33,13 +33,13 @@ void player::init()
 void player::pushStone2List(magicStone* ms)
 {
 	stoneList.push_back(ms);
-	ms->setStatus(gameMetaData::msStatus::owned);
+	ms->setState(gameMetaData::msState::owned);
 }
 
 void player::pushbooung2List(magicStone * ms)
 {
 	booungList.push_back(ms);
-	ms->setStatus(gameMetaData::msStatus::owned);
+	ms->setState(gameMetaData::msState::owned);
 }
 
 int player::getStoneListSize()
@@ -313,6 +313,8 @@ void player::setRotationValue(float rot)
 npc::npc()
 	:state(gameMetaData::npcState::npcWait)
 {
+	arrPrevFailList.reserve(gameMetaData::variableMaxCnt::msTypeCnt);
+	initNpc();
 }
 
 npc::npc(int playOrder)

@@ -5,7 +5,7 @@ class actionManager;
 class soundManager;
 namespace gameMetaData
 {
-	enum msStatus;
+	enum msState;
 	enum msType;
 	enum class msMovement;
 }
@@ -22,7 +22,7 @@ class magicStone : public cocos2d::Sprite
 public:
 	int getMagic();
 	int getStatus();
-	void setStatus(const gameMetaData::msStatus newStatus);
+	void setState(const gameMetaData::msState newStatus);
 	void initObjData();
 
 	bool initMsSprite();	//magic에 맞는 스프라이트로 갱신
@@ -42,7 +42,7 @@ private:
 	soundManager* sndManager;
 
 	gameMetaData::msType magic;
-	gameMetaData::msStatus status;
+	gameMetaData::msState status;
 		
 	float curX;
 	float curY;

@@ -292,6 +292,49 @@ void guestClient::processPacket(const char & pData)
 			networkManager::getInstance()->setGameRoomSceneReady(pPacket->readyId);
 		}
 		break;
+	case netProtocol::pktIdentt::NOTICE_SETROUND:
+		{
+			netProtocol::PKT_NOTICE_SETROUND* pPacket = (netProtocol::PKT_NOTICE_SETROUND*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_SETROUND" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl;
+			for (int i = 0; i < netProtocol::maxSecretCnt; i++)
+			{
+				std::cout << "packet secretDeck[" << i << "] : " << pPacket->secretMsList[i] << std::endl;
+			}
+			for (int i = 0; i < netProtocol::maxPlayerHandCnt; i++)
+			{
+				std::cout << "packet player1Hand[" << i << "] : " << pPacket->player1MsList[i] << std::endl
+					<< "packet player2Hand[" << i << "] : " << pPacket->player2MsList[i] << std::endl
+					<< "packet player3Hand[" << i << "] : " << pPacket->player3MsList[i] << std::endl
+					<< "packet player4Hand[" << i << "] : " << pPacket->player4MsList[i] << std::endl
+					<< "+++++" << std::endl;
+			}
+			std::cout
+				<< "---------------------" << std::endl;
+
+			short bufSecretDeck[netProtocol::maxSecretCnt];
+			short bufPlayer1Hand[netProtocol::maxPlayerHandCnt];
+			short bufPlayer2Hand[netProtocol::maxPlayerHandCnt];
+			short bufPlayer3Hand[netProtocol::maxPlayerHandCnt];
+			short bufPlayer4Hand[netProtocol::maxPlayerHandCnt];
+			memcpy_s(bufSecretDeck, sizeof(short)*netProtocol::maxSecretCnt, pPacket->secretMsList, sizeof(short)*netProtocol::maxSecretCnt);
+			memcpy_s(bufPlayer1Hand, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player1MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(bufPlayer2Hand, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player2MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(bufPlayer3Hand, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player3MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(bufPlayer4Hand, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player4MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+
+			networkManager::getInstance()->setRoundByHostData(
+				bufSecretDeck,
+				bufPlayer1Hand,
+				bufPlayer2Hand,
+				bufPlayer3Hand,
+				bufPlayer4Hand
+			);
+		}
+		break;
 	default:
 		break;
 	}

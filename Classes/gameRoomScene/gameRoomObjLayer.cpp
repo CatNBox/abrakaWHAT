@@ -22,15 +22,25 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	actManager = actionManager::getInstance();
 	actManager->initCnt();
 	netManager = networkManager::getInstance();
+
+	//set idx in order to array e.g : array[order] = idx
+	for (int i = 0; i < gameMetaData::defaultPlayerCnt; i++)
+	{
+		int bufIdx = playerTurnOrder[i] - 1;
+		arrPlayerIdxInOrder[bufIdx] = i;
+	}
+
 	if (curGameMode == gameMetaData::gameMode::single)
 	{
-		myPlayOrder = playerTurnOrder[0] - 1;
+		myPlayerIdx = 0;
 	}
 	else
 	{
 		auto myId = netManager->getMyClientId();
-		myPlayOrder = playerTurnOrder[myId] - 1;
+		myPlayerIdx = myId;
 	}
+	myTurnOrder = playerTurnOrder[myPlayerIdx] - 1;
+	starterIdx = arrPlayerIdxInOrder[0];
 
 	//eventListener setting
 	settingEventListener();
@@ -42,7 +52,7 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	createScoreSpr();
 
 	//create players
-	createPlayers(playerTurnOrder);
+	createPlayers();
 
 	//create magicStones
 	createMagicStones();
@@ -112,49 +122,39 @@ void gameRoomObjLayer::settingCntValues()
 		+ arrMsCnt[gameMetaData::msType::potion];	//potion
 
 	arrScoreSpr.resize(playerCnt);
-	arrPlayers.resize(playerCnt);
+	playersList.resize(playerCnt);
 	arrStones.resize(stoneMaxCnt);
 }
 
-void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
+void gameRoomObjLayer::createPlayers()
 {
-	int playOrder = 0;
-	for (auto &i : arrPlayers)
+	for (int idx = 0; idx < playersList.size(); idx++)
 	{
 		player* tempPlayer;
 		if (curGameMode == gameMetaData::gameMode::single)
 		{
 			//single mode
-			if (myPlayOrder == playOrder)
+			if (idx == myPlayerIdx)
 			{
-				tempPlayer = new player(playOrder);
+				tempPlayer = new player();
 			}
 			else
 			{
-				tempPlayer = new npc(playOrder);
+				tempPlayer = new npc();
 			}
 		}
 		else
 		{
 			//host/guest mode
-			int netIdx;
-			for (int idx = 0; idx < 4; idx++)
-			{
-				if (playerTurnOrder[idx] == playOrder)
-				{
-					netIdx = idx;
-					break;
-				}
-			}
-			gameMetaData::netPlayerState netPlayerState = netManager->getPlayerConnectionState(netIdx);
+			gameMetaData::netPlayerState netPlayerState = netManager->getPlayerConnectionState(idx);
 			if (netPlayerState == gameMetaData::netPlayerState::connected)
 			{
-				tempPlayer = new player(playOrder, netIdx);
+				tempPlayer = new player();
 			}
 			else if (netPlayerState == gameMetaData::netPlayerState::guestNPC
 				|| netPlayerState == gameMetaData::netPlayerState::hostNPC)
 			{
-				tempPlayer = new npc(playOrder, netIdx);
+				tempPlayer = new npc();
 			}
 			else
 			{
@@ -162,58 +162,70 @@ void gameRoomObjLayer::createPlayers(int playerTurnOrder[])
 				assert(true && !"createPlayer()에서 netPlayerState의 값이 disconnect 또는 unknown이었음");
 			}
 		}
-		i = tempPlayer;
-		playOrder++;
+		playersList[idx] = tempPlayer;
 	}
-	if (arrPlayers[myPlayOrder]->isNPC())
+
+	//all npc mode
+	if (playersList[myPlayerIdx]->isNPC())
 	{
 		isMyNumPlayer = false;
 	}
 
 	//Each player pointed next/prevPlayer and DefaultPosition setting
-	for (int i = 0; i < playerCnt; i++)
+	for (int numInOrder = 0; numInOrder < playerCnt; numInOrder++)
 	{
 		//next/prevPlayer setting
-		int next = (i == playerCnt - 1) ? (0) : (i + 1);
-		arrPlayers[i]->setNextPlayer(arrPlayers[next]);
-		int prev = (i == 0) ? (playerCnt - 1) : (i - 1);
-		arrPlayers[i]->setPrevPlayer(arrPlayers[prev]);
+		int next = (numInOrder == playerCnt - 1) ? (0) : (numInOrder + 1);
+		int prev = (numInOrder == 0) ? (playerCnt - 1) : (numInOrder - 1);
+
+		int curPlayerIdxOfOrder = arrPlayerIdxInOrder[numInOrder];
+		int nextIdxOfOrder = arrPlayerIdxInOrder[next];
+		int prevIdxOfOrder = arrPlayerIdxInOrder[prev];
+
+		playersList[curPlayerIdxOfOrder]->setNextPlayer(playersList[nextIdxOfOrder]);
+		playersList[curPlayerIdxOfOrder]->setPrevPlayer(playersList[prevIdxOfOrder]);
 
 		//defaultPos setting
 		int defaultX = 384;
 		int defaultY = 0;
 		float rotValue = 0;
-		if (i == myPlayOrder)	//when multiPlay, it's center Position
+
+		//comp order to setting pos
+		if (numInOrder == myTurnOrder)	//when multiPlay, it's center Position
 		{
 			defaultY = 160;
-			arrScoreSpr.at(i)->setPosition(Vec2(660, 130));
+			arrScoreSpr.at(curPlayerIdxOfOrder)->setPosition(Vec2(660, 130));
 		}
-		else if (i == (myPlayOrder + 1) % playerCnt)
+		else if (numInOrder == (myTurnOrder + 1) % playerCnt)
 		{
 			defaultX = 700;
 			defaultY = 454;
 			rotValue = 90.0f;
-			arrScoreSpr.at(i)->setPosition(Vec2(700, 150));
+			arrScoreSpr.at(curPlayerIdxOfOrder)->setPosition(Vec2(700, 150));
 		}
-		else if (i == (myPlayOrder + 2) % playerCnt)
+		else if (numInOrder == (myTurnOrder + 2) % playerCnt)
 		{
 			defaultY = 700;
-			arrScoreSpr.at(i)->setPosition(Vec2(660, 170));
+			arrScoreSpr.at(curPlayerIdxOfOrder)->setPosition(Vec2(660, 170));
 		}
-		else if (i == (myPlayOrder + 3) % playerCnt)
+		else if (numInOrder == (myTurnOrder + 3) % playerCnt)
 		{
 			defaultX = 68;
 			defaultY = 454;
 			rotValue = -90.0f;
-			arrScoreSpr.at(i)->setPosition(Vec2(620, 150));
+			arrScoreSpr.at(curPlayerIdxOfOrder)->setPosition(Vec2(620, 150));
 		}
 		else
 		{
 			assert(true && !"createPlayer()에서 잘못된 PlayerCnt값이 들어옴");
 		}
-		arrPlayers[i]->setDefaultX(defaultX);
-		arrPlayers[i]->setDefaultY(defaultY);
-		arrPlayers[i]->setRotationValue(rotValue);
+
+		std::cout << "player Index : " << curPlayerIdxOfOrder << std::endl
+			<< "   default x : " << defaultX << std::endl
+			<< "   default y : " << defaultY << std::endl;
+		playersList[curPlayerIdxOfOrder]->setDefaultX(defaultX);
+		playersList[curPlayerIdxOfOrder]->setDefaultY(defaultY);
+		playersList[curPlayerIdxOfOrder]->setRotationValue(rotValue);
 	}
 
 	//scoreSpr 620 660 700 130 150 170
@@ -312,7 +324,7 @@ void gameRoomObjLayer::createPlayerLpObj()
 {
 	//player have info of LpSprite
 	int idx = 0;
-	for (auto &i : arrPlayers)
+	for (auto &i : playersList)
 	{
 		for (int j = 0; j < maxLifePoint; j++)
 		{
@@ -347,6 +359,20 @@ void gameRoomObjLayer::update(float dTime)
 			initRound();
 		}
 	}
+
+	//check networkManager stage
+	if (curProgressStage == gameMetaData::gameProgressStage::waitRoundNetData)
+	{
+		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::roundNetDataReady)
+		{
+			netManager->getInitRoundData(bufSecretDeck, bufPlayer1Hand, bufPlayer2Hand, bufPlayer3Hand, bufPlayer4Hand);
+
+			selectSecretStonebyNetData();
+			distributeStoneByNetdata();
+
+			curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
+		}
+	}
 }
 
 void gameRoomObjLayer::startGameByNpc()
@@ -354,7 +380,7 @@ void gameRoomObjLayer::startGameByNpc()
 	auto actCnt = actManager->getRunningActionCnt();
 	if (actCnt == 0)
 	{
-		((npc*)arrPlayers[starterNum])->npcTurnOn();
+		((npc*)playersList[starterIdx])->npcTurnOn();
 		callNpcProcess();
 	}
 	else
@@ -386,15 +412,14 @@ void gameRoomObjLayer::initRound()
 {
 	//0.init each Object
 	//init magicStones
-	for (auto &i : arrStones)
+	for (auto &msObj : arrStones)
 	{
-		i->initObjData();
+		msObj->initObjData();
 	}
 	//init Players and update Score Sprite
-	for (auto &i : arrPlayers)
+	for (int playerIdx = 0; playerIdx < playerCnt; playerIdx++)
 	{
-		i->init();
-		auto playerIdx = i->getPlayOrder();
+		playersList[playerIdx]->init();
 		arrScoreSpr.at(playerIdx)->setTextureRect(sprManager->getNumSprRect(arrScore.at(playerIdx)));
 		arrScoreSpr.at(playerIdx)->setVisible(true);
 	}
@@ -414,46 +439,83 @@ void gameRoomObjLayer::initRound()
 	EventCustom passTurnEvent("roundUp");
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
 
-	//1. select Secret Stone
-	selSecretStone();
-
-	//2. share magicStones to each player
-	shareStone2Player();
-
-	//3. setting firstTurn Player
-	//setNextRoundStater();
-	starterNum = 0;
-	curPlayerNum = 0;
-
-	if (arrPlayers[starterNum]->isNPC())
+	//init magicStone by mode
+	if (curGameMode == gameMetaData::gameMode::single)
 	{
-		this->scheduleOnce([=](float d)
+		//1. select Secret Stone
+		selectSecretStone();
+
+		//2. share magicStones to each player
+		distributeStone2Player();
+
+		//3. setting firstTurn Player
+		curPlayerNum = 0;
+
+		if (playersList[starterIdx]->isNPC())
 		{
-			startGameByNpc();
-		}, 5.0f, "starterIsNpc");
+			std::cout << "**** start by npc : " << starterIdx << std::endl;
+			this->scheduleOnce([=](float d)
+			{
+				startGameByNpc();
+			}, 7.0f, "starterIsNpc");
+		}
+		else if (starterIdx == myPlayerIdx)
+		{
+			EventCustom myTurnEvent("myTurn");
+			Director::getInstance()->getEventDispatcher()->dispatchEvent(&myTurnEvent);
+		}
 	}
-	else if(starterNum == myPlayOrder)
+	else if (curGameMode == gameMetaData::gameMode::host)
 	{
-		EventCustom myTurnEvent("myTurn");
-		Director::getInstance()->getEventDispatcher()->dispatchEvent(&myTurnEvent);
+		//1. select secret stone and set buffer for packet to server
+		for (int deckIdx = 0; deckIdx < secretCnt; deckIdx++)
+		{
+			//get enum picked stone
+			bufSecretDeck[deckIdx] = hostSelectSecretStone();
+		}
+
+		//2. select player hand stone and set buffer for packet to server
+		for (int handIdx = 0; handIdx < 5; handIdx++)
+		{
+			//get enum picked stone
+			bufPlayer1Hand[handIdx] = hostSelectStone4Hand();
+			bufPlayer2Hand[handIdx] = hostSelectStone4Hand();
+			bufPlayer3Hand[handIdx] = hostSelectStone4Hand();
+			bufPlayer4Hand[handIdx] = hostSelectStone4Hand();
+		}
+
+		//3. post stone list to server
+		netManager->requestHostSetRound(bufSecretDeck, bufPlayer1Hand, bufPlayer2Hand, bufPlayer3Hand, bufPlayer4Hand);
+
+		//4. start loop update function
+		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
+	}
+	else if (curGameMode == gameMetaData::gameMode::guest)
+	{
+		//start loop update function for get network data
+		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
+	}
+	else
+	{
+		//error handling
 	}
 }
 
-void gameRoomObjLayer::selSecretStone()
+void gameRoomObjLayer::selectSecretStone()
 {
 	//add secretStone to list
 	int preDelayCnt = 0;
 	for (int i = 0; i < secretCnt; i++)
 	{
 		magicStone *secretTemp;
-		secretTemp = pickAStone(gameMetaData::msStatus::notUse);
+		secretTemp = pickAStone(gameMetaData::msState::notUse);
 		if (secretTemp == nullptr)
 		{
 			//오류창 팝업 및 종료
 			break;
 		}
 
-		secretTemp->setStatus(gameMetaData::msStatus::secret);
+		secretTemp->setState(gameMetaData::msState::secret);
 		secretTemp->setBaseSprite();
 		//Draw and MoveAction
 		auto targetPos = Vec2(310 + i * 50, 530);
@@ -464,34 +526,65 @@ void gameRoomObjLayer::selSecretStone()
 	}
 }
 
-void gameRoomObjLayer::shareStone2Player()
+short gameRoomObjLayer::hostSelectSecretStone()
+{
+	magicStone *secretTemp;
+	secretTemp = pickAStone(gameMetaData::msState::notUse);
+	if (secretTemp == nullptr)
+	{
+		//error handling
+		return gameMetaData::msType::base;
+	}
+	secretTemp->setState(gameMetaData::msState::preserve);
+
+	return secretTemp->getMagic();
+}
+
+short gameRoomObjLayer::hostSelectStone4Hand()
+{
+	magicStone *handTemp;
+	handTemp = pickAStone(gameMetaData::msState::notUse);
+	if (handTemp == nullptr)
+	{
+		//error handling
+		return gameMetaData::msType::base;
+	}
+	handTemp->setState(gameMetaData::msState::preserve);
+
+	return handTemp->getMagic();
+}
+
+void gameRoomObjLayer::distributeStone2Player()
 {
 	int preDelayCnt = 0;
 	int tempDrawCnt = playerCnt * 5;
 	for (int i = 0; i < tempDrawCnt; i++)
 	{
 		magicStone *tempSelStone;
-		tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
+		//pick magic stone
+		tempSelStone = pickAStone(gameMetaData::msState::notUse);
 		if (tempSelStone == nullptr)
 		{
 			//오류창 팝업 및 종료
 			break;
 		}
 
-		//Sharing by player order
-		int tempCurPlayerIdx = i%playerCnt;
-		arrPlayers[tempCurPlayerIdx]->pushStone2List(tempSelStone);
-		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayOrder))
+		//Distributing by player order
+		int curOrder = i % playerCnt;
+		int tempCurPlayerIdx = arrPlayerIdxInOrder[curOrder];
+		playersList[tempCurPlayerIdx]->pushStone2List(tempSelStone);
+		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayerIdx))
 		{
 			tempSelStone->setBaseSprite();
 		}
 		//Draw and MoveAction
-		int defaultX = arrPlayers[tempCurPlayerIdx]->getDefaultX();
-		int defaultY = arrPlayers[tempCurPlayerIdx]->getDefaultY();
+		int defaultX = playersList[tempCurPlayerIdx]->getDefaultX();
+		int defaultY = playersList[tempCurPlayerIdx]->getDefaultY();
+
 		int revisionValue = getMsPosRevision(5, i / 4);
-		float rotValue = arrPlayers[tempCurPlayerIdx]->getRotationValue();
+		float rotValue = playersList[tempCurPlayerIdx]->getRotationValue();
 		auto tempTargetVec = Vec2(defaultX + revisionValue, defaultY);
-		auto tempStandardValue = (myPlayOrder + 1) % 2;
+		auto tempStandardValue = (myTurnOrder + 1) % 2;
 		if (i % 2 == tempStandardValue)
 		{
 			tempTargetVec.setPoint(defaultX, defaultY + revisionValue);
@@ -502,10 +595,101 @@ void gameRoomObjLayer::shareStone2Player()
 	}
 }
 
-void gameRoomObjLayer::setStartOrder()
+void gameRoomObjLayer::selectSecretStonebyNetData()
 {
-	srand(time(nullptr));
-	starterNum = (rand() % playerCnt) + 1;
+	//add secretStone to list
+	int preDelayCnt = 0;
+	for (int i = 0; i < secretCnt; i++)
+	{
+		magicStone *secretTemp;
+		gameMetaData::msState targetState;
+		if (curGameMode == gameMetaData::gameMode::host)
+		{
+			targetState = gameMetaData::msState::preserve;
+		}
+		else
+		{
+			targetState = gameMetaData::msState::notUse;
+		}
+		secretTemp = pickAStone(targetState, bufSecretDeck[i]);
+		if (secretTemp == nullptr)
+		{
+			//오류창 팝업 및 종료
+			break;
+		}
+
+		secretTemp->setState(gameMetaData::msState::secret);
+		secretTemp->setBaseSprite();
+		//Draw and MoveAction
+		auto targetPos = Vec2(310 + i * 50, 530);
+		secretTemp->setScale(SECRETSTONE_BASESCALE);
+		secretTemp->setLocalZOrder(gameMetaData::layerZOrder::objZ0);
+		secretTemp->actionMove(0.2f * preDelayCnt, targetPos, gameMetaData::msMovement::sharing);
+		preDelayCnt++;
+	}
+}
+
+void gameRoomObjLayer::distributeStoneByNetdata()
+{
+	//pick target State
+	gameMetaData::msState targetState;
+	if (curGameMode == gameMetaData::gameMode::host)
+	{
+		targetState = gameMetaData::msState::preserve;
+	}
+	else
+	{
+		targetState = gameMetaData::msState::notUse;
+	}
+
+	int preDelayCnt = 0;
+	int tempDrawCnt = playerCnt * gameMetaData::defaultHandCnt;
+	for (int i = 0; i < tempDrawCnt; i++)
+	{
+		short *pHandArrPointer;
+		int curOrder = i % playerCnt;
+		if (curOrder == 1)
+			pHandArrPointer = bufPlayer1Hand;
+		else if (curOrder == 2)
+			pHandArrPointer = bufPlayer2Hand;
+		else if (curOrder == 3)
+			pHandArrPointer = bufPlayer3Hand;
+		else if (curOrder == 0)
+			pHandArrPointer = bufPlayer4Hand;
+
+		magicStone *tempSelStone;
+		//pick magic stone
+		int tempHandIdx = i / 4;
+		tempSelStone = pickAStone(targetState, pHandArrPointer[tempHandIdx]);
+		if (tempSelStone == nullptr)
+		{
+			//오류창 팝업 및 종료
+			break;
+		}
+
+		//Distributing by player order
+		int tempCurPlayerIdx = arrPlayerIdxInOrder[curOrder];
+		playersList[tempCurPlayerIdx]->pushStone2List(tempSelStone);
+		if ((isMyNumPlayer) && (tempCurPlayerIdx == myPlayerIdx))
+		{
+			tempSelStone->setBaseSprite();
+		}
+		//Draw and MoveAction
+		int defaultX = playersList[tempCurPlayerIdx]->getDefaultX();
+		int defaultY = playersList[tempCurPlayerIdx]->getDefaultY();
+
+		int revisionValue = getMsPosRevision(5, i / 4);
+		float rotValue = playersList[tempCurPlayerIdx]->getRotationValue();
+		auto tempTargetVec = Vec2(defaultX + revisionValue, defaultY);
+		auto tempStandardValue = (myTurnOrder + 1) % 2;
+		if (i % 2 == tempStandardValue)
+		{
+			tempTargetVec.setPoint(defaultX, defaultY + revisionValue);
+		}
+		tempSelStone->setRotation(rotValue);
+		tempSelStone->actionMove(0.2f * (secretCnt + preDelayCnt), tempTargetVec, gameMetaData::msMovement::sharing);
+		preDelayCnt++;
+	}
 }
 
 void gameRoomObjLayer::callNpcProcess()
@@ -518,11 +702,11 @@ void gameRoomObjLayer::callNpcProcess()
 			if (seenObj.second == true)
 				discardCnt++;
 		}
-		((npc*)arrPlayers[curPlayerNum])->setDiscardCnt(msNum, discardCnt);
+		((npc*)playersList[curPlayerNum])->setDiscardCnt(msNum, discardCnt);
 	}
 	this->schedule([=](float d) {
 		this->unscheduleAllCallbacks();
-		((npc*)arrPlayers[curPlayerNum])->npcProcess();
+		((npc*)playersList[curPlayerNum])->npcProcess();
 	}, 0.0f, 0, 1.0f, "npcPass");
 }
 
@@ -534,7 +718,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	//std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
 	//----current player pointer
-	auto curPlayer = arrPlayers[curPlayerNum];
+	auto curPlayer = playersList[curPlayerNum];
 	bool isCorrectChoice = false;
 
 	//when choose pass
@@ -619,7 +803,7 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 
 void gameRoomObjLayer::activateMagic(const int magicEnum)
 {
-	auto currentPlayer = arrPlayers[curPlayerNum];
+	auto currentPlayer = playersList[curPlayerNum];
 	int damage = 1;
 	switch (magicEnum)
 	{
@@ -655,7 +839,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	case gameMetaData::msType::bangrang:
 	{
 		//----yongyong && bangrang damage action
-		for (auto &i : arrPlayers)
+		for (auto &i : playersList)
 		{
 			if (i == currentPlayer)
 				continue;
@@ -687,13 +871,13 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	}
 	case gameMetaData::msType::booung:
 	{
-		auto tempMs = pickAStone(gameMetaData::msStatus::secret);
+		auto tempMs = pickAStone(gameMetaData::msState::secret);
 		if (tempMs == nullptr)
 		{
 			//팝업창 예외처리
 		}
 		currentPlayer->pushbooung2List(tempMs);
-		if (curPlayerNum == myPlayOrder)
+		if (curPlayerNum == myPlayerIdx)
 			tempMs->actionRevealedSecret();
 		return;
 	}
@@ -721,12 +905,12 @@ void gameRoomObjLayer::updateSeenChecker(const int magicEnum)
 
 void gameRoomObjLayer::reorderPlayerHand()
 {
-	auto curPlayer = arrPlayers[curPlayerNum];
+	auto curPlayer = playersList[curPlayerNum];
 	int playerMsListSize = curPlayer->getStoneListSize();
 	for (int i = 0; i < playerMsListSize; i++)
 	{
 		auto tempMagicStone = curPlayer->getMagicStone(i);
-		if ((isMyNumPlayer) && (curPlayerNum == myPlayOrder))
+		if ((isMyNumPlayer) && (curPlayerNum == myPlayerIdx))
 		{
 			tempMagicStone->setBaseSprite();
 		}
@@ -747,14 +931,14 @@ void gameRoomObjLayer::reorderPlayerHand()
 bool gameRoomObjLayer::isRoundEnd()
 {
 	//players's life check. if anyone have zero LPCnt, roundEnd is True
-	for (const auto &playerPointer : arrPlayers)
+	for (const auto &playerPointer : playersList)
 	{
 		if (playerPointer->getCurLP() == 0)
 			return true;
 	}
 
 	//count curPlayer's rest hand
-	if (arrPlayers[curPlayerNum]->getStoneListSize() == 0)
+	if (playersList[curPlayerNum]->getStoneListSize() == 0)
 	{
 		abrakaWHAT = true;
 		return true;
@@ -769,21 +953,21 @@ void gameRoomObjLayer::calcScore()
 	buf4RoundEndPopUp.at(4) = curPlayerNum;
 
 	//check lp / check booung / if curPlayer's lp is zero, no point
-	if (arrPlayers[curPlayerNum]->getCurLP() > 0)
+	if (playersList[curPlayerNum]->getCurLP() > 0)
 	{
-		arrScore.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 2;
-		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 2;
+		arrScore.at(playersList[curPlayerNum]->getPlayOrder()) += 2;
+		buf4RoundEndPopUp.at(playersList[curPlayerNum]->getPlayOrder()) += 2;
 	}
 
 	if (abrakaWHAT)
 	{
-		arrScore.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 1;
-		buf4RoundEndPopUp.at(arrPlayers[curPlayerNum]->getPlayOrder()) += 1;
+		arrScore.at(playersList[curPlayerNum]->getPlayOrder()) += 1;
+		buf4RoundEndPopUp.at(playersList[curPlayerNum]->getPlayOrder()) += 1;
 		abrakaWHAT = false;
 		return;
 	}
 
-	for (const auto &elemPlayer : arrPlayers)
+	for (const auto &elemPlayer : playersList)
 	{
 		//check Lp
 		if (elemPlayer->getCurLP() > 0)
@@ -826,7 +1010,7 @@ void gameRoomObjLayer::callEndRoundEvent()
 void gameRoomObjLayer::passTurn()
 {
 	//current Player
-	auto curPlayer = arrPlayers[curPlayerNum];
+	auto curPlayer = playersList[curPlayerNum];
 
 	//magicStone의 보유개수가 5개가 아니고 사용되지않은 magicStone이 있다면 보충한다
 	//Draw magicStone
@@ -834,7 +1018,7 @@ void gameRoomObjLayer::passTurn()
 	int drawCnt = 0;
 	for (int i = 0; i < curPlayerReqCnt; i++)
 	{
-		auto tempSelStone = pickAStone(gameMetaData::msStatus::notUse);
+		auto tempSelStone = pickAStone(gameMetaData::msState::notUse);
 		if (tempSelStone == nullptr)
 		{
 			//not enough notUseMagicStone then just break
@@ -858,11 +1042,11 @@ void gameRoomObjLayer::passTurn()
 	}
 	curPlayerNum = (curPlayerNum == playerCnt - 1) ? (0) : (curPlayerNum + 1);
 	
-	if ((!isMyNumPlayer) || (curPlayerNum != myPlayOrder))
+	if ((!isMyNumPlayer) || (curPlayerNum != myPlayerIdx))
 	{
-		if (arrPlayers[curPlayerNum]->isNPC())
+		if (playersList[curPlayerNum]->isNPC())
 		{
-			((npc*)arrPlayers[curPlayerNum])->npcTurnOn();
+			((npc*)playersList[curPlayerNum])->npcTurnOn();
 			callNpcProcess();
 		}
 		EventCustom passTurnEvent("passTurn2NextUser");
@@ -883,7 +1067,7 @@ cocos2d::Sprite* gameRoomObjLayer::getMSSprite(const int magicEnum)
 //random pick magicStone
 magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 {
-	if ((stateEnum == gameMetaData::msStatus::notUse) && isAllUsed())
+	if ((stateEnum == gameMetaData::msState::notUse) && isAllUsed())
 	{
 		//checkArrStones();
 		//std::cout << "All MagicStone is used" << std::endl;
@@ -907,6 +1091,38 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum)
 	return ptempMS;
 }
 
+magicStone * gameRoomObjLayer::pickAStone(const int stateEnum, const short magicEnum)
+{
+	if ((stateEnum == gameMetaData::msState::notUse) && isAllUsed())
+	{
+		//checkArrStones();
+		//std::cout << "All MagicStone is used" << std::endl;
+		//뽑을 카드가 없을 경우 예외설정
+		//1. 모두 사용됬을 경우
+		//2. 초기화가 안되어서 분배에 실패했을 경우
+		return nullptr;
+	}
+
+	magicStone *pTempMS;
+	int rndIndex = 0;
+	int magicMax = 0;
+	for (int i = 1; i <= magicEnum; i++)
+	{
+		magicMax += arrMsCnt[i];
+	}
+	int magicMin = magicMax - magicEnum;
+	while (true)
+	{
+		rndIndex = inlineFunc::getRandomInt(magicMin, magicMax - 1);
+		if (arrStones[rndIndex]->getStatus() == stateEnum)
+		{
+			pTempMS = arrStones[rndIndex];
+			break;
+		}
+	}
+	return pTempMS;
+}
+
 bool gameRoomObjLayer::isAllUsed() const
 {
 	int secretCnt = 0;
@@ -914,7 +1130,7 @@ bool gameRoomObjLayer::isAllUsed() const
 	for (auto const &elemMagicStone : arrStones)
 	{
 		auto elemStatus = elemMagicStone->getStatus();
-		if (elemStatus == gameMetaData::msStatus::notUse)
+		if (elemStatus == gameMetaData::msState::notUse)
 		{
 			return false;
 		}
@@ -939,7 +1155,7 @@ void gameRoomObjLayer::checkArrStones()
 
 void gameRoomObjLayer::checkArrPlayers()
 {
-	for (auto const &i : arrPlayers)
+	for (auto const &i : playersList)
 	{
 		//std::cout << "StoneList size : " << i->getStoneListSize() << std::endl;
 		//std::cout << "BooungList size : " << i->getBooungListSize() << std::endl;

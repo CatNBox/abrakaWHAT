@@ -21,10 +21,16 @@ void networkManager::init(gameMetaData::gameMode modeFlag)
 	this->serverThread = nullptr;
 	this->server = nullptr;
 	this->myClientId = -1;
-	for (auto i : playerList)
+	for (int i = 0; i < playerList.size(); i++)
+	{
+		playerList[i].init();
+	}
+	/*
+	for (auto &i : playerList)
 	{
 		i.init();
 	}
+	*/
 }
 
 void networkManager::start()
@@ -237,6 +243,19 @@ bool networkManager::isAllPlayerReady()
 	return allReadyState;
 }
 
+void networkManager::getInitRoundData(short outSecretDeck[], short outPlayer1Hand[], short outPlayer2Hand[], short outPlayer3Hand[], short outPlayer4Hand[])
+{
+	//call from gameRoomObjLayer::update()
+	memcpy_s(outSecretDeck, gameMetaData::defaultSecretCnt, this->secretDeckList.data(), gameMetaData::defaultSecretCnt);
+
+	playerList[0].getHandList(outPlayer1Hand);
+	playerList[1].getHandList(outPlayer2Hand);
+	playerList[2].getHandList(outPlayer3Hand);
+	playerList[3].getHandList(outPlayer4Hand);
+
+	curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
+}
+
 void networkManager::requestSettingNPC(int id)
 {
 	//send req_npc to all players
@@ -269,6 +288,21 @@ void networkManager::requestGameRoomSceneReady()
 {
 	netProtocol::PKT_REQ_READY sendPkt;
 	sendPkt.init();
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::requestHostSetRound(short secretDeck[], 
+	short player1hand[], short player2hand[], short player3hand[], short player4hand[])
+{
+	netProtocol::PKT_HOST_SETROUND sendPkt;
+	sendPkt.init();
+
+	memcpy_s(sendPkt.secretMsList, sizeof(short)*netProtocol::maxSecretCnt, secretDeck, sizeof(short)*netProtocol::maxSecretCnt);
+	memcpy_s(sendPkt.player1MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, player1hand, sizeof(short)*netProtocol::maxPlayerHandCnt);
+	memcpy_s(sendPkt.player2MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, player2hand, sizeof(short)*netProtocol::maxPlayerHandCnt);
+	memcpy_s(sendPkt.player3MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, player3hand, sizeof(short)*netProtocol::maxPlayerHandCnt);
+	memcpy_s(sendPkt.player4MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, player4hand, sizeof(short)*netProtocol::maxPlayerHandCnt);
 
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 }
@@ -335,6 +369,19 @@ void networkManager::setFlagLoadingGameRooom()
 void networkManager::setGameRoomSceneReady(int readyId)
 {
 	playerList[readyId].setGameRoomReady();
+}
+
+void networkManager::setRoundByHostData(short secretDeck[], 
+	short player1Hand[], short player2Hand[], short player3Hand[], short player4Hand[])
+{
+	memcpy_s(secretDeckList.data(), sizeof(short)*netProtocol::maxSecretCnt, secretDeck, sizeof(short)*netProtocol::maxSecretCnt);
+
+	playerList[0].setHandList(player1Hand);
+	playerList[1].setHandList(player2Hand);
+	playerList[2].setHandList(player3Hand);
+	playerList[3].setHandList(player4Hand);
+
+	curProgressStage = gameMetaData::gameProgressStage::roundNetDataReady;
 }
 
 void networkManager::setMyServerAddr()

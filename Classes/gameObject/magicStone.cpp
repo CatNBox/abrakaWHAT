@@ -20,14 +20,14 @@ int magicStone::getStatus()
 	return this->status;
 }
 
-void magicStone::setStatus(const gameMetaData::msStatus newStatus)
+void magicStone::setState(const gameMetaData::msState newStatus)
 {
 	status = newStatus;
 }
 
 void magicStone::initObjData()
 {
-	status = gameMetaData::msStatus::notUse;
+	status = gameMetaData::msState::notUse;
 	curX = STDAXIS;
 	curY = STDAXIS;
 	tX = STDAXIS;
@@ -77,7 +77,7 @@ void magicStone::actionActivated()
 {
 	this->stopAllActions();
 	this->initMsSprite();
-	this->setStatus(gameMetaData::msStatus::discard);
+	this->setState(gameMetaData::msState::discard);
 	auto moving = cocos2d::MoveTo::create(0.5f, cocos2d::Vec2(STDAXIS, STDAXIS));
 	auto scaling = cocos2d::ScaleTo::create(1.0f, 5.0f);
 	auto fadeOut = cocos2d::FadeOut::create(1.0f);

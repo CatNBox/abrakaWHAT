@@ -26,6 +26,7 @@ public:
 	int getCurLP();
 	void decreaseLP(int varyValue);
 	void increaseLP(int varyValue);
+	//--createLpSprite with player's default position
 	cocos2d::Sprite* createLpObj(int playerIdx);
 	void initLpObj();
 	void actionGainLp(const int msTypeEnum);

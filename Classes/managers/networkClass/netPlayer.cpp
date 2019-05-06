@@ -29,6 +29,11 @@ void netPlayer::setNpcState(gameMetaData::gameMode curGameMode)
 	gameRoomReady = true;
 }
 
+void netPlayer::setHandList(short hand[])
+{
+	memcpy_s(handList.data(), sizeof(short) * gameMetaData::defaultHandCnt, hand, sizeof(short) * gameMetaData::defaultHandCnt);
+}
+
 void netPlayer::connectSuccess()
 {
 	connectionState = gameMetaData::netPlayerState::connected;
@@ -52,4 +57,15 @@ void netPlayer::setGameRoomReady()
 bool netPlayer::getGameRoomReadyState()
 {
 	return gameRoomReady;
+}
+
+void netPlayer::getHandList(short * outputList)
+{
+	if (outputList == nullptr)
+	{
+		//error handling
+		return;
+	}
+
+	memcpy_s(outputList, sizeof(short) * gameMetaData::defaultHandCnt, handList.data(), sizeof(short) * gameMetaData::defaultHandCnt);
 }

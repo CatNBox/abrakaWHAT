@@ -39,6 +39,7 @@ namespace gameMetaData
 	//option.ini defaultValue
 	const int defaultPlayerCnt = 4;
 	const int defaultSecretCnt = 4;
+	const int defaultHandCnt = 5;
 	const int defaultYongCnt = 1;
 	const int defaultBangrangCnt = 2;
 	const int defaultWindCnt = 3;
@@ -214,12 +215,13 @@ namespace gameMetaData
 		effectZ		//----Effect Zorder
 	};
 
-	enum msStatus
+	enum msState
 	{
 		notUse,
 		owned,
 		secret,
 		discard,
+		preserve,
 		unknownStatus
 	};
 
@@ -261,7 +263,10 @@ namespace gameMetaData
 		waiting,
 		readyLoadingGameRoomScene,
 		loadingGameRoomScene,
-		gameRoomReady
+		gameRoomReady,
+		waitRoundNetData,
+		roundNetDataReady,
+		roundSetReady
 	};
 
 	enum class npcState

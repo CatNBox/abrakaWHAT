@@ -214,6 +214,47 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 			vecSessionPool[0]->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 		}
 		break;
+	case netProtocol::pktIdentt::HOST_SETROUND:
+		{
+			netProtocol::PKT_HOST_SETROUND* pPacket = (netProtocol::PKT_HOST_SETROUND*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : HOST_SETROUND" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet sessionID : " << sessionId << std::endl;
+			for (int i = 0; i < netProtocol::maxSecretCnt; i++)
+			{
+				std::cout << "packet secretDeck[" << i << "] : " << pPacket->secretMsList[i] << std::endl;
+			}
+			for (int i = 0; i < netProtocol::maxPlayerHandCnt; i++)
+			{
+				std::cout << "packet player1Hand[" << i << "] : " << pPacket->player1MsList[i] << std::endl
+					<< "packet player2Hand[" << i << "] : " << pPacket->player2MsList[i] << std::endl
+					<< "packet player3Hand[" << i << "] : " << pPacket->player3MsList[i] << std::endl
+					<< "packet player4Hand[" << i << "] : " << pPacket->player4MsList[i] << std::endl
+					<< "+++++" << std::endl;
+			}
+			std::cout
+				<< "---------------------" << std::endl;
+
+			netProtocol::PKT_NOTICE_SETROUND sendPkt;
+			sendPkt.init();
+			memcpy_s(sendPkt.secretMsList, sizeof(short)*netProtocol::maxSecretCnt, pPacket->secretMsList, sizeof(short)*netProtocol::maxSecretCnt);
+			memcpy_s(sendPkt.player1MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player1MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(sendPkt.player2MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player2MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(sendPkt.player3MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player3MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+			memcpy_s(sendPkt.player4MsList, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->player4MsList, sizeof(short)*netProtocol::maxPlayerHandCnt);
+
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
+		}
+		break;
 	default:
 		break;
 	}
