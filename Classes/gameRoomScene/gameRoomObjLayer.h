@@ -34,21 +34,24 @@ private:
 	void startGameByNpc();
 
 	void selectSecretStone();
-	short hostSelectSecretStone();
-	short hostSelectStone4Hand();
 	void distributeStone2Player();
 
 	void selectSecretStonebyNetData();
 	void distributeStoneByNetdata();
 
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
+	void requestCheckOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
+	void netmodeCheckOwnedMagic();
 	void activateMagic(const int magicEnum);
 	void updateSeenChecker(const int magicEnum);
+	void refillPlayerHand(player &curPlayer);
 	void reorderPlayerHand();
 	bool isRoundEnd();
 	void calcScore();
 	void callEndRoundEvent();
 	void passTurn();
+	void netmodePassTurn();
+	void requestRefillHand(player* curPlayer);
 
 	cocos2d::Sprite* getMSSprite(const int magicEnum);
 
@@ -56,6 +59,7 @@ private:
 
 	magicStone* pickAStone(const int stateEnum);
 	magicStone* pickAStone(const int stateEnum, const short magicEnum);
+	short netmodePickAStone();
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
@@ -72,7 +76,8 @@ private:
 	int stoneMaxCnt = 0;
 
 	int starterIdx = 0;
-	int curPlayerNum = 0;
+	int curPlayerIdx = 0;
+	int curOrder = 0;
 	int myPlayerIdx = 0;
 	int myTurnOrder = 0;
 	int roundWinPlayerNum = -1;
@@ -96,6 +101,7 @@ private:
 	spriteManager* sprManager;
 	actionManager* actManager;
 	networkManager* netManager;
+	cocos2d::Director* cocosDirector;
 
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index
@@ -114,6 +120,7 @@ private:
 	short bufPlayer2Hand[5];
 	short bufPlayer3Hand[5];
 	short bufPlayer4Hand[5];
+	short bufRefillHand[5];
 	
 	//멀티에서는 서버에서만 세팅 및 드로우 동작
 	//클라에서는 서버에서 출력해야할 정보만 얻어옴

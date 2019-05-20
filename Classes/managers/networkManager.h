@@ -46,12 +46,16 @@ public:
 		short outPlayer3Hand[],
 		short outPlayer4Hand[]
 	);
+	void getPickedMagicNetData(short *outMagicEnum, int *outPlayerIdx);
+	void getRefillNetData(short outRefillHand[], short *outDrawCnt, int *outCurPlayerIdx);
 
 	//client request function
 	void requestSettingNPC(int id);
-	void requestSettingOrder(int* playerTurnOrder);
+	void requestSettingOrder(int playerTurnOrder[]);
 	void requestGameRoomStart();
 	void requestGameRoomSceneReady();
+	void requestCheckOwnedMagic(short pickedMagicType);
+	void requestRefillHand(short bufRefillHand[], short bufSize, int curPlayerIdx);
 
 	//host request function
 	void requestHostSetRound(
@@ -64,11 +68,11 @@ public:
 
 	//set network data
 	void setMyClientID(int id);
-	void setCurPlayersLoginState(bool* loginStateList);
+	void setCurPlayersLoginState(bool loginStateList[]);
 	void setJoinedNewPlayer(int joinedPlayerId);
 	void setDisconnectPlayer(int disconnectPlayerId);
 	void setNpc(int NpcId);
-	void setTurnOrder(int* turnOrderList);
+	void setTurnOrder(int turnOrderList[]);
 	void setFlagReadyLoadingGameRoom();
 	void setFlagLoadingGameRooom();
 	void setGameRoomSceneReady(int readyId);
@@ -79,6 +83,8 @@ public:
 		short player3Hand[],
 		short player4Hand[]
 	);
+	void setPickedMagicData(const short pickedMagic, const int curPlayerIdx);
+	void setRefillNetData(short refillList[], const short refillSize, const short curPlayerIdx);
 	
 private:
 
@@ -103,6 +109,12 @@ private:
 	std::array<netPlayer, netProtocol::maxSecretCnt> playerList;
 	std::array<int, netProtocol::maxSecretCnt> playerTurnOrder;
 	std::array<short, netProtocol::maxSecretCnt> secretDeckList;
+
+	//netData buffer
+	short bufPickedMagicType;
+	int bufCurTurnPlayerIdx;
+	short bufRefillHand[netProtocol::maxPlayerHandCnt];
+	short bufRefillSize;
 
 	//flags
 	gameMetaData::gameMode curGameMode;

@@ -24,13 +24,13 @@ public:
 	bool checkOutMagic(const int magicEnum);
 
 	int getCurLP();
-	void decreaseLP(int varyValue);
-	void increaseLP(int varyValue);
+	void decreaseLP(const int varyValue);
+	void increaseLP(const int varyValue);
 	//--createLpSprite with player's default position
 	cocos2d::Sprite* createLpObj(int playerIdx);
 	void initLpObj();
 	void actionGainLp(const int msTypeEnum);
-	void actionLostLp(int lostValue);
+	void actionLostLp(const int lostValue);
 
 	bool doHaveThisMagic(const int magicNumber);
 	bool isNPC() const;
@@ -48,6 +48,8 @@ public:
 	void setDefaultY(int posY);
 	float getRotationValue() const;
 	void setRotationValue(float rot);
+
+	void setPlayOrder(int playOrder);
 
 protected:
 	int defaultX = 384;
@@ -76,7 +78,7 @@ public:
 	npc(int playOrder);
 	npc(int playOrder, int netIdx);
 	void initNpc();
-	void npcProcess();
+	void npcProcess(gameMetaData::gameMode curMode);
 	void npcTurnOn();
 	void waitTurn();
 	void choiceFail(const int magicEnum);

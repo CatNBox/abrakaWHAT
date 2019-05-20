@@ -24,15 +24,19 @@ namespace netProtocol
 		REQ_ORDER = 4,
 		REQ_START = 5,
 		REQ_READY = 6,
-		RES_IN = 10,
-		NOTICE_IN = 11,
-		NOTICE_OUT = 12,
-		NOTICE_NPC = 13,
-		NOTICE_ORDER = 14,
-		NOTICE_START = 15,
-		NOTICE_READY = 16,
-		NOTICE_SETROUND = 17,
-		HOST_SETROUND = 30
+		REQ_CHECKMAGIC = 7,
+		REQ_REFILL = 8,
+		RES_IN = 20,
+		NOTICE_IN = 21,
+		NOTICE_OUT = 22,
+		NOTICE_NPC = 23,
+		NOTICE_ORDER = 24,
+		NOTICE_START = 25,
+		NOTICE_READY = 26,
+		NOTICE_SETROUND = 27,
+		NOTICE_CHECKMAGIC = 28,
+		NOTICE_REFILL = 29,
+		HOST_SETROUND = 40
 	};
 
 	/*
@@ -107,6 +111,38 @@ namespace netProtocol
 		{
 			pktId = pktIdentt::REQ_READY;
 			pktSize = sizeof(PKT_REQ_READY);
+		}
+	};
+
+	struct PKT_REQ_CHECKMAGIC : public PACKET_HEADER
+	{
+		//msType 1~8 
+		short pickedMagicType;
+
+		void init()
+		{
+			pktId = pktIdentt::REQ_CHECKMAGIC;
+			pktSize = sizeof(PKT_REQ_CHECKMAGIC);
+			pickedMagicType = 9;
+		}
+	};
+
+	struct PKT_REQ_REFILL : public PACKET_HEADER
+	{
+		short refillHand[maxPlayerHandCnt];
+		short refillSize;
+		int curTurnPlayerIdx;
+
+		void init()
+		{
+			pktId = pktIdentt::REQ_REFILL;
+			pktSize = sizeof(PKT_REQ_REFILL);
+			for (int i = 0; i < maxPlayerHandCnt; i++)
+			{
+				refillHand[i] = -1;
+			}
+			refillSize = 0;
+			curTurnPlayerIdx = -1;
 		}
 	};
 
@@ -231,6 +267,39 @@ namespace netProtocol
 				player3MsList[i] = -1;
 				player4MsList[i] = -1;
 			}
+		}
+	};
+
+	struct PKT_NOTICE_CHECKMAGIC : public PACKET_HEADER
+	{
+		//msType 1~8 
+		short pickedMagicType;
+		int curTurnPlayerIdx;
+
+		void init()
+		{
+			pktId = pktIdentt::NOTICE_CHECKMAGIC;
+			pktSize = sizeof(PKT_NOTICE_CHECKMAGIC);
+			pickedMagicType = 9;
+			curTurnPlayerIdx = -1;
+		}
+	};
+
+	struct PKT_NOTICE_REFILL : public PACKET_HEADER
+	{
+		short refillHand[maxPlayerHandCnt];
+		short refillSize;
+		int curTurnPlayerIdx;
+
+		void init()
+		{
+			pktId = pktIdentt::NOTICE_REFILL;
+			pktSize = sizeof(PKT_NOTICE_REFILL);
+			for (int i = 0; i < maxPlayerHandCnt; i++)
+			{
+				refillHand[i] = -1;
+			}
+			refillSize = 0;
 		}
 	};
 }

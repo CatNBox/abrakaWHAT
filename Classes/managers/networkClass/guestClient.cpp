@@ -335,6 +335,44 @@ void guestClient::processPacket(const char & pData)
 			);
 		}
 		break;
+	case netProtocol::pktIdentt::NOTICE_CHECKMAGIC:
+		{
+			netProtocol::PKT_NOTICE_CHECKMAGIC* pPacket = (netProtocol::PKT_NOTICE_CHECKMAGIC*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_CHECKMAGIC" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet pickedMagicType : " << pPacket->pickedMagicType << std::endl
+				<< "packet curTurnPlayerIdx : " << pPacket->curTurnPlayerIdx << std::endl
+				<< "---------------------" << std::endl;
+
+			networkManager::getInstance()->setPickedMagicData(pPacket->pickedMagicType, pPacket->curTurnPlayerIdx);
+		}
+		break;
+	case netProtocol::pktIdentt::NOTICE_REFILL: //start gameRoom packet
+		{
+			netProtocol::PKT_NOTICE_REFILL* pPacket = (netProtocol::PKT_NOTICE_REFILL*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : NOTICE_REFILL" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet refillSize : " << pPacket->refillSize << std::endl
+				<< "packet curTurnPlayerIdx : " << pPacket->curTurnPlayerIdx << std::endl;
+			for (int i = 0; i < netProtocol::maxPlayerHandCnt; i++)
+			{
+				std::cout << "packet refillHand[" << i << "] : " << pPacket->refillHand[i] << std::endl;
+			}
+			std::cout
+				<< "---------------------" << std::endl;
+
+			short bufRefillData[netProtocol::maxPlayerHandCnt];
+			memcpy_s(bufRefillData, netProtocol::maxPlayerHandCnt, pPacket->refillHand, netProtocol::maxPlayerHandCnt);
+
+			networkManager::getInstance()->setRefillNetData(bufRefillData, pPacket->refillSize, pPacket->curTurnPlayerIdx);
+		}
+		break;
 	default:
 		break;
 	}

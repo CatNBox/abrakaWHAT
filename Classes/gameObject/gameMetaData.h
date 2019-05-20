@@ -266,7 +266,12 @@ namespace gameMetaData
 		gameRoomReady,
 		waitRoundNetData,
 		roundNetDataReady,
-		roundSetReady
+		roundSetReady,
+		requestCheckOwnedMagic,
+		takeMagicResult,
+		requestRefillHand,
+		takeRefillResult,
+		requestPassTurn
 	};
 
 	enum class npcState
@@ -289,5 +294,10 @@ namespace gameMetaData
 		disconnected,
 		guestNPC,
 		hostNPC
+	};
+
+	enum class customEventType
+	{
+		roundUp
 	};
 }

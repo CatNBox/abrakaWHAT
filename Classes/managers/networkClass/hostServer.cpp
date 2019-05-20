@@ -211,7 +211,75 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 			sendPkt.init();
 			sendPkt.readyId = sessionId;
 
-			vecSessionPool[0]->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
+		}
+		break;
+	case netProtocol::pktIdentt::REQ_CHECKMAGIC: //start gameRoom packet
+		{
+			//notify all session game is start
+			netProtocol::PKT_REQ_CHECKMAGIC* pPacket = (netProtocol::PKT_REQ_CHECKMAGIC*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_CHECKMAGIC" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "packet pickedMagicType : " << pPacket->pickedMagicType << std::endl
+				<< "---------------------" << std::endl;
+
+			netProtocol::PKT_NOTICE_CHECKMAGIC sendPkt;
+			sendPkt.init();
+			sendPkt.pickedMagicType = pPacket->pickedMagicType;
+			sendPkt.curTurnPlayerIdx = sessionId;
+
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
+		}
+		break;
+	case netProtocol::pktIdentt::REQ_REFILL: //start gameRoom packet
+		{
+			//notify all session that curPlayer refill hand
+			netProtocol::PKT_REQ_REFILL* pPacket = (netProtocol::PKT_REQ_REFILL*)&pData;
+
+			std::cout
+				<< "---------------------" << std::endl
+				<< "packet ID : REQ_CHECKMAGIC" << std::endl
+				<< "packet size : " << pPacket->pktSize << std::endl
+				<< "packet sessionID : " << sessionId << std::endl
+				<< "packet refillSize : " << pPacket->refillSize << std::endl
+				<< "packet curTurnPlayerIdx : " << pPacket->curTurnPlayerIdx << std::endl;
+			for (int i = 0; i < netProtocol::maxPlayerHandCnt; i++)
+			{
+				std::cout << "packet refillHand[" << i << "] : " << pPacket->refillHand[i] << std::endl;
+			}
+			std::cout
+				<< "---------------------" << std::endl;
+
+			netProtocol::PKT_NOTICE_REFILL sendPkt;
+			sendPkt.init();
+			memcpy_s(sendPkt.refillHand, netProtocol::maxPlayerHandCnt, pPacket->refillHand, netProtocol::maxPlayerHandCnt);
+			sendPkt.refillSize = pPacket->refillSize;
+			sendPkt.curTurnPlayerIdx = pPacket->curTurnPlayerIdx;
+
+			for (auto i : vecSessionPool)
+			{
+				if (i->getSocket().is_open())
+				{
+					i->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+				}
+			}
 		}
 		break;
 	case netProtocol::pktIdentt::HOST_SETROUND:

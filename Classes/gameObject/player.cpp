@@ -92,7 +92,7 @@ int player::getCurLP()
 	return temp;
 }
 
-void player::decreaseLP(int varyValue)
+void player::decreaseLP(const int varyValue)
 {
 	roundLP -= varyValue;
 
@@ -100,7 +100,7 @@ void player::decreaseLP(int varyValue)
 		roundLP = 5;
 }
 
-void player::increaseLP(int varyValue)
+void player::increaseLP(const int varyValue)
 {
 	roundLP += varyValue;
 
@@ -201,11 +201,13 @@ void player::actionGainLp(const int msTypeEnum)
 	}
 }
 
-void player::actionLostLp(int lostValue)
+void player::actionLostLp(const int lostValue)
 {
+	int lostLpValue = lostValue;
+
 	for (auto &i : lpSprList)
 	{
-		if (lostValue <= 0)
+		if (lostLpValue <= 0)
 			break;
 
 		if (i.second == true)
@@ -223,7 +225,7 @@ void player::actionLostLp(int lostValue)
 			auto seq = cocos2d::Sequence::create(spawning, setBack, NULL);
 			
 			i.first->runAction(seq);
-			lostValue--;
+			lostLpValue--;
 		}
 	}
 }
@@ -305,6 +307,11 @@ void player::setRotationValue(float rot)
 	rotationValue = rot;
 }
 
+void player::setPlayOrder(int playOrder)
+{
+	myPlayOrder = playOrder;
+}
+
 /*-------------------------------------------------
 
 			class NPC
@@ -348,12 +355,14 @@ void npc::initNpc()
 	arrPrevFailList.clear();
 }
 
-void npc::npcProcess()
+void npc::npcProcess(gameMetaData::gameMode curMode)
 {
 	if (state == gameMetaData::npcState::npcTurnOn)
 	{
 		if (newHandCnt > 0)
+		{
 			arrPrevFailList.clear();
+		}
 
 		duplArrDiscardCnt2ArrMsScore();
 		countAnotherPlayerHand();
@@ -365,9 +374,18 @@ void npc::npcProcess()
 		prevChoice = targetMagic;
 		//계산후 이 부분의 선택한 magicStone값을 설정한 후 스케줄로 호출
 		cocos2d::Director::getInstance()->getScheduler()->schedule(
-			[targetMagic](float dt)
+			[targetMagic, curMode](float dt)
 		{
-			cocos2d::EventCustom checkEvent("checkOwnedMagic");
+			std::string eventName;
+			if (curMode == gameMetaData::gameMode::single)
+			{
+				eventName = "checkOwnedMagic";
+			}
+			else
+			{
+				eventName = "requestCheckOwnedMagic";
+			}
+			cocos2d::EventCustom checkEvent(eventName);
 			checkEvent.setUserData((void*)targetMagic);
 			Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
 		}, this, 0.0f, 0, thinkRowhenTime, false, "npcChoice");

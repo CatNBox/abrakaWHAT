@@ -11,10 +11,10 @@ cocos2d::Scene * gameRoomScene::createScene(gameMetaData::gameMode modeFlag, int
 	auto scene = gameRoomScene::create();
 
 	auto layerBG = gameRoomBGLayer::create();
-	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerTurnOrder);
 	auto layerUI = gameRoomUILayer::create();
 	auto layerPopup = popupLayer::create();
 	auto layerCommonUI = commonUILayer::create();
+	auto layerObj = gameRoomObjLayer::createWithParam(modeFlag, playerTurnOrder);
 
 	scene->addChild(layerBG, gameMetaData::layerZOrder::backGroundZ);
 	scene->addChild(layerUI, gameMetaData::layerZOrder::objZ0);

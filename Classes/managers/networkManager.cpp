@@ -246,7 +246,7 @@ bool networkManager::isAllPlayerReady()
 void networkManager::getInitRoundData(short outSecretDeck[], short outPlayer1Hand[], short outPlayer2Hand[], short outPlayer3Hand[], short outPlayer4Hand[])
 {
 	//call from gameRoomObjLayer::update()
-	memcpy_s(outSecretDeck, gameMetaData::defaultSecretCnt, this->secretDeckList.data(), gameMetaData::defaultSecretCnt);
+	memcpy_s(outSecretDeck, gameMetaData::defaultSecretCnt * sizeof(short), this->secretDeckList.data(), gameMetaData::defaultSecretCnt * sizeof(short));
 
 	playerList[0].getHandList(outPlayer1Hand);
 	playerList[1].getHandList(outPlayer2Hand);
@@ -254,6 +254,33 @@ void networkManager::getInitRoundData(short outSecretDeck[], short outPlayer1Han
 	playerList[3].getHandList(outPlayer4Hand);
 
 	curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
+}
+
+void networkManager::getPickedMagicNetData(short *outMagicEnum, int * outPlayerIdx)
+{
+	if ((outMagicEnum == nullptr) || (outPlayerIdx == nullptr))
+	{
+		//output variable null handling
+		return;
+	}
+
+	outMagicEnum = &bufPickedMagicType;
+	outPlayerIdx = &bufCurTurnPlayerIdx;
+
+	curProgressStage = gameMetaData::gameProgressStage::takeMagicResult;
+}
+
+void networkManager::getRefillNetData(short outRefillHand[], short * outDrawCnt, int * outCurPlayerIdx)
+{
+	if ((outRefillHand == nullptr) || (outDrawCnt == nullptr) || (outCurPlayerIdx == nullptr))
+	{
+		//output variable null handling
+		return;
+	}
+
+	memcpy_s(outRefillHand, netProtocol::maxPlayerHandCnt, bufRefillHand, netProtocol::maxPlayerHandCnt);
+	outDrawCnt = &bufRefillSize;
+	outCurPlayerIdx = &bufCurTurnPlayerIdx;
 }
 
 void networkManager::requestSettingNPC(int id)
@@ -266,7 +293,7 @@ void networkManager::requestSettingNPC(int id)
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 }
 
-void networkManager::requestSettingOrder(int * playerTurnOrder)
+void networkManager::requestSettingOrder(int playerTurnOrder[])
 {
 	//send req_order to server for echo all players
 	netProtocol::PKT_REQ_ORDER sendPkt;
@@ -292,6 +319,27 @@ void networkManager::requestGameRoomSceneReady()
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 }
 
+void networkManager::requestCheckOwnedMagic(short pickedMagicType)
+{
+	netProtocol::PKT_REQ_CHECKMAGIC sendPkt;
+	sendPkt.init();
+	sendPkt.pickedMagicType = pickedMagicType;
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
+void networkManager::requestRefillHand(short bufRefillHand[], short bufSize, int curPlayerIdx)
+{
+	//send req_refill to server for echo all players
+	netProtocol::PKT_REQ_REFILL sendPkt;
+	sendPkt.init();
+	memcpy_s(sendPkt.refillHand, sizeof(short)*bufSize, bufRefillHand, sizeof(short)*bufSize);
+	sendPkt.refillSize = bufSize;
+	sendPkt.curTurnPlayerIdx = curPlayerIdx;
+
+	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
+}
+
 void networkManager::requestHostSetRound(short secretDeck[], 
 	short player1hand[], short player2hand[], short player3hand[], short player4hand[])
 {
@@ -312,7 +360,7 @@ void networkManager::setMyClientID(int id)
 	this->myClientId = id;
 }
 
-void networkManager::setCurPlayersLoginState(bool* loginStateList)
+void networkManager::setCurPlayersLoginState(bool loginStateList[])
 {
 	for (int i = 0; i < netProtocol::maxSessionCnt; i++)
 	{
@@ -346,7 +394,7 @@ void networkManager::setNpc(int NpcId)
 	updateCurPlayerCnt();
 }
 
-void networkManager::setTurnOrder(int * turnOrderList)
+void networkManager::setTurnOrder(int turnOrderList[])
 {
 	for (int i = 0; i < netProtocol::maxSessionCnt; i++)
 	{
@@ -382,6 +430,24 @@ void networkManager::setRoundByHostData(short secretDeck[],
 	playerList[3].setHandList(player4Hand);
 
 	curProgressStage = gameMetaData::gameProgressStage::roundNetDataReady;
+}
+
+void networkManager::setPickedMagicData(const short pickedMagic, const int curPlayerIdx)
+{
+	//picked magic data on current turn
+	bufPickedMagicType = pickedMagic;
+	bufCurTurnPlayerIdx = curPlayerIdx;
+
+	curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
+}
+
+void networkManager::setRefillNetData(short refillList[], const short refillSize, const short curPlayerIdx)
+{
+	memcpy_s(bufRefillHand, netProtocol::maxPlayerHandCnt, refillList, netProtocol::maxPlayerHandCnt);
+	bufRefillSize = refillSize;
+	bufCurTurnPlayerIdx = curPlayerIdx;
+
+	curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
 }
 
 void networkManager::setMyServerAddr()
