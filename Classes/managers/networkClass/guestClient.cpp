@@ -345,9 +345,10 @@ void guestClient::processPacket(const char & pData)
 				<< "packet size : " << pPacket->pktSize << std::endl
 				<< "packet pickedMagicType : " << pPacket->pickedMagicType << std::endl
 				<< "packet curTurnPlayerIdx : " << pPacket->curTurnPlayerIdx << std::endl
+				<< "packet damageValue : " << pPacket->damageValue << std::endl
 				<< "---------------------" << std::endl;
 
-			networkManager::getInstance()->setPickedMagicData(pPacket->pickedMagicType, pPacket->curTurnPlayerIdx);
+			networkManager::getInstance()->setPickedMagicData(pPacket->pickedMagicType, pPacket->curTurnPlayerIdx, pPacket->damageValue);
 		}
 		break;
 	case netProtocol::pktIdentt::NOTICE_REFILL: //start gameRoom packet
@@ -368,7 +369,7 @@ void guestClient::processPacket(const char & pData)
 				<< "---------------------" << std::endl;
 
 			short bufRefillData[netProtocol::maxPlayerHandCnt];
-			memcpy_s(bufRefillData, netProtocol::maxPlayerHandCnt, pPacket->refillHand, netProtocol::maxPlayerHandCnt);
+			memcpy_s(bufRefillData, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->refillHand, sizeof(short)*netProtocol::maxPlayerHandCnt);
 
 			networkManager::getInstance()->setRefillNetData(bufRefillData, pPacket->refillSize, pPacket->curTurnPlayerIdx);
 		}

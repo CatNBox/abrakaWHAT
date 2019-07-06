@@ -118,12 +118,16 @@ namespace netProtocol
 	{
 		//msType 1~8 
 		short pickedMagicType;
+		int curTurnPlayerIdx;
+		int damageValue;
 
 		void init()
 		{
 			pktId = pktIdentt::REQ_CHECKMAGIC;
 			pktSize = sizeof(PKT_REQ_CHECKMAGIC);
 			pickedMagicType = 9;
+			curTurnPlayerIdx = -1;
+			damageValue = 1;
 		}
 	};
 
@@ -275,6 +279,7 @@ namespace netProtocol
 		//msType 1~8 
 		short pickedMagicType;
 		int curTurnPlayerIdx;
+		int damageValue;
 
 		void init()
 		{
@@ -282,6 +287,7 @@ namespace netProtocol
 			pktSize = sizeof(PKT_NOTICE_CHECKMAGIC);
 			pickedMagicType = 9;
 			curTurnPlayerIdx = -1;
+			damageValue = 1;
 		}
 	};
 

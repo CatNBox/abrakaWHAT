@@ -24,12 +24,10 @@ public:
 	bool checkOutMagic(const int magicEnum);
 
 	int getCurLP();
-	void decreaseLP(const int varyValue);
-	void increaseLP(const int varyValue);
 	//--createLpSprite with player's default position
-	cocos2d::Sprite* createLpObj(int playerIdx);
+	cocos2d::Sprite* createLpObj();
 	void initLpObj();
-	void actionGainLp(const int msTypeEnum);
+	void actionGainLp(const int msTypeEnum, const int gainLpNum = 1);
 	void actionLostLp(const int lostValue);
 
 	bool doHaveThisMagic(const int magicNumber);
@@ -40,6 +38,7 @@ public:
 	player* getPrevPlayer() const;
 	void setPrevPlayer(player* next);
 	const int getPlayOrder() const;
+	void setPlayOrder(const int playOrder);
 	const int getNetIndex() const;
 
 	int getDefaultX() const;
@@ -49,16 +48,16 @@ public:
 	float getRotationValue() const;
 	void setRotationValue(float rot);
 
-	void setPlayOrder(int playOrder);
+	void setPlayIdx(int playerIdx);
+	const int getPlayIdx();
 
 protected:
 	int defaultX = 384;
 	int defaultY = 0;
 	float rotationValue = 0;
+	int myPlayerIdx = 0;
 	int myPlayOrder = 0;
 	int myNetIndex = 0;
-
-	int roundLP = 5;
 
 	bool flagNPC = false;
 	//char* playerIPaddr;
@@ -98,6 +97,6 @@ private:
 	std::array<std::pair<int, int>, gameMetaData::variableMaxCnt::msTypeCnt> arrMsScore;
 	std::array<int, gameMetaData::variableMaxCnt::msTypeCnt> arrDiscardCnt;
 	std::vector<int> arrPrevFailList;
-	float thinkRowhenTime = 1.5f;
+	float thinkRowhenTime = 2.0f;
 	gameMetaData::npcState state; // gameMetaData::npcState
 };

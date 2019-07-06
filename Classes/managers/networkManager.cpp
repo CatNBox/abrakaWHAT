@@ -256,16 +256,17 @@ void networkManager::getInitRoundData(short outSecretDeck[], short outPlayer1Han
 	curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
 }
 
-void networkManager::getPickedMagicNetData(short *outMagicEnum, int * outPlayerIdx)
+void networkManager::getPickedMagicNetData(short *outMagicEnum, int * outPlayerIdx, int * outDamageValue)
 {
-	if ((outMagicEnum == nullptr) || (outPlayerIdx == nullptr))
+	if ((outMagicEnum == nullptr) || (outPlayerIdx == nullptr) || (outDamageValue == nullptr))
 	{
 		//output variable null handling
 		return;
 	}
 
-	outMagicEnum = &bufPickedMagicType;
-	outPlayerIdx = &bufCurTurnPlayerIdx;
+	*outMagicEnum = bufPickedMagicType;
+	*outPlayerIdx = bufCurTurnPlayerIdx;
+	*outDamageValue = bufDamageValue;
 
 	curProgressStage = gameMetaData::gameProgressStage::takeMagicResult;
 }
@@ -278,9 +279,9 @@ void networkManager::getRefillNetData(short outRefillHand[], short * outDrawCnt,
 		return;
 	}
 
-	memcpy_s(outRefillHand, netProtocol::maxPlayerHandCnt, bufRefillHand, netProtocol::maxPlayerHandCnt);
-	outDrawCnt = &bufRefillSize;
-	outCurPlayerIdx = &bufCurTurnPlayerIdx;
+	memcpy_s(outRefillHand, sizeof(short)*netProtocol::maxPlayerHandCnt, bufRefillHand, sizeof(short)*netProtocol::maxPlayerHandCnt);
+	*outDrawCnt = bufRefillSize;
+	*outCurPlayerIdx = bufCurTurnPlayerIdx;
 }
 
 void networkManager::requestSettingNPC(int id)
@@ -319,11 +320,13 @@ void networkManager::requestGameRoomSceneReady()
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 }
 
-void networkManager::requestCheckOwnedMagic(short pickedMagicType)
+void networkManager::requestCheckOwnedMagic(short pickedMagicType, int curTurnPlayerIdx, int damageValue)
 {
 	netProtocol::PKT_REQ_CHECKMAGIC sendPkt;
 	sendPkt.init();
 	sendPkt.pickedMagicType = pickedMagicType;
+	sendPkt.curTurnPlayerIdx = curTurnPlayerIdx;
+	sendPkt.damageValue = damageValue;
 
 	myClient->startSend(false, sendPkt.pktSize, (char&)sendPkt);
 }
@@ -432,18 +435,19 @@ void networkManager::setRoundByHostData(short secretDeck[],
 	curProgressStage = gameMetaData::gameProgressStage::roundNetDataReady;
 }
 
-void networkManager::setPickedMagicData(const short pickedMagic, const int curPlayerIdx)
+void networkManager::setPickedMagicData(const short pickedMagic, const int curPlayerIdx, const int damageValue)
 {
 	//picked magic data on current turn
 	bufPickedMagicType = pickedMagic;
 	bufCurTurnPlayerIdx = curPlayerIdx;
+	bufDamageValue = damageValue;
 
 	curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
 }
 
 void networkManager::setRefillNetData(short refillList[], const short refillSize, const short curPlayerIdx)
 {
-	memcpy_s(bufRefillHand, netProtocol::maxPlayerHandCnt, refillList, netProtocol::maxPlayerHandCnt);
+	memcpy_s(bufRefillHand, sizeof(short)*netProtocol::maxPlayerHandCnt, refillList, sizeof(short)*netProtocol::maxPlayerHandCnt);
 	bufRefillSize = refillSize;
 	bufCurTurnPlayerIdx = curPlayerIdx;
 

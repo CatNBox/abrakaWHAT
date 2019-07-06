@@ -46,7 +46,7 @@ public:
 		short outPlayer3Hand[],
 		short outPlayer4Hand[]
 	);
-	void getPickedMagicNetData(short *outMagicEnum, int *outPlayerIdx);
+	void getPickedMagicNetData(short *outMagicEnum, int *outPlayerIdx, int *outDamageValue);
 	void getRefillNetData(short outRefillHand[], short *outDrawCnt, int *outCurPlayerIdx);
 
 	//client request function
@@ -54,7 +54,7 @@ public:
 	void requestSettingOrder(int playerTurnOrder[]);
 	void requestGameRoomStart();
 	void requestGameRoomSceneReady();
-	void requestCheckOwnedMagic(short pickedMagicType);
+	void requestCheckOwnedMagic(short pickedMagicType, int curTurnPlayerIdx, int damageValue = 1);
 	void requestRefillHand(short bufRefillHand[], short bufSize, int curPlayerIdx);
 
 	//host request function
@@ -83,7 +83,7 @@ public:
 		short player3Hand[],
 		short player4Hand[]
 	);
-	void setPickedMagicData(const short pickedMagic, const int curPlayerIdx);
+	void setPickedMagicData(const short pickedMagic, const int curPlayerIdx, const int damageValue);
 	void setRefillNetData(short refillList[], const short refillSize, const short curPlayerIdx);
 	
 private:
@@ -113,6 +113,7 @@ private:
 	//netData buffer
 	short bufPickedMagicType;
 	int bufCurTurnPlayerIdx;
+	int bufDamageValue;
 	short bufRefillHand[netProtocol::maxPlayerHandCnt];
 	short bufRefillSize;
 

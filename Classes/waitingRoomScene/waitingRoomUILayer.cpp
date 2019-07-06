@@ -391,6 +391,12 @@ bool waitingRoomUILayer::setBufTurnOrder()
 		}
 	}
 
+	bufTurnOrder[0] = 4;
+	bufTurnOrder[1] = 3;
+	bufTurnOrder[2] = 2;
+	bufTurnOrder[3] = 1;
+
+
 	return true;
 }
 

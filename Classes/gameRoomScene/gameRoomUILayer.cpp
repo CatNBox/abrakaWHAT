@@ -6,7 +6,7 @@
 
 using namespace cocos2d;
 
-bool gameRoomUILayer::init()
+bool gameRoomUILayer::init(gameMetaData::gameMode modeFlag)
 {
 	if (!Layer::init())
 	{
@@ -17,10 +17,27 @@ bool gameRoomUILayer::init()
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
+	curGameMode = modeFlag;
 
 	initUI();
 
 	return true;
+}
+
+gameRoomUILayer * gameRoomUILayer::createWithParam(gameMetaData::gameMode modeFlag)
+{
+	gameRoomUILayer *pRet = new(std::nothrow) gameRoomUILayer();
+	if (pRet && pRet->init(modeFlag))
+	{
+		pRet->autorelease();
+		return pRet;
+	}
+	else
+	{
+		delete pRet;
+		pRet = nullptr;
+		return nullptr;
+	}
 }
 
 void gameRoomUILayer::settingEventListener()
@@ -51,7 +68,7 @@ void gameRoomUILayer::settingEventListener()
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(callBackListener, this);
 
 	//disable passBtn, selectUI WHEN passing turn to next user
-	callBackListener = EventListenerCustom::create("passTurn2NextUser",
+	callBackListener = EventListenerCustom::create("turnOverUIDisabled",
 		[=](EventCustom* event) {
 		setEnabledInputUI(false, false);
 		lastChooseMs = 0;
@@ -188,9 +205,18 @@ void gameRoomUILayer::checkMagic(const int magicStoneNumber)
 		arrBtnSelectStone[i]->setEnabled(false);
 	}
 
-	EventCustom checkEvent("checkOwnedMagic");
-	checkEvent.setUserData((void*)magicStoneNumber);
-	Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
+	if (curGameMode == gameMetaData::gameMode::single)
+	{
+		EventCustom checkEvent("checkOwnedMagic");
+		checkEvent.setUserData((void*)magicStoneNumber);
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
+	}
+	else
+	{
+		EventCustom checkEvent("requestCheckOwnedMagic");
+		checkEvent.setUserData((void*)magicStoneNumber);
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&checkEvent);
+	}
 }
 
 void gameRoomUILayer::onKeyPressed(cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event * event)

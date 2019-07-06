@@ -9,12 +9,12 @@ player::player()
 }
 
 player::player(int playOrder)
-	:myPlayOrder(playOrder)
+	:myPlayerIdx(playOrder)
 {
 }
 
 player::player(int playOrder, int netIndex)
-	: myPlayOrder(playOrder),
+	: myPlayerIdx(playOrder),
 	myNetIndex(netIndex)
 {
 }
@@ -92,25 +92,9 @@ int player::getCurLP()
 	return temp;
 }
 
-void player::decreaseLP(const int varyValue)
+cocos2d::Sprite * player::createLpObj()
 {
-	roundLP -= varyValue;
-
-	if (roundLP > 5)
-		roundLP = 5;
-}
-
-void player::increaseLP(const int varyValue)
-{
-	roundLP += varyValue;
-
-	if (roundLP > 5)
-		roundLP = 5;
-}
-
-cocos2d::Sprite * player::createLpObj(int playerIdx)
-{
-	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrLpTokenName[playerIdx]);
+	auto tempSpr = cocos2d::Sprite::createWithSpriteFrameName(gameMetaData::arrLpTokenName[myPlayOrder + 1]);
 	std::pair<cocos2d::Sprite*, bool> tempPair(tempSpr, true);
 	lpSprList.push_back(tempPair);
 	tempSpr->setPosition(defaultX, defaultY);
@@ -132,18 +116,16 @@ void player::initLpObj()
 	actionGainLp(gameMetaData::msType::base);
 }
 
-void player::actionGainLp(const int msTypeEnum)
+void player::actionGainLp(const int msTypeEnum, const int gainLpNum)
 {
-	int gainNum = 1;
+	int gainNum = gainLpNum;
 	if (msTypeEnum == gameMetaData::msType::base)
 	{
 		gainNum = GetPrivateProfileInt(L"RoundOption", L"maxLifePoint", gameMetaData::defaultMaxLifePoint, L"option.ini");
 	}
-	else if (msTypeEnum == gameMetaData::msType::wind)
-	{
-		gainNum = inlineFunc::getRandomInt(1, 3);
-	}
 
+	int signMark = -1;
+	int randArry[7] = { -5,5,15,25,35,45,60 };
 	for (auto &i : lpSprList)
 	{
 		if (gainNum <= 0)
@@ -154,15 +136,19 @@ void player::actionGainLp(const int msTypeEnum)
 			i.second = true;
 
 			//기준 384,600 / 168,434 / 600,434 / 384,260
-			int revisionX = inlineFunc::getRandomInt(10, 50);
-			int revisionY = inlineFunc::getRandomInt(11, 51);
+			int revisionX = randArry[inlineFunc::getRandomInt(0, 6)];
+			int revisionY = randArry[inlineFunc::getRandomInt(0, 6)];
+
+			signMark *= signMark;
+			revisionX *= signMark;
+			revisionY *= signMark;
 
 			int tempX = defaultX;
 			int tempY = defaultY;
 
 			if (tempX == 384)
 			{
-				tempX = tempX - 100 + revisionX * 4;
+				tempX = tempX - 130 + revisionX * 4;
 			}
 			else if(tempX > 384)
 			{
@@ -173,11 +159,11 @@ void player::actionGainLp(const int msTypeEnum)
 				tempX = tempX + 70 + revisionX;
 			}
 
-			if (tempY == 434)
+			if (tempY == 454)
 			{
-				tempY = tempY - 100 + revisionY * 4;
+				tempY = tempY - 130 + revisionY * 4;
 			}
-			else if (tempY > 434)
+			else if (tempY > 454)
 			{
 				tempY = tempY - 70 - revisionY;
 			}
@@ -272,6 +258,11 @@ const int player::getPlayOrder() const
 	return myPlayOrder;
 }
 
+void player::setPlayOrder(const int playOrder)
+{
+	myPlayOrder = playOrder;
+}
+
 const int player::getNetIndex() const
 {
 	return myNetIndex;
@@ -307,9 +298,14 @@ void player::setRotationValue(float rot)
 	rotationValue = rot;
 }
 
-void player::setPlayOrder(int playOrder)
+void player::setPlayIdx(int playerIdx)
 {
-	myPlayOrder = playOrder;
+	myPlayerIdx = playerIdx;
+}
+
+const int player::getPlayIdx()
+{
+	return myPlayerIdx;
 }
 
 /*-------------------------------------------------
@@ -459,7 +455,7 @@ void npc::calcScoreMsList()
 		if (msIdx > 0)
 		{
 			elemMsScore.second = (msIdx - elemMsScore.first) * 100 / msIdx;
-			std::cout << myPlayOrder << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
+			std::cout << myPlayerIdx << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
 		}
 		msIdx++;
 	}
@@ -487,6 +483,6 @@ int npc::chooseMs()
 		if (maxScore.second > 65)
 			break;
 	}
-	//return maxScore.second < 50 ? gameMetaData::msType::pass : maxScore.first + 1;
+
 	return maxScore.first;
 }

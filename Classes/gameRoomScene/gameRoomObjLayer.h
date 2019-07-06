@@ -30,6 +30,7 @@ private:
 	void createScoreSpr();
 
 	void update(float dTime);
+	void runUpdate();
 
 	void startGameByNpc();
 
@@ -42,9 +43,9 @@ private:
 	void checkOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void requestCheckOwnedMagic(cocos2d::EventCustom* checkOwnedMagicEvent);
 	void netmodeCheckOwnedMagic();
-	void activateMagic(const int magicEnum);
+	void activateMagic(const int magicEnum, const int damage = 1);
 	void updateSeenChecker(const int magicEnum);
-	void refillPlayerHand(player &curPlayer);
+	void refillPlayerHand(const int curIdx);
 	void reorderPlayerHand();
 	bool isRoundEnd();
 	void calcScore();
@@ -63,7 +64,7 @@ private:
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
-
+	
 	gameMetaData::gameMode curGameMode;
 	gameMetaData::gameProgressStage curProgressStage;
 
@@ -88,8 +89,9 @@ private:
 	std::vector<magicStone*> arrStones;
 	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
 
-	//vector[playerIndex] = score
+	//vector[playerIndex] = score number sprite
 	std::vector<cocos2d::Sprite*> arrScoreSpr;
+	//array[playerIndex] = score
 	std::array<int, gameMetaData::defaultPlayerCnt> arrScore{ 0 };
 
 	//vector[index] = player
@@ -121,6 +123,9 @@ private:
 	short bufPlayer3Hand[5];
 	short bufPlayer4Hand[5];
 	short bufRefillHand[5];
+
+	short bufDrawCnt = 0;
+	int bufCurPlayerIdx = 0;
 	
 	//멀티에서는 서버에서만 세팅 및 드로우 동작
 	//클라에서는 서버에서 출력해야할 정보만 얻어옴

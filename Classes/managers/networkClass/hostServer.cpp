@@ -232,12 +232,15 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 				<< "packet size : " << pPacket->pktSize << std::endl
 				<< "packet sessionID : " << sessionId << std::endl
 				<< "packet pickedMagicType : " << pPacket->pickedMagicType << std::endl
+				<< "packet curTurnPlayerIdx : " << pPacket->curTurnPlayerIdx << std::endl
+				<< "packet damageValue : " << pPacket->damageValue << std::endl
 				<< "---------------------" << std::endl;
 
 			netProtocol::PKT_NOTICE_CHECKMAGIC sendPkt;
 			sendPkt.init();
 			sendPkt.pickedMagicType = pPacket->pickedMagicType;
-			sendPkt.curTurnPlayerIdx = sessionId;
+			sendPkt.curTurnPlayerIdx = pPacket->curTurnPlayerIdx;
+			sendPkt.damageValue = pPacket->damageValue;
 
 			for (auto i : vecSessionPool)
 			{
@@ -255,7 +258,7 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 
 			std::cout
 				<< "---------------------" << std::endl
-				<< "packet ID : REQ_CHECKMAGIC" << std::endl
+				<< "packet ID : REQ_REFILL" << std::endl
 				<< "packet size : " << pPacket->pktSize << std::endl
 				<< "packet sessionID : " << sessionId << std::endl
 				<< "packet refillSize : " << pPacket->refillSize << std::endl
@@ -269,7 +272,7 @@ void hostServer::processPacket(const int sessionId, const char & pData)
 
 			netProtocol::PKT_NOTICE_REFILL sendPkt;
 			sendPkt.init();
-			memcpy_s(sendPkt.refillHand, netProtocol::maxPlayerHandCnt, pPacket->refillHand, netProtocol::maxPlayerHandCnt);
+			memcpy_s(sendPkt.refillHand, sizeof(short)*netProtocol::maxPlayerHandCnt, pPacket->refillHand, sizeof(short)*netProtocol::maxPlayerHandCnt);
 			sendPkt.refillSize = pPacket->refillSize;
 			sendPkt.curTurnPlayerIdx = pPacket->curTurnPlayerIdx;
 

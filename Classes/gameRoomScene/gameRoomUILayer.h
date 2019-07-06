@@ -1,15 +1,21 @@
 #pragma once
 #include "cocos2d.h"
 
+namespace gameMetaData
+{
+	enum class gameMode;
+}
+
 class spriteManager;
 class actionManager;
 
 class gameRoomUILayer : public cocos2d::Layer
 {
 public:
-	virtual bool init();
+	virtual bool init(gameMetaData::gameMode modeFlag);
 
-	CREATE_FUNC(gameRoomUILayer);
+	static gameRoomUILayer* createWithParam(gameMetaData::gameMode modeFlag);
+
 private:
 	void settingEventListener();
 	void setEnabledInputUI(const bool flag4KeyboardNselectUI, const bool flag4PassBtn);
@@ -32,6 +38,8 @@ private:
 	int lastChooseMs = 0;
 	cocos2d::Sprite* roundSpr;
 	cocos2d::Object* roundObj;
+
+	gameMetaData::gameMode curGameMode;
 
 	std::vector<cocos2d::MenuItemImage*> arrBtnSelectStone;
 };

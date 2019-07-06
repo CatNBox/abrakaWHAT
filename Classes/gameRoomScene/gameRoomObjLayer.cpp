@@ -17,6 +17,9 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 
 	curGameMode = modeFlag;
 	curProgressStage = gameMetaData::gameProgressStage::loadingGameRoomScene;
+	std::cout << "******" << std::endl
+		<< "init() curProgressStage changed loadingGameRoomScene" << std::endl
+		<< "******" << std::endl;
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
@@ -74,7 +77,7 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	{
 		netManager->requestGameRoomSceneReady();
 		//this->scheduleUpdate();
-		this->schedule(schedule_selector(gameRoomObjLayer::update), 0.2f, CC_REPEAT_FOREVER, 1.0f);
+		runUpdate();
 	}
 
 	return true;
@@ -197,6 +200,7 @@ void gameRoomObjLayer::createPlayers()
 		int nextIdxOfOrder = arrPlayerIdxInOrder[next];
 		int prevIdxOfOrder = arrPlayerIdxInOrder[prev];
 
+		playersList[curPlayerIdxOfOrder]->setPlayIdx(curPlayerIdxOfOrder);
 		playersList[curPlayerIdxOfOrder]->setPlayOrder(numInOrder);
 		playersList[curPlayerIdxOfOrder]->setNextPlayer(playersList[nextIdxOfOrder]);
 		playersList[curPlayerIdxOfOrder]->setPrevPlayer(playersList[prevIdxOfOrder]);
@@ -339,15 +343,13 @@ void gameRoomObjLayer::createSeenChecker()
 void gameRoomObjLayer::createPlayerLpObj()
 {
 	//player have info of LpSprite
-	int idx = 0;
 	for (auto &i : playersList)
 	{
 		for (int j = 0; j < maxLifePoint; j++)
 		{
-			auto temp = i->createLpObj(idx + 1);
-			this->addChild(temp, gameMetaData::layerZOrder::objZ1);
+			auto tempLpObj = i->createLpObj();
+			this->addChild(tempLpObj, gameMetaData::layerZOrder::objZ1);
 		}
-		idx++;
 	}
 }
 
@@ -371,7 +373,6 @@ void gameRoomObjLayer::update(float dTime)
 	{
 		if (netManager->isAllPlayerReady())
 		{
-			//curProgressStage = gameMetaData::gameProgressStage::gameRoomReady;
 			initRound();
 		}
 	}
@@ -387,6 +388,9 @@ void gameRoomObjLayer::update(float dTime)
 			distributeStoneByNetdata();
 
 			curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
+			std::cout << "******" << std::endl
+				<< "update() curProgressStage changed roundSetReady" << std::endl
+				<< "******" << std::endl;
 
 			if (curGameMode == gameMetaData::gameMode::host && playersList[curPlayerIdx]->isNPC())
 			{
@@ -401,20 +405,42 @@ void gameRoomObjLayer::update(float dTime)
 				EventCustom myTurnEvent("myTurn");
 				Director::getInstance()->getEventDispatcher()->dispatchEvent(&myTurnEvent);
 			}
+			else
+			{
+				curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
+				std::cout << "******" << std::endl
+					<< "update() curProgressStage changed requestCheckOwnedMagic" << std::endl
+					<< "******" << std::endl;
+			}
 		}
 	}
 	else if (curProgressStage == gameMetaData::gameProgressStage::requestCheckOwnedMagic)
 	{
 		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::requestCheckOwnedMagic)
 		{
-			netmodeCheckOwnedMagic();
 			curProgressStage = gameMetaData::gameProgressStage::takeMagicResult;
+			std::cout << "******" << std::endl
+				<< "update() curProgressStage changed takeMagicResult" << std::endl
+				<< "******" << std::endl;
+			netmodeCheckOwnedMagic();
 		}
 	}
 	else if (curProgressStage == gameMetaData::gameProgressStage::requestRefillHand)
 	{
-
+		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::requestRefillHand)
+		{
+			curProgressStage = gameMetaData::gameProgressStage::takeRefillResult;
+			std::cout << "******" << std::endl
+				<< "update() curProgressStage changed takeRefillResult" << std::endl
+				<< "******" << std::endl;
+			netmodePassTurn();
+		}
 	}
+}
+
+void gameRoomObjLayer::runUpdate()
+{
+	this->schedule(schedule_selector(gameRoomObjLayer::update), 0.2f, CC_REPEAT_FOREVER, 1.0f);
 }
 
 void gameRoomObjLayer::startGameByNpc()
@@ -483,7 +509,8 @@ void gameRoomObjLayer::initRound()
 	Director::getInstance()->getEventDispatcher()->dispatchEvent(&roundUpEvent);
 
 	//first player setting
-	curPlayerIdx = starterIdx;
+	curOrder = 0;
+	curPlayerIdx = arrPlayerIdxInOrder[curOrder];
 
 	//init magicStone by mode
 	if (curGameMode == gameMetaData::gameMode::single)
@@ -532,11 +559,17 @@ void gameRoomObjLayer::initRound()
 
 		//4. start loop update function
 		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
+		std::cout << "******" << std::endl
+			<< "initRound() curProgressStage changed waitRoundNetData" << std::endl
+			<< "******" << std::endl;
 	}
 	else if (curGameMode == gameMetaData::gameMode::guest)
 	{
 		//start loop update function for get network data
 		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
+		std::cout << "******" << std::endl
+			<< "initRound() curProgressStage changed waitRoundNetData" << std::endl
+			<< "******" << std::endl;
 	}
 	else
 	{
@@ -751,7 +784,12 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		isCorrectChoice = true;
 
 		//----activateMagic
-		activateMagic(magicEnum);
+		int damage = 1;
+		if (magicEnum == gameMetaData::msType::yongyong || magicEnum == gameMetaData::msType::wind)
+		{
+			damage = inlineFunc::getRandomInt(1, 3);
+		}
+		activateMagic(magicEnum, damage);
 
 		//----seenChecker update and effect action
 		updateSeenChecker(magicEnum);
@@ -821,16 +859,27 @@ void gameRoomObjLayer::requestCheckOwnedMagic(cocos2d::EventCustom * checkOwnedM
 {
 	//call request to server
 	const short magicEnum = (short)(checkOwnedMagicEvent->getUserData());
-	netManager->requestCheckOwnedMagic(magicEnum);
+	int damageValue = 1;
+	if (magicEnum == gameMetaData::msType::yongyong || magicEnum == gameMetaData::msType::wind)
+	{
+		damageValue = inlineFunc::getRandomInt(1, 3);
+	}
+
 	curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
+	std::cout << "******" << std::endl
+		<< "requestCheckOwnedMagic() curProgressStage changed requestCheckOwnedMagic" << std::endl
+		<< "******" << std::endl;
+	netManager->requestCheckOwnedMagic(magicEnum, curPlayerIdx, damageValue);
+	runUpdate();
 }
 
 void gameRoomObjLayer::netmodeCheckOwnedMagic()
 {
 	short pickedMagicEnum = 9;
 	int curTurnPlayerIdx = -1;
+	int damageValue = 1;
 
-	netManager->getPickedMagicNetData(&pickedMagicEnum, &curTurnPlayerIdx);
+	netManager->getPickedMagicNetData(&pickedMagicEnum, &curTurnPlayerIdx, &damageValue);
 	if (curTurnPlayerIdx > 3 && curTurnPlayerIdx < 0)
 	{
 		//error handling
@@ -849,8 +898,17 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 	//when choose pass
 	if (pickedMagicEnum == gameMetaData::msType::pass)
 	{
-		//std::cout << "passTurn : " << magicEnum << std::endl;
-		requestRefillHand(curPlayer);
+		if (curPlayerIdx == myPlayerIdx)
+		{
+			requestRefillHand(curPlayer);
+		}
+		else
+		{
+			curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
+			std::cout << "******" << std::endl
+				<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
+				<< "******" << std::endl;
+		}
 		return;
 	}
 	//check and activate selected magicStone
@@ -860,7 +918,7 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		isCorrectChoice = true;
 
 		//----activateMagic
-		activateMagic((int)pickedMagicEnum);
+		activateMagic((int)pickedMagicEnum, damageValue);
 
 		//----seenChecker update and effect action
 		updateSeenChecker((int)pickedMagicEnum);
@@ -875,10 +933,13 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		isCorrectChoice = false;
 
 		//----action checkFail
-		int damage = 1;
-		if (pickedMagicEnum == gameMetaData::msType::yongyong)
-			damage = inlineFunc::getRandomInt(1, 3);
-		curPlayer->actionLostLp(damage);
+		if (pickedMagicEnum == gameMetaData::msType::wind)
+		{
+			damageValue = 1;
+		}
+		curPlayer->actionLostLp(damageValue);
+
+		//npc control
 		if (curGameMode == gameMetaData::gameMode::host)
 		{
 			if (curPlayer->isNPC())
@@ -917,22 +978,55 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		{
 			callNpcProcess();
 		}
-		else //not NPC
+		else if (curPlayerIdx == myPlayerIdx)
 		{
 			EventCustom callBackEvent("choicerUIEnabled");
 			Director::getInstance()->getEventDispatcher()->dispatchEvent(&callBackEvent);
 		}
+		else// if (curGameMode == gameMetaData::gameMode::guest)
+		{
+			curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
+			std::cout << "******" << std::endl
+				<< "netmodeCheckOwnedMagic() curProgressStage changed requestCheckOwnedMagic" << std::endl
+				<< "******" << std::endl;
+		}
 	}
 	else
 	{
-		netmodePassTurn();
+		if (curPlayer->isNPC())
+		{
+			if (curGameMode == gameMetaData::gameMode::host)
+			{
+				requestRefillHand(curPlayer);
+			}
+			else if(curGameMode == gameMetaData::gameMode::guest)
+			{
+				curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
+				std::cout << "******" << std::endl
+					<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
+					<< "******" << std::endl;
+			}
+		}
+		else
+		{
+			if (curPlayerIdx == myPlayerIdx)
+			{
+				requestRefillHand(curPlayer);
+			}
+			else
+			{
+				curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
+				std::cout << "******" << std::endl
+					<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
+					<< "******" << std::endl;
+			}
+		}
 	}
 }
 
-void gameRoomObjLayer::activateMagic(const int magicEnum)
+void gameRoomObjLayer::activateMagic(const int magicEnum, const int damage)
 {
 	auto currentPlayer = playersList[curPlayerIdx];
-	int damage = 1;
 	switch (magicEnum)
 	{
 	case gameMetaData::msType::yongyong:
@@ -961,8 +1055,6 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 		//auto seq02 = cocos2d::Sequence::create(seq01, reverseAction, NULL);
 		auto seqEarthQuake = actManager->wrapActions4Cnt(seq01, reverseAction, NULL);
 		this->runAction(seqEarthQuake);
-
-		damage = inlineFunc::getRandomInt(1, 3);
 	}
 	case gameMetaData::msType::bangrang:
 	{
@@ -994,7 +1086,7 @@ void gameRoomObjLayer::activateMagic(const int magicEnum)
 	case gameMetaData::msType::wind:
 	case gameMetaData::msType::potion:
 	{
-		currentPlayer->actionGainLp(magicEnum);
+		currentPlayer->actionGainLp(magicEnum, damage);
 		return;
 	}
 	case gameMetaData::msType::booung:
@@ -1031,40 +1123,49 @@ void gameRoomObjLayer::updateSeenChecker(const int magicEnum)
 	}
 }
 
-void gameRoomObjLayer::refillPlayerHand(player &curPlayer)
+void gameRoomObjLayer::refillPlayerHand(const int curIdx)
 {
-	short drawCnt = 0;
-	int tempCurPlayerIdx = 0;
-	netManager->getRefillNetData(bufRefillHand, &drawCnt, &tempCurPlayerIdx);
-
-	if (curPlayerIdx != tempCurPlayerIdx)
+	//short drawCnt = 0;
+	//int tempCurPlayerIdx = 0;
+	netManager->getRefillNetData(bufRefillHand, &bufDrawCnt, &bufCurPlayerIdx);
+	
+	if (curIdx != bufCurPlayerIdx)
 	{
 		//error handling
 		return;
 	}
 
+	auto curPlayer = playersList[curIdx];
+
 	auto tempMsState = gameMetaData::msState::notUse;
-	if (curGameMode == gameMetaData::gameMode::host)
+	if (curIdx == myPlayerIdx 
+		|| (curGameMode == gameMetaData::gameMode::host && curPlayer->isNPC())
+		)
 	{
 		tempMsState = gameMetaData::msState::preserve;
 	}
 
 	//refill magicStone
-	for (int drawIdx = 0; drawIdx < drawCnt; drawIdx)
+	for (int drawIdx = 0; drawIdx < bufDrawCnt; drawIdx++)
 	{
 		auto tempMagicStone = pickAStone(tempMsState, bufRefillHand[drawIdx]);
 		if (tempMagicStone == nullptr)
 		{
 			//error handling
+			//drawCnt = drawIdx;
+			//break;
 			return;
 		}
 		else
 		{
-			curPlayer.pushStone2List(tempMagicStone);
+			curPlayer->pushStone2List(tempMagicStone);
 		}
 	}
-	if (curPlayer.isNPC())
-		((npc&)curPlayer).setNewHandCnt((int)drawCnt);
+
+	if (curPlayer->isNPC())
+	{
+		((npc&)curPlayer).setNewHandCnt((int)bufDrawCnt);
+	}
 }
 
 void gameRoomObjLayer::reorderPlayerHand()
@@ -1114,19 +1215,20 @@ bool gameRoomObjLayer::isRoundEnd()
 void gameRoomObjLayer::calcScore()
 {
 	//roundfinisher
-	buf4RoundEndPopUp.at(4) = curPlayerIdx;
+	auto curPlayerOrder = playersList[curPlayerIdx]->getPlayOrder();
+	buf4RoundEndPopUp.at(4) = curPlayerOrder;
 
 	//check lp / check booung / if curPlayer's lp is zero, no point
 	if (playersList[curPlayerIdx]->getCurLP() > 0)
 	{
 		arrScore.at(curPlayerIdx) += 2;
-		buf4RoundEndPopUp.at(curPlayerIdx) += 2;
+		buf4RoundEndPopUp.at(curPlayerOrder) += 2;
 	}
 
 	if (abrakaWHAT)
 	{
 		arrScore.at(curPlayerIdx) += 1;
-		buf4RoundEndPopUp.at(curPlayerIdx) += 1;
+		buf4RoundEndPopUp.at(curPlayerOrder) += 1;
 		abrakaWHAT = false;
 		return;
 	}
@@ -1138,11 +1240,11 @@ void gameRoomObjLayer::calcScore()
 		{
 			//at least have 1 Lp, get 1 point
 			arrScore.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += 1;
-			buf4RoundEndPopUp.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += 1;
+			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += 1;
 
 			//check booung
 			arrScore.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += elemPlayer->getBooungListSize();
-			buf4RoundEndPopUp.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += elemPlayer->getBooungListSize();
+			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += elemPlayer->getBooungListSize();
 		}
 	}
 }
@@ -1214,7 +1316,7 @@ void gameRoomObjLayer::passTurn()
 			((npc*)playersList[curPlayerIdx])->npcTurnOn();
 			callNpcProcess();
 		}
-		EventCustom passTurnEvent("passTurn2NextUser");
+		EventCustom passTurnEvent("turnOverUIDisabled");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
 	}
 	else
@@ -1231,29 +1333,34 @@ void gameRoomObjLayer::netmodePassTurn()
 	//current Player
 	auto curPlayer = playersList[curPlayerIdx];
 
-	refillPlayerHand(*curPlayer);
+	refillPlayerHand(curPlayerIdx);
 	reorderPlayerHand();
 
 	//update curPlayerNum
-	if (curGameMode == gameMetaData::gameMode::host && curPlayer->isNPC())
+	if ((curGameMode == gameMetaData::gameMode::host) && (curPlayer->isNPC()))
 	{
 		((npc*)curPlayer)->waitTurn();
 	}
 	curOrder = (curOrder == playerCnt - 1) ? (0) : (curOrder + 1);
 	curPlayerIdx = arrPlayerIdxInOrder[curOrder];
 
+	//next turn
 	if ((!isMyNumPlayer) || (curPlayerIdx != myPlayerIdx))
 	{
-		if (curGameMode == gameMetaData::gameMode::host)
+		if (playersList[curPlayerIdx]->isNPC() && curGameMode == gameMetaData::gameMode::host)
 		{
-			if (playersList[curPlayerIdx]->isNPC())
-			{
-				((npc*)playersList[curPlayerIdx])->npcTurnOn();
-				callNpcProcess();
-			}
-			EventCustom passTurnEvent("passTurn2NextUser");
-			Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
+			((npc*)playersList[curPlayerIdx])->npcTurnOn();
+			callNpcProcess();
 		}
+		else
+		{
+			curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
+			std::cout << "******" << std::endl
+				<< "netmodePassTurn() curProgressStage changed requestCheckOwnedMagic" << std::endl
+				<< "******" << std::endl;
+		}
+		EventCustom passTurnEvent("turnOverUIDisabled");
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
 	}
 	else
 	{
@@ -1274,11 +1381,18 @@ void gameRoomObjLayer::requestRefillHand(player* curPlayer)
 	for (int drawIdx = 0; drawIdx < curPlayerReqCnt; drawIdx++)
 	{
 		bufRefillHand[drawIdx] = netmodePickAStone();
-		drawCnt++;
+		if (bufRefillHand[drawIdx] != 0)
+		{
+			//0 is mean All magicStone is used
+			drawCnt++;
+		}
 	}
 
-	netManager->requestRefillHand(bufRefillHand, drawCnt, curPlayerIdx);
 	curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
+	std::cout << "******" << std::endl
+		<< "requestRefillHand() curProgressStage changed requestRefillHand" << std::endl
+		<< "******" << std::endl;
+	netManager->requestRefillHand(bufRefillHand, drawCnt, curPlayerIdx);
 }
 
 cocos2d::Sprite* gameRoomObjLayer::getMSSprite(const int magicEnum)
@@ -1324,6 +1438,12 @@ magicStone * gameRoomObjLayer::pickAStone(const int stateEnum, const short magic
 		//2. 초기화가 안되어서 분배에 실패했을 경우
 		return nullptr;
 	}
+	/*
+	else if ((magicEnum == gameMetaData::msType::base) || (magicEnum == gameMetaData::msType::pass))
+	{
+		return nullptr;
+	}
+	*/
 
 	magicStone *pTempMS;
 	int rndIndex = 0;
