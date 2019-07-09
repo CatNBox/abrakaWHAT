@@ -152,26 +152,26 @@ void gameRoomUILayer::initUI()
 	magicChoicer->addChild(btnPass, 0, "btnPass");
 	magicChoicer->alignItemsHorizontallyWithPadding(10.0f);
 	magicChoicer->setPosition(Vec2(384, 56));
-	this->addChild(magicChoicer);
+	this->addChild(magicChoicer, gameMetaData::layerZOrder::objZ2);
 
 	auto seenCheckerBoard = Sprite::createWithSpriteFrameName("ms_seenBG.png");
 	seenCheckerBoard->setPosition(Vec2(380, 420));
 	seenCheckerBoard->setRotation(90.0f);
 
-	this->addChild(seenCheckerBoard);
+	this->addChild(seenCheckerBoard, gameMetaData::layerZOrder::objZ0);
 
 	roundSpr = Sprite::createWithSpriteFrameName("spr_number.png");
 	roundSpr->setPosition(Vec2(50, 710));
 	roundSpr->setScale(0.8f);
 	setRound();
 
-	this->addChild(roundSpr);
+	this->addChild(roundSpr, gameMetaData::layerZOrder::objZ2);
 
 	auto scoreSpr = Sprite::createWithSpriteFrameName("sprScore.png");
 	scoreSpr->setPosition(Vec2(660, 216));
 	scoreSpr->setScale(0.5f);
 
-	this->addChild(scoreSpr);
+	this->addChild(scoreSpr, gameMetaData::layerZOrder::objZ2);
 }
 
 void gameRoomUILayer::setRound()

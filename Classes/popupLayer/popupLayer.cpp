@@ -158,8 +158,16 @@ void popupLayer::setEndGame(cocos2d::EventCustom* endGameEvent)
 	for (int playerNum = 0; playerNum < arrEndScore->size(); playerNum++)
 	{
 		int tempScore = arrEndScore->at(playerNum);
+		if (tempScore > 9)
+		{
+			auto temp10Spr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
+			temp10Spr->setTextureRect(sprManager->getNumSprRect(1));
+			temp10Spr->setPosition(cocos2d::Vec2(420.0f, STDAXIS - (63.0f*playerNum)));
+			temp10Spr->setScale(0.6f);
+			this->addChild(temp10Spr, gameMetaData::layerZOrder::objZ1);
+		}
 		auto tempScoreSpr = cocos2d::Sprite::createWithSpriteFrameName("spr_number.png");
-		tempScoreSpr->setTextureRect(sprManager->getNumSprRect(tempScore));
+		tempScoreSpr->setTextureRect(sprManager->getNumSprRect(tempScore%10));
 		tempScoreSpr->setPosition(cocos2d::Vec2(450.0f, STDAXIS - (63.0f*playerNum)));
 		tempScoreSpr->setScale(0.6f);
 		this->addChild(tempScoreSpr, gameMetaData::layerZOrder::objZ1);

@@ -5,6 +5,8 @@
 #include "managers\actionManager.h"
 #include "managers/networkManager.h"
 #include <iostream>
+#include <fstream>
+#include <ctime>
 
 using namespace cocos2d;
 
@@ -68,6 +70,9 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 	//create playerLpObj
 	createPlayerLpObj();
 
+	//create current turn player marker
+	createTurnMarker();
+
 	//init round setting
 	if (curGameMode == gameMetaData::gameMode::single)
 	{
@@ -85,6 +90,12 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 
 void gameRoomObjLayer::delay01secCallWrapper(void(gameRoomObjLayer::* targetFunc)(void))
 {
+	if (targetFunc == nullptr)
+	{
+		writeErrLog("gameRoomObjLayer::delay01secCallWrapper parameter is nullptr");
+		cocosDirector->end();
+	}
+
 	this->scheduleOnce([=](float d)
 	{
 		(this->*targetFunc)();
@@ -355,13 +366,65 @@ void gameRoomObjLayer::createPlayerLpObj()
 
 void gameRoomObjLayer::createScoreSpr()
 {
-	for (int i = 0; i < 4; i++)
+	for (int idx = 0; idx < gameMetaData::defaultPlayerCnt; idx++)
 	{
 		auto tempSpr = Sprite::createWithSpriteFrameName("spr_number.png");
 		tempSpr->setVisible(false);
 		tempSpr->setScale(SCORE_BASESCALE);
-		arrScoreSpr.at(i) = tempSpr;
+		arrScoreSpr.at(idx) = tempSpr;
 		this->addChild(tempSpr, gameMetaData::layerZOrder::objZ1);
+	}
+}
+
+void gameRoomObjLayer::createTurnMarker()
+{
+	for (int order = 0; order < gameMetaData::defaultPlayerCnt; order++)
+	{
+		auto tempSpr = Sprite::createWithSpriteFrameName("turnMarker01.png");
+		tempSpr->setVisible(false);
+		auto tempX = playersList[arrPlayerIdxInOrder.at(order)]->getDefaultX();
+		auto tempY = playersList[arrPlayerIdxInOrder.at(order)]->getDefaultY();
+
+		//set rotation and position
+		if (tempX == 384)
+		{
+			if (tempY < 454)
+			{
+				tempSpr->setRotation(180.0f);
+				tempY += 170;
+			}
+			else
+			{
+				tempY -= 160;
+			}
+		}
+		else
+		{
+			tempY -= 20;
+			if (tempX > 384)
+			{
+				tempSpr->setRotation(90.0f);
+				tempX -= 170;
+			}
+			else
+			{
+				tempSpr->setRotation(-90.0f);
+				tempX += 160;
+			}
+		}
+		tempSpr->setPosition(Vec2(tempX, tempY));
+
+		//blink action
+		auto action01 = FadeIn::create(0.3f);//ToggleVisibility::create();
+		auto delay05sec01 = DelayTime::create(0.5f);
+		auto action02 = FadeOut::create(0.3f); //ToggleVisibility::create();
+		auto delay05sec02 = DelayTime::create(0.5f);
+		auto sequence01 = Sequence::create(action01, delay05sec01, action02, delay05sec02, NULL);
+		auto repeatForever = RepeatForever::create(sequence01);
+		tempSpr->runAction(repeatForever);
+
+		arrTurnMarkerSpr.push_back(tempSpr);
+		this->addChild(tempSpr, gameMetaData::layerZOrder::objZ2);
 	}
 }
 
@@ -511,6 +574,7 @@ void gameRoomObjLayer::initRound()
 	//first player setting
 	curOrder = 0;
 	curPlayerIdx = arrPlayerIdxInOrder[curOrder];
+	curTurnMarkerToggle();
 
 	//init magicStone by mode
 	if (curGameMode == gameMetaData::gameMode::single)
@@ -824,9 +888,8 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 		{
 			if (elemScore >= 8)
 			{
-				EventCustom popupEndRound("popupEndGame");
-				popupEndRound.setUserData(&arrScore);
-				Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+				delay01secCallWrapper(&gameRoomObjLayer::callEndGameEvent);
+
 				return;
 			}
 		}
@@ -902,6 +965,10 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		{
 			requestRefillHand(curPlayer);
 		}
+		else if (curGameMode == gameMetaData::gameMode::host && curPlayer->isNPC())
+		{
+			requestRefillHand(curPlayer);
+		}
 		else
 		{
 			curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
@@ -959,9 +1026,8 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		{
 			if (elemScore >= 8)
 			{
-				EventCustom popupEndRound("popupEndGame");
-				popupEndRound.setUserData(&arrScore);
-				Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+				delay01secCallWrapper(&gameRoomObjLayer::callEndGameEvent);
+
 				return;
 			}
 		}
@@ -1199,13 +1265,17 @@ bool gameRoomObjLayer::isRoundEnd()
 	for (const auto &playerPointer : playersList)
 	{
 		if (playerPointer->getCurLP() == 0)
+		{
+			curTurnMarkerToggle();
 			return true;
+		}
 	}
 
 	//count curPlayer's rest hand
 	if (playersList[curPlayerIdx]->getStoneListSize() == 0)
 	{
 		abrakaWHAT = true;
+		curTurnMarkerToggle();
 		return true;
 	}
 
@@ -1225,26 +1295,30 @@ void gameRoomObjLayer::calcScore()
 		buf4RoundEndPopUp.at(curPlayerOrder) += 2;
 	}
 
-	if (abrakaWHAT)
-	{
-		arrScore.at(curPlayerIdx) += 1;
-		buf4RoundEndPopUp.at(curPlayerOrder) += 1;
-		abrakaWHAT = false;
-		return;
-	}
-
 	for (const auto &elemPlayer : playersList)
 	{
+		auto elemPlayerOrder = elemPlayer->getPlayOrder();
+		auto elemPlayerIdx = arrPlayerIdxInOrder[elemPlayerOrder];
 		//check Lp
 		if (elemPlayer->getCurLP() > 0)
 		{
 			//at least have 1 Lp, get 1 point
-			arrScore.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += 1;
-			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += 1;
+			arrScore.at(elemPlayerIdx) += 1;
+			buf4RoundEndPopUp.at(elemPlayerOrder) += 1;
 
 			//check booung
-			arrScore.at(arrPlayerIdxInOrder[elemPlayer->getPlayOrder()]) += elemPlayer->getBooungListSize();
-			buf4RoundEndPopUp.at(elemPlayer->getPlayOrder()) += elemPlayer->getBooungListSize();
+			arrScore.at(elemPlayerIdx) += elemPlayer->getBooungListSize();
+			buf4RoundEndPopUp.at(elemPlayerOrder) += elemPlayer->getBooungListSize();
+		}
+
+		if (abrakaWHAT)
+		{
+			if (elemPlayerIdx == curPlayerIdx)
+			{
+				continue;
+			}
+			arrScore.at(elemPlayerIdx) = 0;
+			buf4RoundEndPopUp.at(elemPlayerOrder) = 0;
 		}
 	}
 }
@@ -1268,6 +1342,35 @@ void gameRoomObjLayer::callEndRoundEvent()
 	{
 		loopError = 0;
 		EventCustom popupEndRound("popupEndRound");
+		popupEndRound.setUserData(&buf4RoundEndPopUp);
+		Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
+	}
+}
+
+void gameRoomObjLayer::callEndGameEvent()
+{
+	int checkActionCnt = actManager->getRunningActionCnt();
+	if (checkActionCnt > 0)
+	{
+		loopError++;
+		if (loopError > 50)
+		{
+			cocos2d::EventCustom errorWarning("popupWarning");
+			errorWarning.setUserData((void*)gameMetaData::warningCode::infinityLoopWarning);
+			Director::getInstance()->getEventDispatcher()->dispatchEvent(&errorWarning);
+			return;
+		}
+		delay01secCallWrapper(&gameRoomObjLayer::callEndGameEvent);
+	}
+	else
+	{
+		loopError = 0;
+
+		for (const auto &ptrPlayer : playersList)
+		{
+			buf4RoundEndPopUp.at(ptrPlayer->getPlayOrder()) = arrScore.at(ptrPlayer->getPlayIdx());
+		}
+		EventCustom popupEndRound("popupEndGame");
 		popupEndRound.setUserData(&buf4RoundEndPopUp);
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&popupEndRound);
 	}
@@ -1307,7 +1410,9 @@ void gameRoomObjLayer::passTurn()
 		((npc*)curPlayer)->waitTurn();
 	}
 	curOrder = (curOrder == playerCnt - 1) ? (0) : (curOrder + 1);
+	curTurnMarkerToggle();
 	curPlayerIdx = arrPlayerIdxInOrder[curOrder];
+	curTurnMarkerToggle();
 
 	if ((!isMyNumPlayer) || (curPlayerIdx != myPlayerIdx))
 	{
@@ -1342,7 +1447,9 @@ void gameRoomObjLayer::netmodePassTurn()
 		((npc*)curPlayer)->waitTurn();
 	}
 	curOrder = (curOrder == playerCnt - 1) ? (0) : (curOrder + 1);
+	curTurnMarkerToggle();
 	curPlayerIdx = arrPlayerIdxInOrder[curOrder];
+	curTurnMarkerToggle();
 
 	//next turn
 	if ((!isMyNumPlayer) || (curPlayerIdx != myPlayerIdx))
@@ -1497,6 +1604,43 @@ bool gameRoomObjLayer::isAllUsed() const
 int gameRoomObjLayer::getMsPosRevision(int msListSize, int msOrder)
 {
 	return 38 * (msListSize - 1 - (msOrder * 2));
+}
+
+void gameRoomObjLayer::curTurnMarkerToggle()
+{
+	auto curMarker = arrTurnMarkerSpr[playersList.at(curPlayerIdx)->getPlayOrder()];
+	if (curMarker->isVisible() == false)
+	{
+		curMarker->setVisible(true);
+	}
+	else
+	{
+		curMarker->setVisible(false);
+	}
+}
+
+void gameRoomObjLayer::writeErrLog(std::string logMsg)
+{
+	std::fstream errLogStream;
+	errLogStream.open("errLog", std::ios::ate);
+
+	//current time
+	time_t timeAfter19700101;
+	timeAfter19700101 = time(NULL);
+
+	std::tm *curTime;
+	curTime = std::localtime(&timeAfter19700101);
+
+	errLogStream <<
+		"# " << curTime->tm_year + 1900 << "/" <<
+		curTime->tm_mon + 1 << "/" <<
+		curTime->tm_mday << " " <<
+		curTime->tm_hour << ":" <<
+		curTime->tm_min << ":" <<
+		curTime->tm_sec << " msg = " <<
+		logMsg << std::endl;
+
+	errLogStream.close();
 }
 
 void gameRoomObjLayer::checkArrStones()

@@ -28,6 +28,7 @@ private:
 	void createSeenChecker();
 	void createPlayerLpObj();
 	void createScoreSpr();
+	void createTurnMarker();
 
 	void update(float dTime);
 	void runUpdate();
@@ -50,6 +51,7 @@ private:
 	bool isRoundEnd();
 	void calcScore();
 	void callEndRoundEvent();
+	void callEndGameEvent();
 	void passTurn();
 	void netmodePassTurn();
 	void requestRefillHand(player* curPlayer);
@@ -64,6 +66,12 @@ private:
 	bool isAllUsed() const; //check to discard all
 
 	int getMsPosRevision(int msListSize, int msOrder);
+
+	//call when change curPlayerIdx value : initRound, passTurn, netmodePassTurn, isRoundEnd
+	void curTurnMarkerToggle();
+
+	//nullptr error log write
+	void writeErrLog(std::string logMsg);
 	
 	gameMetaData::gameMode curGameMode;
 	gameMetaData::gameProgressStage curProgressStage;
@@ -108,6 +116,9 @@ private:
 	//init each round in initRound()
 	//last elem is victoryPlayer's Index
 	std::array<int, 5> buf4RoundEndPopUp{ 0 }; 
+
+	//vector[playerOrder] = *turnMarkerSprite
+	std::vector<cocos2d::Sprite*> arrTurnMarkerSpr;
 
 	cocos2d::EventListenerCustom* uiListener;
 

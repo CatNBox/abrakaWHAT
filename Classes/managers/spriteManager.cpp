@@ -114,4 +114,7 @@ void spriteManager::preLoadingSprites()
 
 	tempSpr->initWithFile("UISprite/sprRank.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprRank.png");
+
+	tempSpr->initWithFile("UISprite/turnMarker01.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "turnMarker01.png");
 }

@@ -470,7 +470,9 @@ int npc::chooseMs()
 	for (int msNum = prevChoice; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
 		if (std::find(arrPrevFailList.begin(), arrPrevFailList.end(), msNum) != arrPrevFailList.end())
+		{
 			continue;
+		}
 
 		if (arrMsScore[msNum].second > maxScore.second)
 		{
