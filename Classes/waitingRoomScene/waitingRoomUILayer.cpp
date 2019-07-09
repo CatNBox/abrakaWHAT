@@ -3,7 +3,6 @@
 #include "managers\actionManager.h"
 #include "managers\networkManager.h"
 #include "gameRoomScene\gameRoomScene.h"
-#include <iostream>
 
 using namespace cocos2d;
 
@@ -379,7 +378,6 @@ bool waitingRoomUILayer::setBufTurnOrder()
 			if (breakInf > 1000) break; //오류추가
 			else breakInf++;
 		}
-		std::cout << "waitingRoomUILayer::setBufTurnOrder() pickOrderNum : " << pickOrderNum << std::endl;
 		if (pickOrderNum == 0)
 		{
 			return false;
@@ -390,12 +388,6 @@ bool waitingRoomUILayer::setBufTurnOrder()
 			playerTurnOrder[i] = pickOrderNum;
 		}
 	}
-
-	bufTurnOrder[0] = 4;
-	bufTurnOrder[1] = 3;
-	bufTurnOrder[2] = 2;
-	bufTurnOrder[3] = 1;
-
 
 	return true;
 }

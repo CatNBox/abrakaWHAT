@@ -6,7 +6,6 @@
 #include "gameObject\gameMetaData.h"
 #include "commonUILayer\commonUILayer.h"
 #include "managers/networkManager.h"
-#include <iostream>
 
 cocos2d::Scene * waitingRoomScene::createScene(gameMetaData::gameMode modeFlag)
 {

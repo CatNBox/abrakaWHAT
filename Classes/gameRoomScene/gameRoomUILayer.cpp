@@ -2,7 +2,6 @@
 #include "gameObject\gameMetaData.h"
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
-#include <iostream>
 
 using namespace cocos2d;
 
@@ -85,9 +84,7 @@ void gameRoomUILayer::settingEventListener()
 	//라운드가 종료되면 라운드 숫자 UP
 	callBackListener = EventListenerCustom::create("roundUp",
 		[=](EventCustom* event) {
-		std::cout << "round : " << roundNum << std::endl;
 		roundNum++;
-		std::cout << "round : " << roundNum << std::endl;
 		setRound();
 		setEnabledInputUI(false, false);
 	});

@@ -1,6 +1,5 @@
 #include "gameObject/player.h"
 #include "gameObject/magicStone.h"
-#include <iostream>
 
 using namespace cocos2d;
 
@@ -365,7 +364,6 @@ void npc::npcProcess(gameMetaData::gameMode curMode)
 		countMySecret();
 		calcScoreMsList();
 		int targetMagic = chooseMs();
-		std::cout << "선택된 번호 : " << targetMagic << std::endl;
 
 		prevChoice = targetMagic;
 		//계산후 이 부분의 선택한 magicStone값을 설정한 후 스케줄로 호출
@@ -455,7 +453,6 @@ void npc::calcScoreMsList()
 		if (msIdx > 0)
 		{
 			elemMsScore.second = (msIdx - elemMsScore.first) * 100 / msIdx;
-			std::cout << myPlayerIdx << "번 npc score 계산 " << msIdx << "번 magicStone : " << elemMsScore.second << std::endl;
 		}
 		msIdx++;
 	}
@@ -466,7 +463,6 @@ int npc::chooseMs()
 	//<msIdx, score>
 	std::pair<int, int> maxScore = std::make_pair(gameMetaData::msType::pass, 0);
 	
-	std::cout << std::endl << "chooseMs prevChoice value : " << prevChoice <<  std::endl << std::endl;
 	for (int msNum = prevChoice; msNum < gameMetaData::variableMaxCnt::msTypeCnt; msNum++)
 	{
 		if (std::find(arrPrevFailList.begin(), arrPrevFailList.end(), msNum) != arrPrevFailList.end())

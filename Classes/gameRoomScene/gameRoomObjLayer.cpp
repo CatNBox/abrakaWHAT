@@ -4,7 +4,6 @@
 #include "managers\spriteManager.h"
 #include "managers\actionManager.h"
 #include "managers/networkManager.h"
-#include <iostream>
 #include <fstream>
 #include <ctime>
 
@@ -19,9 +18,6 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 
 	curGameMode = modeFlag;
 	curProgressStage = gameMetaData::gameProgressStage::loadingGameRoomScene;
-	std::cout << "******" << std::endl
-		<< "init() curProgressStage changed loadingGameRoomScene" << std::endl
-		<< "******" << std::endl;
 
 	sprManager = new spriteManager;
 	actManager = actionManager::getInstance();
@@ -72,6 +68,9 @@ bool gameRoomObjLayer::init(gameMetaData::gameMode modeFlag, int playerTurnOrder
 
 	//create current turn player marker
 	createTurnMarker();
+
+	//create sprite for display last picked magic stone
+	createLastPickedStone();
 
 	//init round setting
 	if (curGameMode == gameMetaData::gameMode::single)
@@ -251,9 +250,6 @@ void gameRoomObjLayer::createPlayers()
 			assert(true && !"createPlayer()에서 잘못된 PlayerCnt값이 들어옴");
 		}
 
-		std::cout << "player Index : " << curPlayerIdxOfOrder << std::endl
-			<< "   default x : " << defaultX << std::endl
-			<< "   default y : " << defaultY << std::endl;
 		playersList[curPlayerIdxOfOrder]->setDefaultX(defaultX);
 		playersList[curPlayerIdxOfOrder]->setDefaultY(defaultY);
 		playersList[curPlayerIdxOfOrder]->setRotationValue(rotValue);
@@ -428,6 +424,36 @@ void gameRoomObjLayer::createTurnMarker()
 	}
 }
 
+void gameRoomObjLayer::createLastPickedStone()
+{
+	//last pick text sprite
+	auto tempSpr = Sprite::createWithSpriteFrameName("sprLastPick.png");
+	tempSpr->setPosition(Vec2(100.0f, 210.0f));
+	tempSpr->setScale(0.5f);
+	this->addChild(tempSpr, gameMetaData::layerZOrder::effectZ);
+
+	//last picked stone sprite
+	arrLastPickedStones.resize(10);
+	for (int idx = 0; idx < arrLastPickedStones.size(); idx++)
+	{
+		if (idx == 9)
+		{
+			arrLastPickedStones.at(idx) = Sprite::createWithSpriteFrameName(gameMetaData::arrMsSpriteName[idx]);
+		}
+		else
+		{
+			arrLastPickedStones.at(idx) = Sprite::createWithSpriteFrameName(gameMetaData::arrMsSpriteName[idx]);
+		}
+		arrLastPickedStones.at(idx)->setPosition(Vec2(100.0f, 150.0f));
+		arrLastPickedStones.at(idx)->setScale(0.7f);
+		arrLastPickedStones.at(idx)->setVisible(false);
+		this->addChild(arrLastPickedStones.at(idx), gameMetaData::layerZOrder::effectZ);
+	}
+
+	lastPickedMsNum = 0;
+	changeLastPickedStone(lastPickedMsNum);
+}
+
 void gameRoomObjLayer::update(float dTime)
 {
 	//update function only run on multiplay guestMode/hostMode
@@ -441,23 +467,17 @@ void gameRoomObjLayer::update(float dTime)
 	}
 	else if (curProgressStage == gameMetaData::gameProgressStage::waitRoundNetData)
 	{
-		std::cout << "in waitRoundNetData" << std::endl;
 		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::roundNetDataReady)
 		{
-			std::cout << "in roundNetDataReady" << std::endl;
 			netManager->getInitRoundData(bufSecretDeck, bufPlayer1Hand, bufPlayer2Hand, bufPlayer3Hand, bufPlayer4Hand);
 
 			selectSecretStonebyNetData();
 			distributeStoneByNetdata();
 
 			curProgressStage = gameMetaData::gameProgressStage::roundSetReady;
-			std::cout << "******" << std::endl
-				<< "update() curProgressStage changed roundSetReady" << std::endl
-				<< "******" << std::endl;
 
 			if (curGameMode == gameMetaData::gameMode::host && playersList[curPlayerIdx]->isNPC())
 			{
-				std::cout << "**** start by npc : " << curPlayerIdx << std::endl;
 				this->scheduleOnce([=](float d)
 				{
 					startGameByNpc();
@@ -471,9 +491,6 @@ void gameRoomObjLayer::update(float dTime)
 			else
 			{
 				curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
-				std::cout << "******" << std::endl
-					<< "update() curProgressStage changed requestCheckOwnedMagic" << std::endl
-					<< "******" << std::endl;
 			}
 		}
 	}
@@ -482,9 +499,6 @@ void gameRoomObjLayer::update(float dTime)
 		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::requestCheckOwnedMagic)
 		{
 			curProgressStage = gameMetaData::gameProgressStage::takeMagicResult;
-			std::cout << "******" << std::endl
-				<< "update() curProgressStage changed takeMagicResult" << std::endl
-				<< "******" << std::endl;
 			netmodeCheckOwnedMagic();
 		}
 	}
@@ -493,9 +507,6 @@ void gameRoomObjLayer::update(float dTime)
 		if (netManager->getNetworkProgressStage() == gameMetaData::gameProgressStage::requestRefillHand)
 		{
 			curProgressStage = gameMetaData::gameProgressStage::takeRefillResult;
-			std::cout << "******" << std::endl
-				<< "update() curProgressStage changed takeRefillResult" << std::endl
-				<< "******" << std::endl;
 			netmodePassTurn();
 		}
 	}
@@ -509,7 +520,6 @@ void gameRoomObjLayer::runUpdate()
 void gameRoomObjLayer::startGameByNpc()
 {
 	auto actCnt = actManager->getRunningActionCnt();
-	std::cout << "actCnt : " << actCnt << std::endl;
 	if (actCnt == 0)
 	{
 		((npc*)playersList[starterIdx])->npcTurnOn();
@@ -587,7 +597,6 @@ void gameRoomObjLayer::initRound()
 
 		if (playersList[curPlayerIdx]->isNPC())
 		{
-			std::cout << "**** start by npc : " << curPlayerIdx << std::endl;
 			this->scheduleOnce([=](float d)
 			{
 				startGameByNpc();
@@ -623,17 +632,11 @@ void gameRoomObjLayer::initRound()
 
 		//4. start loop update function
 		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
-		std::cout << "******" << std::endl
-			<< "initRound() curProgressStage changed waitRoundNetData" << std::endl
-			<< "******" << std::endl;
 	}
 	else if (curGameMode == gameMetaData::gameMode::guest)
 	{
 		//start loop update function for get network data
 		curProgressStage = gameMetaData::gameProgressStage::waitRoundNetData;
-		std::cout << "******" << std::endl
-			<< "initRound() curProgressStage changed waitRoundNetData" << std::endl
-			<< "******" << std::endl;
 	}
 	else
 	{
@@ -830,6 +833,8 @@ void gameRoomObjLayer::checkOwnedMagic(EventCustom* checkOwnedMagicEvent)
 	const int magicEnum = (int)(checkOwnedMagicEvent->getUserData());
 	//std::cout << "checkOwnedMagic Event activate : " << magicEnum << std::endl;
 
+	changeLastPickedStone(magicEnum);
+
 	//----current player pointer
 	auto curPlayer = playersList[curPlayerIdx];
 	bool isCorrectChoice = false;
@@ -929,9 +934,6 @@ void gameRoomObjLayer::requestCheckOwnedMagic(cocos2d::EventCustom * checkOwnedM
 	}
 
 	curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
-	std::cout << "******" << std::endl
-		<< "requestCheckOwnedMagic() curProgressStage changed requestCheckOwnedMagic" << std::endl
-		<< "******" << std::endl;
 	netManager->requestCheckOwnedMagic(magicEnum, curPlayerIdx, damageValue);
 	runUpdate();
 }
@@ -954,6 +956,8 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		return;
 	}
 
+	changeLastPickedStone(pickedMagicEnum);
+
 	//----current player pointer
 	auto curPlayer = playersList[curPlayerIdx];
 	bool isCorrectChoice = false;
@@ -972,9 +976,6 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		else
 		{
 			curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
-			std::cout << "******" << std::endl
-				<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
-				<< "******" << std::endl;
 		}
 		return;
 	}
@@ -1052,9 +1053,6 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 		else// if (curGameMode == gameMetaData::gameMode::guest)
 		{
 			curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
-			std::cout << "******" << std::endl
-				<< "netmodeCheckOwnedMagic() curProgressStage changed requestCheckOwnedMagic" << std::endl
-				<< "******" << std::endl;
 		}
 	}
 	else
@@ -1068,9 +1066,6 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 			else if(curGameMode == gameMetaData::gameMode::guest)
 			{
 				curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
-				std::cout << "******" << std::endl
-					<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
-					<< "******" << std::endl;
 			}
 		}
 		else
@@ -1082,9 +1077,6 @@ void gameRoomObjLayer::netmodeCheckOwnedMagic()
 			else
 			{
 				curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
-				std::cout << "******" << std::endl
-					<< "netmodeCheckOwnedMagic() curProgressStage changed requestRefillHand" << std::endl
-					<< "******" << std::endl;
 			}
 		}
 	}
@@ -1300,6 +1292,15 @@ void gameRoomObjLayer::calcScore()
 		auto elemPlayerOrder = elemPlayer->getPlayOrder();
 		auto elemPlayerIdx = arrPlayerIdxInOrder[elemPlayerOrder];
 		//check Lp
+		if (abrakaWHAT)
+		{
+			if (elemPlayerIdx != curPlayerIdx)
+			{
+				buf4RoundEndPopUp.at(elemPlayerOrder) = 0;
+				continue;
+			}
+		}
+		
 		if (elemPlayer->getCurLP() > 0)
 		{
 			//at least have 1 Lp, get 1 point
@@ -1310,17 +1311,8 @@ void gameRoomObjLayer::calcScore()
 			arrScore.at(elemPlayerIdx) += elemPlayer->getBooungListSize();
 			buf4RoundEndPopUp.at(elemPlayerOrder) += elemPlayer->getBooungListSize();
 		}
-
-		if (abrakaWHAT)
-		{
-			if (elemPlayerIdx == curPlayerIdx)
-			{
-				continue;
-			}
-			arrScore.at(elemPlayerIdx) = 0;
-			buf4RoundEndPopUp.at(elemPlayerOrder) = 0;
-		}
 	}
+	abrakaWHAT = false;
 }
 
 void gameRoomObjLayer::callEndRoundEvent()
@@ -1462,9 +1454,6 @@ void gameRoomObjLayer::netmodePassTurn()
 		else
 		{
 			curProgressStage = gameMetaData::gameProgressStage::requestCheckOwnedMagic;
-			std::cout << "******" << std::endl
-				<< "netmodePassTurn() curProgressStage changed requestCheckOwnedMagic" << std::endl
-				<< "******" << std::endl;
 		}
 		EventCustom passTurnEvent("turnOverUIDisabled");
 		Director::getInstance()->getEventDispatcher()->dispatchEvent(&passTurnEvent);
@@ -1496,9 +1485,6 @@ void gameRoomObjLayer::requestRefillHand(player* curPlayer)
 	}
 
 	curProgressStage = gameMetaData::gameProgressStage::requestRefillHand;
-	std::cout << "******" << std::endl
-		<< "requestRefillHand() curProgressStage changed requestRefillHand" << std::endl
-		<< "******" << std::endl;
 	netManager->requestRefillHand(bufRefillHand, drawCnt, curPlayerIdx);
 }
 
@@ -1641,6 +1627,13 @@ void gameRoomObjLayer::writeErrLog(std::string logMsg)
 		logMsg << std::endl;
 
 	errLogStream.close();
+}
+
+void gameRoomObjLayer::changeLastPickedStone(const int magicEnum)
+{
+	arrLastPickedStones[lastPickedMsNum]->setVisible(false);
+	arrLastPickedStones[magicEnum]->setVisible(true);
+	lastPickedMsNum = magicEnum;
 }
 
 void gameRoomObjLayer::checkArrStones()

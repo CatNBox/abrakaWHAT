@@ -117,4 +117,10 @@ void spriteManager::preLoadingSprites()
 
 	tempSpr->initWithFile("UISprite/turnMarker01.png");
 	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "turnMarker01.png");
+
+	tempSpr->initWithFile("UISprite/sprLastPick.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "sprLastPick.png");
+
+	tempSpr->initWithFile("UISprite/ms_pass_abled_normal.png");
+	spriteCache->addSpriteFrame(tempSpr->getSpriteFrame(), "ms_pass_abled_normal.png");
 }

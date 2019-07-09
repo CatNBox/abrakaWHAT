@@ -29,6 +29,7 @@ private:
 	void createPlayerLpObj();
 	void createScoreSpr();
 	void createTurnMarker();
+	void createLastPickedStone();
 
 	void update(float dTime);
 	void runUpdate();
@@ -72,6 +73,9 @@ private:
 
 	//nullptr error log write
 	void writeErrLog(std::string logMsg);
+
+	//change lastPickedStone's texture
+	void changeLastPickedStone(const int magicEnum);
 	
 	gameMetaData::gameMode curGameMode;
 	gameMetaData::gameProgressStage curProgressStage;
@@ -95,6 +99,8 @@ private:
 	bool abrakaWHAT = false;
 
 	std::vector<magicStone*> arrStones;
+	std::vector<cocos2d::Sprite*> arrLastPickedStones;
+	int lastPickedMsNum;
 	std::vector<std::vector<std::pair<cocos2d::Sprite*, bool>>> seenChecker;
 
 	//vector[playerIndex] = score number sprite
